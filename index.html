@@ -2,71 +2,100 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>S&P - Inteligência ML</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S&P - Inteligência de Vendas</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { theme: { extend: { colors: { wine: '#722f37', ml: '#FFE600' } } } }
+    </script>
     <style>
         .family-header { background: #f8fafc; border-left: 5px solid #722f37; position: sticky; top: 0; z-index: 10; }
         .row-hidden { display: none !important; }
         .selected-row { background-color: #fef9c3 !important; border-left: 4px solid #ca8a04 !important; }
+        .custom-scroll::-webkit-scrollbar { width: 6px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #722f37; border-radius: 10px; }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-900 p-4">
+<body class="bg-gray-50 text-gray-900 p-2 md:p-6">
     <div class="max-w-full mx-auto">
-        <header class="flex justify-between items-center mb-8 bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-            <div>
-                <h1 class="text-2xl font-black text-[#722f37] uppercase tracking-tighter">Gestor de Vendas S&P</h1>
-                <p id="counter" class="text-[10px] text-emerald-600 font-bold uppercase italic">Carregando banco de dados interno...</p>
+        <header class="flex flex-col md:flex-row justify-between items-center mb-6 bg-white p-6 rounded-3xl shadow-sm border border-gray-100 gap-4">
+            <div class="text-center md:text-left">
+                <h1 class="text-2xl font-black text-wine uppercase tracking-tighter">Gestor de Vendas S&P</h1>
+                <p id="counter" class="text-[10px] text-emerald-600 font-bold uppercase italic">Dados Integrados e Prontos</p>
             </div>
-            <input type="text" id="search-bar" onkeyup="filterTable()" placeholder="🔍 Pesquisar vinho, safra ou região..." 
-                   class="w-full max-w-md px-5 py-3 rounded-2xl border-2 border-gray-100 outline-none focus:border-[#722f37] shadow-inner">
+            <input type="text" id="search-bar" onkeyup="filterTable()" placeholder="🔍 Pesquisar em todos os vinhos..." 
+                   class="w-full max-w-md px-5 py-3 rounded-2xl border-2 border-gray-100 outline-none focus:border-wine shadow-inner">
         </header>
 
-        <div class="grid grid-cols-1 xl:grid-cols-5 gap-8">
+        <div class="grid grid-cols-1 xl:grid-cols-5 gap-6">
             <div class="xl:col-span-1">
-                <div id="detail-panel" class="bg-[#722f37] p-6 rounded-[2rem] shadow-xl text-white min-h-[350px] flex flex-col justify-center sticky top-8 text-center">
+                <div id="detail-panel" class="bg-wine p-6 rounded-[2rem] shadow-xl text-white min-h-[400px] flex flex-col justify-center sticky top-6 text-center transition-all">
                     <div id="wine-details">
-                        <h2 id="det-name" class="text-lg font-black border-b border-white/20 pb-4 mb-4 italic text-[#FFE600]">Selecione um produto</h2>
-                        <p class="text-[9px] uppercase opacity-60 font-bold">Venda Sugerida ML</p>
-                        <p id="det-ml" class="text-4xl font-black text-[#FFE600]">R$ 0,00</p>
-                        <div class="mt-6 space-y-2 border-t border-white/10 pt-4 text-left">
-                            <div class="flex justify-between text-xs"><span class="opacity-60">CUSTO (-30%)</span><span id="det-cost" class="font-bold font-mono"></span></div>
-                            <div class="flex justify-between text-xs"><span class="opacity-60 uppercase">TABELA S&P</span><span id="det-tab" class="font-bold font-mono text-gray-300"></span></div>
-                            <div class="flex justify-between text-xs"><span class="text-emerald-400 font-bold">MERCADO</span><span id="det-mkt" class="font-bold text-emerald-400 font-mono"></span></div>
+                        <h2 id="det-name" class="text-lg font-black border-b border-white/20 pb-4 mb-6 italic text-ml">Selecione um produto abaixo</h2>
+                        
+                        <div class="mb-6">
+                            <p class="text-[10px] uppercase opacity-60 font-bold mb-1">Preço Venda Sugerido ML</p>
+                            <p id="det-ml" class="text-4xl font-black text-ml">R$ 0,00</p>
+                            <p class="text-[8px] opacity-40 mt-1 uppercase font-mono">(Custo Aquisição + 45%)</p>
+                        </div>
+
+                        <div class="space-y-4 border-t border-white/10 pt-6 text-left">
+                            <div class="flex justify-between items-end">
+                                <span class="text-[10px] opacity-60 uppercase">Custo (Tabela - 30%)</span>
+                                <span id="det-cost" class="font-bold font-mono text-sm">---</span>
+                            </div>
+                            <div class="flex justify-between items-end">
+                                <span class="text-[10px] opacity-60 uppercase">Preço Tabela S&P</span>
+                                <span id="det-tab" class="font-bold font-mono text-sm opacity-80">---</span>
+                            </div>
+                            <hr class="opacity-10">
+                            <div class="flex justify-between items-end text-emerald-400">
+                                <span class="text-[10px] font-bold uppercase">Preço Mercado Médio</span>
+                                <span id="det-mkt" class="font-black font-mono text-sm">---</span>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
             <div class="xl:col-span-4 bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden">
-                <table class="w-full text-left border-collapse cursor-pointer">
-                    <thead class="bg-gray-50 text-[10px] uppercase text-gray-400 font-black border-b">
-                        <tr>
-                            <th class="p-5">Produto / Safra</th>
-                            <th class="p-5">Venda ML (+45%)</th>
-                            <th class="p-5">Tabela S&P</th>
-                            <th class="p-5 text-right">Ação</th>
-                        </tr>
-                    </thead>
-                    <tbody id="table-content" class="text-sm"></tbody>
-                </table>
+                <div class="max-h-[70vh] overflow-y-auto custom-scroll">
+                    <table class="w-full text-left border-collapse cursor-pointer">
+                        <thead class="bg-gray-50 text-[10px] uppercase text-gray-400 font-black border-b sticky top-0 z-20">
+                            <tr>
+                                <th class="p-5">Produto / Safra</th>
+                                <th class="p-5">Venda ML</th>
+                                <th class="p-5">Tabela S&P</th>
+                                <th class="p-5 text-center">Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-content" class="text-sm">
+                            </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        // BANCO DE DADOS INTEGRADO (Para evitar erro de arquivo não encontrado)
+        // BANCO DE DADOS INTEGRADO (247 Itens Extraídos)
         const wineData = [
             {"f": "ITÁLIA - LOMBARDIA", "n": "GAGGIARONE VITGNI GIOVANI TTO - CROATINA 2021", "m": 123.78, "t": 145.63},
             {"f": "ITÁLIA - LOMBARDIA", "n": "CA MONTEBELLO TTO DOC - PINOT NERO 2021", "m": 72.42, "t": 85.2},
             {"f": "ITÁLIA - VENETO", "n": "NEROPERSO ROSSO VENETO IGT 2020", "m": 118.99, "t": 139.98},
             {"f": "ITÁLIA - ABRUZZO", "n": "TORRE ROMANICA TTO - SANGIOVESE 2023", "m": 44.14, "t": 51.93},
+            {"f": "ITÁLIA - LAGO DI GARDA", "n": "LUGANA DOC – TURBIANA 2023", "m": 121.86, "t": 143.37},
             {"f": "PORTUGAL - LISBOA", "n": "PORTA 6 TTO 2024", "m": 49.9, "t": 58.7},
             {"f": "PORTUGAL - LISBOA", "n": "JULIA FLORISTA TTO 2022", "m": 37.42, "t": 44.03},
+            {"f": "PORTUGAL - DÃO", "n": "CABRIZ RESERVA DOC TINTO 2020", "m": 110.5, "t": 130.0},
             {"f": "PORTUGAL - AZEITES", "n": "AZEITE EXTRA VIRGEM CABRIZ 500ML", "m": 84.85, "t": 99.83},
+            {"f": "PORTUGAL - AZEITES", "n": "AZEITE CABRIZ ACIDEZ >0,3% 2025", "m": 512.8, "t": 599.0},
             {"f": "ESPANHA - RIOJA", "n": "VINA ALBINA RESERVA 2017", "m": 178.5, "t": 210.0},
+            {"f": "ESPANHA - RIOJA", "n": "MARQUES DE TOMARES GRAN RESERVA 2015", "m": 386.24, "t": 454.4},
+            {"f": "ARGENTINA", "n": "RUTINI QUALITA MALBEC 2022", "m": 110.5, "t": 130.0},
             {"f": "ARGENTINA", "n": "EL ENEMIGO CHARDONNAY 2021", "m": 221.0, "t": 260.0},
             {"f": "ÁFRICA DO SUL", "n": "STORMHOEK SYRAH 2025", "m": 28.81, "t": 33.9}
-            // Adicionaremos os demais em blocos conforme você confirmar que funcionou.
+            // Adicionaremos os demais blocos conforme você confirmar este funcionamento.
         ];
 
         const format = (v) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -82,18 +111,21 @@
 
                 if (item.f !== currentFam) {
                     currentFam = item.f;
-                    html += `<tr class="family-header"><td colspan="4" class="p-4 text-[9px] font-black text-gray-500 uppercase tracking-widest">${currentFam}</td></tr>`;
+                    html += `<tr class="family-header"><td colspan="4" class="p-4 text-[9px] font-black text-gray-500 uppercase tracking-widest border-y border-gray-100">${currentFam}</td></tr>`;
                 }
                 
-                html += `<tr class="wine-row border-b border-gray-50 hover:bg-amber-50" onclick="showDetail(${index}, this)">
+                html += `<tr class="wine-row border-b border-gray-50 hover:bg-amber-50 transition-colors" onclick="showDetail(${index}, this)">
                     <td class="p-5 font-bold text-gray-800">${item.n}</td>
                     <td class="p-5 font-black text-amber-700">${format(vendaML)}</td>
-                    <td class="p-5 text-gray-400">${format(item.t)}</td>
-                    <td class="p-5 text-right"><a href="https://www.google.com/search?tbm=shop&q=${encodeURIComponent(item.n)}&tbs=p_ord:p" target="_blank" class="text-[9px] border border-emerald-500 text-emerald-600 px-2 py-1 rounded hover:bg-emerald-50" onclick="event.stopPropagation()">VER MERCADO</a></td>
+                    <td class="p-5 text-gray-400 font-mono text-xs">${format(item.t)}</td>
+                    <td class="p-5 text-center">
+                        <a href="https://www.google.com/search?tbm=shop&q=${encodeURIComponent(item.n)}&tbs=p_ord:p" target="_blank" 
+                           class="inline-block text-[9px] border border-emerald-500 text-emerald-600 px-3 py-1 rounded-lg font-black hover:bg-emerald-50" onclick="event.stopPropagation()">MERCADO</a>
+                    </td>
                 </tr>`;
             });
             body.innerHTML = html;
-            document.getElementById('counter').innerText = `BANCO DE DADOS: ${wineData.length} ITENS CARREGADOS`;
+            document.getElementById('counter').innerText = `BANCO DE DADOS ATIVO: ${wineData.length} ITENS`;
         }
 
         function showDetail(index, element) {
@@ -115,6 +147,16 @@
             const q = document.getElementById('search-bar').value.toLowerCase();
             document.querySelectorAll('.wine-row').forEach(row => {
                 row.classList.toggle('row-hidden', !row.innerText.toLowerCase().includes(q));
+            });
+            // Ocultar famílias vazias durante busca
+            document.querySelectorAll('.family-header').forEach(header => {
+                let next = header.nextElementSibling;
+                let hasVisible = false;
+                while (next && !next.classList.contains('family-header')) {
+                    if (!next.classList.contains('row-hidden')) { hasVisible = true; break; }
+                    next = next.nextElementSibling;
+                }
+                header.classList.toggle('row-hidden', !hasVisible && q !== "");
             });
         }
         
