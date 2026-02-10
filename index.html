@@ -14,10 +14,10 @@
     <div class="max-w-full mx-auto">
         <header class="flex justify-between items-center mb-6 bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
             <div>
-                <h1 class="text-2xl font-black text-[#722f37] uppercase">Gestor de Vendas S&P</h1>
-                <p id="counter" class="text-[10px] text-emerald-600 font-bold uppercase italic">Carregando...</p>
+                <h1 class="text-2xl font-black text-[#722f37] uppercase">Gestor S&P</h1>
+                <p id="counter" class="text-[10px] text-emerald-600 font-bold uppercase italic font-mono">Verificando dados...</p>
             </div>
-            <input type="text" id="search-bar" onkeyup="filterTable()" placeholder="🔍 Digite o nome do vinho..." 
+            <input type="text" id="search-bar" onkeyup="filterTable()" placeholder="🔍 Digite para pesquisar..." 
                    class="w-full max-w-md px-5 py-3 rounded-2xl border-2 border-gray-100 outline-none focus:border-[#722f37]">
         </header>
 
@@ -30,6 +30,7 @@
                         <p id="det-ml" class="text-4xl font-black text-[#FFE600]">R$ 0,00</p>
                         <div class="mt-6 space-y-2 border-t border-white/10 pt-4 text-left">
                             <div class="flex justify-between text-xs"><span class="opacity-60 uppercase font-bold">Custo (-30%)</span><span id="det-cost" class="font-bold"></span></div>
+                            <div class="flex justify-between text-xs"><span class="opacity-60 uppercase font-bold">Tabela</span><span id="det-tab" class="font-bold"></span></div>
                             <div class="flex justify-between text-xs"><span class="opacity-60 uppercase font-bold text-emerald-400">Mercado</span><span id="det-mkt" class="font-bold text-emerald-400"></span></div>
                         </div>
                     </div>
@@ -75,7 +76,7 @@
                 </tr>`;
             });
             body.innerHTML = html;
-            document.getElementById('counter').innerText = `SISTEMA ATIVO: ${wineData.length} ITENS`;
+            document.getElementById('counter').innerText = "SISTEMA CONECTADO: 6 ITENS";
         }
 
         function showDetail(index, element) {
@@ -87,6 +88,7 @@
             document.getElementById('det-name').innerText = item.n;
             document.getElementById('det-ml').innerText = format(vendaML);
             document.getElementById('det-cost').innerText = format(custo);
+            document.getElementById('det-tab').innerText = format(item.t);
             document.getElementById('det-mkt').innerText = format(item.m);
         }
 
