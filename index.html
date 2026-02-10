@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>S&P - Central de Inteligência de Mercado</title>
+    <title>S&P - Gestor de Margens</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = { theme: { extend: { colors: { wine: '#722f37', ml: '#FFE600' } } } }
@@ -21,33 +21,32 @@
         <header class="flex flex-col md:flex-row justify-between items-center mb-6 bg-white p-6 rounded-3xl shadow-sm border border-slate-200 gap-4">
             <div>
                 <h1 class="text-2xl font-black text-wine uppercase tracking-tighter">S&P Gestor de Vendas</h1>
-                <p id="counter" class="text-[10px] text-emerald-600 font-bold uppercase italic">Base de Dados: 244 Itens Carregados</p>
+                <p id="counter" class="text-[10px] text-emerald-600 font-bold uppercase italic">Preços com 30% de desconto aplicados</p>
             </div>
-            <input type="text" id="search-bar" onkeyup="filterTable()" placeholder="🔍 Pesquisar em todos os vinhos, safras ou famílias..." 
+            <input type="text" id="search-bar" onkeyup="filterTable()" placeholder="🔍 Pesquisar vinhos, azeites ou famílias..." 
                    class="w-full max-w-xl px-5 py-4 rounded-2xl border-2 border-slate-100 outline-none focus:border-wine shadow-inner text-lg">
         </header>
 
         <div class="grid grid-cols-1 xl:grid-cols-5 gap-6">
             <div class="xl:col-span-1">
                 <div id="detail-panel" class="bg-wine p-8 rounded-[2.5rem] shadow-2xl text-white min-h-[500px] flex flex-col justify-between sticky top-6 text-center border-4 border-white/10">
-                    <div>
-                        <h2 id="det-name" class="text-xl font-black border-b border-white/20 pb-4 mb-8 italic text-ml leading-tight uppercase">Selecione um vinho</h2>
+                    <div id="wine-details">
+                        <h2 id="det-name" class="text-xl font-black border-b border-white/20 pb-4 mb-8 italic text-ml leading-tight uppercase">Selecione um item</h2>
                         
                         <div class="mb-8">
-                            <p class="text-[10px] uppercase opacity-60 font-bold mb-2">Sugestão de Venda Mercado Livre</p>
+                            <p class="text-[10px] uppercase opacity-60 font-bold mb-2">Venda Sugerida ML (+45%)</p>
                             <p id="det-ml" class="text-5xl font-black text-ml">R$ 0,00</p>
                         </div>
 
                         <div class="bg-white/10 p-4 rounded-2xl mb-8">
-                            <p class="text-[10px] uppercase opacity-80 font-bold mb-1">Menor Preço Online (Ref.)</p>
-                            <p id="det-mkt" class="text-3xl font-black text-emerald-400">R$ 0,00</p>
+                            <p class="text-[10px] uppercase opacity-80 font-bold mb-1">Custo Líquido (-30%)</p>
+                            <p id="det-cost" class="text-3xl font-black text-white">R$ 0,00</p>
                         </div>
                     </div>
 
                     <div class="space-y-4 text-left text-sm font-bold border-t border-white/10 pt-6">
-                        <div class="flex justify-between"><span>CUSTO (-30%)</span><span id="det-cost" class="font-mono">---</span></div>
-                        <div class="flex justify-between opacity-60"><span>TABELA S&P</span><span id="det-tab" class="font-mono">---</span></div>
-                        <a id="det-link" href="#" target="_blank" class="block w-full bg-ml text-wine text-center py-4 rounded-2xl font-black uppercase tracking-widest text-xs shadow-xl hover:scale-105 transition-transform mt-4">Investigar Concorrência 🔗</a>
+                        <div class="flex justify-between text-emerald-400"><span>MENOR MERCADO</span><span id="det-mkt" class="font-mono text-lg">---</span></div>
+                        <a id="det-link" href="#" target="_blank" class="block w-full bg-ml text-wine text-center py-4 rounded-2xl font-black uppercase tracking-widest text-xs shadow-xl hover:scale-105 transition-transform mt-4">Ver Oferta Online 🔍</a>
                     </div>
                 </div>
             </div>
@@ -58,9 +57,9 @@
                         <thead class="bg-slate-50 text-[11px] uppercase text-slate-400 font-black border-b sticky top-0 z-20">
                             <tr>
                                 <th class="p-6">Vinho / Produto</th>
-                                <th class="p-6">Venda ML (+45%)</th>
-                                <th class="p-6">Tabela S&P</th>
-                                <th class="p-6 text-emerald-600 font-black">Preço Internet</th>
+                                <th class="p-6 text-amber-700">Venda ML</th>
+                                <th class="p-6">Custo S&P (-30%)</th>
+                                <th class="p-6 text-emerald-600 font-black">Ref. Mercado</th>
                                 <th class="p-6 text-center">Ação</th>
                             </tr>
                         </thead>
@@ -232,3 +231,4 @@
     </script>
 </body>
 </html>
+
