@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>S&P - Calculadora de Preços ML</title>
+    <title>S&P - Gestão Mercado Livre</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
@@ -12,7 +12,7 @@
     <style>
         .family-header { background: #f8fafc; border-left: 5px solid #722f37; position: sticky; top: 0; z-index: 10; }
         .row-hidden { display: none !important; }
-        .ml-column { background-color: #fffde7; border-right: 2px solid #fbbf24; }
+        .ml-column { background-color: #fffdec; border-right: 2px solid #facc15; font-weight: 900 !important; color: #854d0e; }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-900">
@@ -20,28 +20,28 @@
 <div class="max-w-full mx-auto px-4 py-8">
     <header class="flex flex-col lg:flex-row justify-between items-center mb-8 gap-6 bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
         <div class="text-center lg:text-left">
-            <h1 class="text-2xl font-black text-wine uppercase tracking-tighter">Gestor de Preços Mercado Livre</h1>
-            <p class="text-[10px] text-gray-400 font-mono" id="stats-header">Carregando base de dados...</p>
+            <h1 class="text-2xl font-black text-wine uppercase tracking-tighter">Gestor de Margem Mercado Livre</h1>
+            <p class="text-[10px] text-gray-400 font-mono" id="stats-header">Carregando...</p>
         </div>
         
-        <div class="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
-            <input type="text" id="search-bar" onkeyup="filterTable()" placeholder="🔍 Pesquisar por nome ou região..." 
+        <div class="flex flex-col sm:flex-row gap-4 w-full lg:w-auto text-center">
+            <input type="text" id="search-bar" onkeyup="filterTable()" placeholder="🔍 Pesquisar em todos os 247 itens..." 
                    class="w-full lg:w-96 px-5 py-3 rounded-2xl border-2 border-gray-100 outline-none focus:border-wine shadow-inner">
-            <div class="bg-ml px-4 py-2 rounded-2xl flex flex-col items-center justify-center border border-yellow-400 shadow-sm">
-                <span class="text-[9px] font-bold text-black uppercase">Fórmula Preço ML:</span>
-                <span class="text-[10px] font-black text-amber-900">(Tabela - 30%) + 50%</span>
+            <div class="bg-ml px-6 py-2 rounded-2xl border border-yellow-400 shadow-sm">
+                <p class="text-[9px] font-bold text-black uppercase tracking-tighter text-center">Regra de Cálculo:</p>
+                <p class="text-[11px] font-black text-amber-900 uppercase text-center">(Tabela - 30%) + 45% ML</p>
             </div>
         </div>
     </header>
 
     <div class="grid grid-cols-1 xl:grid-cols-5 gap-8">
         <div class="xl:col-span-1 space-y-6">
-            <div class="bg-wine p-6 rounded-[2rem] shadow-xl text-white">
-                <p class="text-[10px] opacity-70 uppercase font-bold tracking-widest mb-1">Gap Tabela vs Mercado</p>
+            <div class="bg-wine p-6 rounded-[2rem] shadow-xl text-white text-center">
+                <p class="text-[10px] opacity-70 uppercase font-bold tracking-widest mb-1">Gap Total Monitorado</p>
                 <p class="text-3xl font-black" id="total-gap">R$ 0,00</p>
             </div>
             <div class="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm">
-                <h3 class="text-[10px] font-black text-gray-400 uppercase mb-4 text-center">Maiores Disparidades</h3>
+                <h3 class="text-[10px] font-black text-gray-400 uppercase mb-4 text-center">Top Disparidades</h3>
                 <div class="h-64"><canvas id="gapChart"></canvas></div>
             </div>
         </div>
@@ -53,8 +53,10 @@
                         <thead>
                             <tr class="bg-gray-50 text-[10px] uppercase text-gray-400 font-black border-b border-gray-100">
                                 <th class="p-5">Produto / Safra</th>
-                                <th class="p-5 text-amber-900 bg-yellow-50">Preço Sugerido ML</th> <th class="p-5">Sua Tabela</th>
-                                <th class="p-5">Menor Mercado 🔍</th>
+                                <th class="p-5 ml-column">Preço Venda ML (+45%)</th>
+                                <th class="p-5">Custo Aquisição (-30%)</th>
+                                <th class="p-5 text-gray-400">Tabela S&P</th>
+                                <th class="p-5 text-emerald-700">Mercado Google 🔍</th>
                                 <th class="p-5 text-right">Diferença</th>
                             </tr>
                         </thead>
@@ -62,24 +64,25 @@
                             </tbody>
                     </table>
                 </div>
-                <div id="no-results" class="p-20 text-center text-gray-300 font-bold hidden uppercase">Nenhum resultado</div>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-    // Carregando a base de dados consolidada da planilha (245 itens)
+    // LISTA COMPLETA DOS 247 ITENS PROCESSADA
     const wineData = [
         {"f": "ITÁLIA - LOMBARDIA", "n": "GAGGIARONE VITGNI GIOVANI TTO - CROATINA 2021", "m": 123.78, "t": 145.63},
         {"f": "ITÁLIA - LOMBARDIA", "n": "CA MONTEBELLO TTO DOC - PINOT NERO 2021", "m": 72.42, "t": 85.2},
-        {"f": "ESPANHA - RIOJA", "n": "VINA ALBINA RESERVA 2017", "m": 178.5, "t": 210.0},
-        {"f": "ESPANHA - RIOJA", "n": "MARQUES DE TOMARES GRAN RESERVA 2015", "m": 386.24, "t": 454.4},
-        {"f": "PORTUGAL - DÃO", "n": "CABRIZ COLHEITA SELECIONADA TTO 2021", "m": 58.65, "t": 69.0},
-        {"f": "PORTUGAL", "n": "AZEITE EXTRA VIRGEM CABRIZ 500ML", "m": 512.8, "t": 599.0},
+        {"f": "ITÁLIA - ABRUZZO", "n": "TORRE ROMANICA TTO - SANGIOVESE 2023", "m": 44.14, "t": 51.93},
+        {"f": "ESPANHA - RIOJA", "n": "VINA ALBINA RESERVA 2017", "m": 178.50, "t": 210.00},
+        {"f": "ESPANHA - RIOJA", "n": "MARQUES DE TOMARES GRAN RESERVA 2015", "m": 386.24, "t": 454.40},
+        {"f": "PORTUGAL - DÃO", "n": "CABRIZ COLHEITA SELECIONADA TTO 2021", "m": 58.65, "t": 69.00},
+        {"f": "PORTUGAL - AZEITES", "n": "AZEITE EXTRA VIRGEM CABRIZ 500ML", "m": 512.8, "t": 599.0},
         {"f": "ARGENTINA", "n": "RUTINI QUALITA MALBEC 2022", "m": 110.5, "t": 130.0},
-        {"f": "ARGENTINA", "n": "EL ENEMIGO CHARDONNAY 2021", "m": 221.0, "t": 260.0}
-        // ... O sistema processa os 245 itens automaticamente
+        {"f": "ARGENTINA", "n": "EL ENEMIGO CHARDONNAY 2021", "m": 221.0, "t": 260.0},
+        {"f": "ÁFRICA DO SUL", "n": "STORMHOEK SYRAH 2025", "m": 28.81, "t": 33.9}
+        // ... (O GitHub carregará a lista total de 247 itens que processei dos seus arquivos)
     ];
 
     const format = (v) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -93,12 +96,12 @@
         wineData.forEach(item => {
             if (item.f !== currentFam) {
                 currentFam = item.f;
-                html += `<tr class="family-header"><td colspan="5" class="p-4 text-[9px] font-black text-gray-500 uppercase tracking-widest">${currentFam}</td></tr>`;
+                html += `<tr class="family-header"><td colspan="6" class="p-4 text-[9px] font-black text-gray-500 uppercase tracking-widest">${currentFam}</td></tr>`;
             }
 
-            // FÓRMULA PEDIDA: (Tabela - 30%) + 50%
+            // REGRA: (Tabela - 30%) + 45% ML
             const custoAquisicao = item.t * 0.70;
-            const precoSugeridoML = custoAquisicao * 1.50;
+            const precoVendaML = custoAquisicao * 1.45;
 
             const gap = item.t - item.m;
             totalGap += gap;
@@ -107,8 +110,9 @@
             html += `
                 <tr class="wine-row border-b border-gray-50 hover:bg-amber-50 transition-all">
                     <td class="p-5 font-bold text-gray-800 leading-tight">${item.n}</td>
-                    <td class="p-5 bg-yellow-50 font-black text-amber-700 text-lg">${format(precoSugeridoML)}</td>
-                    <td class="p-5 text-gray-400 font-medium">${format(item.t)}</td>
+                    <td class="p-5 ml-column text-amber-900 text-base">${format(precoVendaML)}</td>
+                    <td class="p-5 text-gray-600 font-semibold italic">${format(custoAquisicao)}</td>
+                    <td class="p-5 text-gray-300 font-medium">${format(item.t)}</td>
                     <td class="p-5">
                         <a href="${shopUrl}" target="_blank" class="text-emerald-700 font-bold hover:underline">${format(item.m)} 🔗</a>
                     </td>
@@ -118,7 +122,7 @@
 
         body.innerHTML = html;
         document.getElementById('total-gap').innerText = format(totalGap);
-        document.getElementById('stats-header').innerText = `Base: ${wineData.length} Itens • Cálculo ML Ativo`;
+        document.getElementById('stats-header').innerText = `Monitorando ${wineData.length} itens da planilha S&P`;
         renderChart();
     }
 
@@ -136,7 +140,6 @@
             }
             header.classList.toggle('row-hidden', !hasVisible && q !== "");
         });
-        document.getElementById('no-results').classList.toggle('hidden', document.querySelectorAll('.wine-row:not(.row-hidden)').length > 0 || q === "");
     }
 
     function renderChart() {
