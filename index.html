@@ -2,78 +2,90 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>S&P - Inteligência de Mercado</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        /* Estilos base */
         .family-header { background: #f8fafc; border-bottom: 2px solid #722f37; position: sticky; top: 0; z-index: 10; }
         .row-hidden { display: none !important; }
-        .selected-row { background-color: #fef9c3 !important; border-left: 8px solid #ca8a04 !important; }
-        .custom-scroll::-webkit-scrollbar { width: 6px; }
+        .selected-row { background-color: #fef9c3 !important; border-left: 6px solid #ca8a04 !important; }
+        
+        /* Barra de rolagem personalizada */
+        .custom-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
         .custom-scroll::-webkit-scrollbar-thumb { background: #722f37; border-radius: 10px; }
-        .wine-row { transition: all 0.2s ease; }
+        .custom-scroll::-webkit-scrollbar-track { background: #f1f1f1; }
+
+        /* Animações e Interações */
+        .wine-row { transition: background-color 0.2s ease; }
         .market-btn { cursor: pointer; transition: transform 0.2s, background-color 0.2s; }
         .market-btn:hover { transform: scale(1.02); background-color: #047857; }
         .market-btn:active { transform: scale(0.98); }
+
+        /* Ajustes Mobile Específicos */
+        @media (max-width: 768px) {
+            .selected-row { border-left-width: 4px !important; }
+        }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-900 p-2 md:p-4 font-sans">
-    <div class="max-w-full mx-auto">
-        <header class="flex flex-col md:flex-row justify-between items-center mb-4 bg-white p-6 rounded-3xl shadow-sm border border-gray-100 gap-4">
-            <div>
-                <h1 class="text-2xl font-black text-[#722f37] uppercase tracking-tighter leading-none">Gestor de Vendas S&P</h1>
+<body class="bg-gray-50 text-gray-900 p-2 lg:p-4 font-sans antialiased">
+    <div class="max-w-[1600px] mx-auto">
+        <header class="flex flex-col lg:flex-row justify-between items-center mb-4 bg-white p-4 lg:p-6 rounded-3xl shadow-sm border border-gray-100 gap-3 lg:gap-4 sticky top-0 z-30 lg:static">
+            <div class="text-center lg:text-left">
+                <h1 class="text-xl lg:text-2xl font-black text-[#722f37] uppercase tracking-tighter leading-none">Gestor S&P</h1>
                 <p id="counter" class="text-[10px] text-emerald-600 font-bold uppercase mt-1">Carregando...</p>
             </div>
-            <input type="text" id="search-bar" onkeyup="filterTable()" placeholder="🔍 Digite para buscar e trazer ao topo..." 
-                   class="w-full max-w-2xl px-5 py-4 rounded-2xl border-2 border-slate-200 outline-none focus:border-[#722f37] shadow-lg text-lg transition-shadow focus:shadow-xl">
+            <input type="text" id="search-bar" onkeyup="filterTable()" placeholder="🔍 Buscar vinho, safra ou região..." 
+                   class="w-full max-w-xl px-4 py-3 rounded-2xl border-2 border-slate-200 outline-none focus:border-[#722f37] shadow-sm text-base lg:text-lg transition-all focus:shadow-md appearance-none">
         </header>
 
-        <div class="grid grid-cols-1 xl:grid-cols-5 gap-4">
-            <div class="xl:col-span-1">
-                <div id="detail-panel" class="bg-[#722f37] p-8 rounded-[2.5rem] shadow-xl text-white min-h-[580px] flex flex-col justify-between sticky top-4 text-center border-4 border-white/10">
+        <div class="grid grid-cols-1 lg:grid-cols-5 gap-4 lg:gap-6">
+            
+            <div class="lg:col-span-1 order-1">
+                <div id="detail-panel" class="bg-[#722f37] p-6 lg:p-8 rounded-[2rem] shadow-xl text-white min-h-auto lg:min-h-[580px] flex flex-col justify-between relative lg:sticky lg:top-4 text-center border-4 border-white/10 transition-all">
                     <div id="wine-details">
-                        <h2 id="det-name" class="text-xl font-black border-b border-white/20 pb-4 mb-6 italic text-[#FFE600] uppercase leading-tight">Selecione um produto</h2>
+                        <h2 id="det-name" class="text-lg lg:text-xl font-black border-b border-white/20 pb-4 mb-4 italic text-[#FFE600] uppercase leading-tight">Selecione um item</h2>
                         
-                        <div class="mb-6">
+                        <div class="mb-4 lg:mb-6">
                             <p class="text-[10px] uppercase opacity-70 font-bold mb-1">Venda Sugerida ML</p>
-                            <p id="det-ml" class="text-5xl font-black text-[#FFE600] font-mono">R$ 0,00</p>
-                            <p class="text-[9px] opacity-40 mt-1 uppercase">(Tabela S&P + 45%)</p>
+                            <p id="det-ml" class="text-4xl lg:text-5xl font-black text-[#FFE600] font-mono">R$ 0,00</p>
+                            <p class="text-[9px] opacity-40 mt-1 uppercase">(Tabela + 45%)</p>
                         </div>
 
-                        <a id="det-mkt-link" href="#" target="_blank" class="block decoration-none market-btn bg-emerald-600 p-5 rounded-3xl mb-4 shadow-lg border-4 border-emerald-400 group relative overflow-hidden ring-4 ring-emerald-600/30">
+                        <a id="det-mkt-link" href="#" target="_blank" class="block decoration-none market-btn bg-emerald-600 p-4 lg:p-5 rounded-3xl mb-4 shadow-lg border-4 border-emerald-400 group relative overflow-hidden ring-4 ring-emerald-600/30">
                             <div class="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
-                            <p class="text-[10px] uppercase text-emerald-100 font-bold mb-1 italic relative z-10">Menor Preço Mercado</p>
-                            <p id="det-mkt" class="text-4xl font-black text-white font-mono relative z-10 drop-shadow-md">R$ 0,00</p>
-                            <p class="text-[11px] text-yellow-300 mt-2 font-black relative z-10 uppercase tracking-widest animate-pulse border-t border-white/20 pt-2">
+                            <p class="text-[9px] lg:text-[10px] uppercase text-emerald-100 font-bold mb-1 italic relative z-10">Menor Preço Mercado</p>
+                            <p id="det-mkt" class="text-3xl lg:text-4xl font-black text-white font-mono relative z-10 drop-shadow-md">R$ 0,00</p>
+                            <p class="text-[10px] lg:text-[11px] text-yellow-300 mt-2 font-black relative z-10 uppercase tracking-widest animate-pulse border-t border-white/20 pt-2">
                                 👉 Clique p/ Investigar 👈
                             </p>
                         </a>
                     </div>
 
-                    <div class="space-y-4 text-left text-sm font-bold border-t border-white/10 pt-6">
+                    <div class="space-y-3 lg:space-y-4 text-left text-sm font-bold border-t border-white/10 pt-4 lg:pt-6">
                         <div class="flex justify-between items-center">
                             <span class="text-[10px] opacity-70 uppercase">Preço Tabela</span>
-                            <span id="det-tab" class="font-mono text-xl text-white">---</span>
+                            <span id="det-tab" class="font-mono text-lg lg:text-xl text-white">---</span>
                         </div>
-                        <div class="bg-black/20 p-4 rounded-xl min-h-[60px] flex items-center justify-center">
-                            <p id="det-desc" class="text-[11px] opacity-90 font-medium italic leading-snug text-center">Detalhes técnicos aparecerão aqui.</p>
+                        <div class="bg-black/20 p-3 lg:p-4 rounded-xl min-h-[50px] lg:min-h-[60px] flex items-center justify-center">
+                            <p id="det-desc" class="text-[10px] lg:text-[11px] opacity-90 font-medium italic leading-snug text-center">Detalhes técnicos aparecerão aqui.</p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="xl:col-span-4 bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
-                <div class="max-h-[85vh] overflow-y-auto custom-scroll">
+            <div class="lg:col-span-4 order-2 bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden flex flex-col h-[60vh] lg:h-[85vh]">
+                <div class="overflow-auto custom-scroll flex-1">
                     <table id="wine-table" class="w-full text-left border-collapse cursor-pointer">
-                        <thead class="bg-gray-50 text-[11px] uppercase text-gray-400 font-black border-b sticky top-0 z-20">
+                        <thead class="bg-gray-50 text-[9px] lg:text-[11px] uppercase text-gray-400 font-black border-b sticky top-0 z-20">
                             <tr>
-                                <th class="p-6">Produto / Safra</th>
-                                <th class="p-6 text-amber-700">Venda ML</th>
-                                <th class="p-6">Tabela</th>
-                                <th class="p-6 text-emerald-600">Mercado</th>
+                                <th class="p-4 lg:p-6">Produto</th>
+                                <th class="p-4 lg:p-6 text-amber-700 text-right lg:text-left">Venda ML</th>
+                                <th class="hidden sm:table-cell p-4 lg:p-6">Tabela</th>
+                                <th class="hidden md:table-cell p-4 lg:p-6 text-emerald-600">Mercado</th>
                             </tr>
                         </thead>
-                        <tbody id="table-content" class="text-sm font-medium"></tbody>
+                        <tbody id="table-content" class="text-xs lg:text-sm font-medium"></tbody>
                     </table>
                 </div>
             </div>
@@ -81,267 +93,267 @@
     </div>
 
     <script>
-        // LISTA COMPLETA DOS 244 ITENS
+        // BASE DE DADOS COMPLETA - 244 ITENS
         const wineData = [
-    {"f": "ITÁLIA - LOMBARDIA", "n": "GAGGIARONE VITGNI GIOVANI TTO", "s": "2021", "t": 145.63, "m": 123.78, "d": "CROATINA"},
-    {"f": "ITÁLIA - LOMBARDIA", "n": "GAGGIARONE VITGNI GIOVANI TTO", "s": "", "t": 260.93, "m": 221.79, "d": "CROATINA"},
-    {"f": "ITÁLIA - LOMBARDIA", "n": "CA MONTEBELLO TTO DOC", "s": "2021", "t": 85.2, "m": 72.42, "d": "PINOT NERO"},
-    {"f": "ITÁLIA - LOMBARDIA", "n": "CA MONTEBELLO BCO DOC", "s": "2022", "t": 85.2, "m": 72.42, "d": "PINOT NERO BIANCO"},
-    {"f": "ITÁLIA - LOMBARDIA", "n": "CA MONTEBELLO BCO IGT", "s": "2021", "t": 85.2, "m": 72.42, "d": "PINOT GRIGIO"},
-    {"f": "ITÁLIA - LOMBARDIA", "n": "CA MONTEBELLO TTO DOC", "s": "2021", "t": 85.2, "m": 72.42, "d": "BARBERA, UVA RARA"},
-    {"f": "ITÁLIA - LOMBARDIA", "n": "NEROPERSO ROSSO VENETO IGT", "s": "2020", "t": 139.98, "m": 118.99, "d": "APASSIMENTO DE TINTAS VERONESES"},
-    {"f": "ITÁLIA - SICILIA", "n": "LIBURNA DOC SICILIA TTO", "s": "2020", "t": 42.42, "m": 36.06, "d": "NERO D´AVOLA"},
-    {"f": "ITÁLIA - ABRUZZO", "n": "BORGO DEL FILARI DOC D'ABRUZZO", "s": "2021", "t": 53.06, "m": 45.1, "d": "MONTEPULCIANO"},
-    {"f": "ITÁLIA - PUGLIA", "n": "LA FOGLIATA DI PUGLIA", "s": "2022", "t": 63.03, "m": 53.58, "d": "PRIMITIVO"},
-    {"f": "ITÁLIA - ABRUZZO", "n": "TORRE ROMANICA", "s": "2023", "t": 37.82, "m": 32.15, "d": "ROSSO"},
-    {"f": "ITÁLIA - ABRUZZO", "n": "TORRE ROMANICA", "s": "2023", "t": 37.82, "m": 32.15, "d": "BIANCO"},
-    {"f": "ITÁLIA - ABRUZZO", "n": "TORRE ROMANICA", "s": "2023", "t": 37.82, "m": 32.15, "d": "ROSATO"},
-    {"f": "ITÁLIA - ABRUZZO", "n": "TORRE ROMANICA TTO", "s": "2023", "t": 51.93, "m": 44.14, "d": "SANGIOVESE"},
-    {"f": "ITÁLIA - ABRUZZO", "n": "TORRE ROMANICA PINOT GRIGIO", "s": "", "t": 51.93, "m": 44.14, "d": ""},
-    {"f": "ITÁLIA - ABRUZZO", "n": "TORRE ROMANICA PUGLIA", "s": "2023", "t": 72.44, "m": 61.57, "d": "PRIMITIVO"},
-    {"f": "ITÁLIA - ABRUZZO", "n": "TORRE ROMANICA PREMIUM", "s": "2021", "t": 84.67, "m": 71.97, "d": "MONTEPULCIANO"},
-    {"f": "ITÁLIA - LOMBARDIA", "n": "LE CIME PASSITO IGT", "s": "2021", "t": 225.78, "m": 191.91, "d": "GARGANEGA, MOSCATO AMARELO"},
-    {"f": "ITÁLIA - LOMBARDIA", "n": "CARPINO GARDA DOC", "s": "2018", "t": 250.62, "m": 213.02, "d": "MERLOT"},
-    {"f": "ITÁLIA - LOMBARDIA", "n": "RIBÓ GARDA DOC", "s": "2019", "t": 153.53, "m": 130.5, "d": "CABERNET FRANC, CABERNET SAUVIGNON"},
-    {"f": "ITÁLIA - LOMBARDIA", "n": "MERIDIANO GARDA DOC", "s": "2023", "t": 143.37, "m": 121.86, "d": "CHARDONNAY"},
-    {"f": "ITÁLIA - LOMBARDIA", "n": "LUGANA DOC", "s": "2023", "t": 143.37, "m": 121.86, "d": "TURBIANA"},
-    {"f": "ITÁLIA - LOMBARDIA", "n": "CORNALINO ROSSO IGT ALTO MINCIO", "s": "2021", "t": 105.36, "m": 89.56, "d": "MERLOT, CABERNET"},
-    {"f": "ITÁLIA - LOMBARDIA", "n": "I CIOTTOLI GARDA DOC", "s": "2022", "t": 96.9, "m": 82.36, "d": "CABERNET FRANC, CAB. SAUVIGNON"},
-    {"f": "ITÁLIA - LOMBARDIA", "n": "LE MURE GARDA DOC", "s": "2023", "t": 90.12, "m": 76.61, "d": "CHARDONNAY"},
-    {"f": "ITÁLIA - LOMBARDIA", "n": "MANDORLO BIANCO IGT MANTOVA", "s": "2023", "t": 90.12, "m": 76.61, "d": "TOCAI FRIULANO"},
-    {"f": "ITÁLIA - LOMBARDIA", "n": "LA CASINA BIANCO GARDA DOC", "s": "2023", "t": 90.12, "m": 76.61, "d": "GARGANEGA, TREBBIANO, CHARDONNAY"},
-    {"f": "ITÁLIA - LOMBARDIA", "n": "LA CASINA CHIARETO GARDA DOC", "s": "2023", "t": 90.12, "m": 76.61, "d": "MERLOT, CABERNET, RONDINELLA"},
-    {"f": "ITÁLIA - LOMBARDIA", "n": "LA CASINA ROSSO GARDA DOC", "s": "2022", "t": 90.12, "m": 76.61, "d": "MERLOT, RONDINELLA, CAB. SAUVIGNON, SANGIOVESE"},
-    {"f": "FRANÇA - LANGUEDOC", "n": "DIRTY RABBIT TTO", "s": "2023", "t": 63.9, "m": 54.31, "d": "PETIT VERDOT"},
-    {"f": "FRANÇA - LANGUEDOC", "n": "CHARMING RABBIT BCO", "s": "2022", "t": 63.9, "m": 54.31, "d": "CHARDONNAY"},
-    {"f": "FRANÇA - LANGUEDOC", "n": "MRS. RABBIT TTO", "s": "2021", "t": 63.9, "m": 54.31, "d": "PINOT NOIR"},
-    {"f": "FRANÇA - LANGUEDOC", "n": "PINK RABBIT ROSÉ", "s": "2022", "t": 55.02, "m": 46.77, "d": "GRENACHE, SYRAH"},
-    {"f": "FRANÇA - LANGUEDOC", "n": "MR. RABBIT TTO", "s": "2021", "t": 53.25, "m": 45.26, "d": "CABERNET SAUVIGNON"},
-    {"f": "FRANÇA - LANGUEDOC", "n": "MASTER RABBIT TTO", "s": "2020", "t": 53.25, "m": 45.26, "d": "SYRAH"},
-    {"f": "FRANÇA - LANGUEDOC", "n": "SPRING RABBIT BCO", "s": "2022", "t": 53.25, "m": 45.26, "d": "SAUVIGNON BLANC"},
-    {"f": "FRANÇA - LANGUEDOC", "n": "CHATELAIN VALMONT COTES DU RHONE TTO", "s": "2021", "t": 60.35, "m": 51.3, "d": "GRENACHE SYRAH"},
-    {"f": "PORTUGAL - VERDE", "n": "PESCADA BRANCO, DOC VERDE", "s": "2024", "t": 37.82, "m": 32.15, "d": "AZAL, TRAJADURA, LOUREIRO e ARINTO"},
-    {"f": "PORTUGAL - VERDE", "n": "PESCADA ROSE, DOC VERDE", "s": "2024", "t": 37.82, "m": 32.15, "d": "TOURIGA NACIONAL, TINTA RORIZ E RUFETE"},
-    {"f": "PORTUGAL - VERDE", "n": "PESCADA", "s": "2023", "t": 75.64, "m": 64.29, "d": "ARINTO E TRAJADURA"},
-    {"f": "PORTUGAL - VERDE", "n": "PESCADA", "s": "2023", "t": 135.84, "m": 115.47, "d": "100% ALVARINHO"},
-    {"f": "PORTUGAL - LISBOA", "n": "PORTA 6 TTO meia garrafa", "s": "2023", "t": 35.0, "m": 29.75, "d": "ARAGONES, CASTELÃO, TOURIGA NACIONAL"},
-    {"f": "PORTUGAL - LISBOA", "n": "PORTA 6 BCO meia garrafa", "s": "2023", "t": 35.0, "m": 29.75, "d": "FERNÃO PIRES, ARINTO, SAUVIGNON BLANC"},
-    {"f": "PORTUGAL - LISBOA", "n": "ESPUMANTE PORTA 6 BCO BRUT", "s": "2023", "t": 58.7, "m": 49.9, "d": "ARINTO, FERNÃO PIRES, CHARDONNAY"},
-    {"f": "PORTUGAL - LISBOA", "n": "VINHO VERDE PORTA 6 DOC", "s": "2023", "t": 58.7, "m": 49.9, "d": "LOUREIRO, TRAJADURA, ARINTO"},
-    {"f": "PORTUGAL - LISBOA", "n": "VINHO VERDE PORTA 6 DOC", "s": "2023", "t": 58.7, "m": 49.9, "d": "LOUREIRO, TRAJADURA, ARINTO"},
-    {"f": "PORTUGAL - LISBOA", "n": "PORTA 6 BCO", "s": "2023", "t": 58.7, "m": 49.9, "d": "FERNÃO PIRES, ARINTO, SAUVIGNON BLANC"},
-    {"f": "PORTUGAL - LISBOA", "n": "PORTA 6 BCO", "s": "2023", "t": 58.7, "m": 49.9, "d": "FERNÃO PIRES, ARINTO, SAUVIGNON BLANC"},
-    {"f": "PORTUGAL - LISBOA", "n": "PORTA 6 ROSE", "s": "2023", "t": 58.7, "m": 49.9, "d": "CASTELÃO, TINTA RORIZ, SYRAH"},
-    {"f": "PORTUGAL - LISBOA", "n": "PORTA 6 TTO", "s": "2024", "t": 58.7, "m": 49.9, "d": "ARAGONES, CASTELÃO, TOURIGA NACIONAL"},
-    {"f": "PORTUGAL - LISBOA", "n": "PORTA 6 RESERVA TTO", "s": "2023", "t": 86.17, "m": 73.25, "d": "SYRAH, ALICANTE BOUSCHET, CABERNET, TGA NACIONAL"},
-    {"f": "PORTUGAL - LISBOA", "n": "PORTA 6 MAGNUN TTO", "s": "2023", "t": 90.69, "m": 77.09, "d": "ARAGONES, CASTELÃO, TOURIGA NACIONAL"},
-    {"f": "PORTUGAL - LISBOA", "n": "PORTA 6 DOUBLE MAGNUM TTO", "s": "2023", "t": 279.4, "m": 237.49, "d": "ARAGONES, CASTELÃO, TOURIGA NACIONAL"},
-    {"f": "PORTUGAL - LISBOA", "n": "BAG IN BOX PORTA 6 TTO", "s": "2023", "t": 110.91, "m": 94.28, "d": "ARAGONES, CASTELÃO, TOURIGA NACIONAL"},
-    {"f": "PORTUGAL - LISBOA", "n": "BAG IN BOX PORTA 6 BBC", "s": "2024", "t": 110.91, "m": 94.28, "d": "FERNÃO PIRES, ARINTO, SAUVIGNON BLANC"},
-    {"f": "PORTUGAL - LISBOA", "n": "PACK 2UN", "s": "2023", "t": 58.7, "m": 49.9, "d": "PORTA 6 TTO"},
-    {"f": "PORTUGAL - LISBOA", "n": "PACK 2UN", "s": "2023", "t": 58.7, "m": 49.9, "d": "(1 PORTA 6 TTO 1 PORTA 6 BBCO)"},
-    {"f": "PORTUGAL - LISBOA", "n": "PORTA 6 BITUBE TTO 2023", "s": "", "t": 135.47, "m": 115.15, "d": ""},
-    {"f": "PORTUGAL - LISBOA", "n": "DOM DINIS MESA TTO", "s": "2022", "t": 40.64, "m": 34.54, "d": "CASTELÃO, ARAGONEZ"},
-    {"f": "PORTUGAL - LISBOA", "n": "DOM DINIS MESA BCO", "s": "2021", "t": 40.64, "m": 34.54, "d": "FERNÃO PIRES, MOSCATEL"},
-    {"f": "PORTUGAL - LISBOA", "n": "RESERVA DOS AMIGOS REGIONAL TTO", "s": "2020", "t": 52.68, "m": 44.78, "d": "ARAGONES, CASTELÃO, TINTA MIUDA"},
-    {"f": "PORTUGAL - LISBOA", "n": "RESERVA DOS AMIGOS MAGNUN TTO", "s": "2020", "t": 84.67, "m": 71.97, "d": "ARAGONES, CASTELÃO, TINTA MIUDA"},
-    {"f": "PORTUGAL - LISBOA", "n": "RES. DOS AMIGOS SELEÇÃO ESPECIAL TTO", "s": "2019", "t": 114.02, "m": 96.92, "d": "TOURIGA NACIONAL, SYRAH, CABERNET"},
-    {"f": "PORTUGAL - LISBOA", "n": "BAG IN BOX BRANCO DOS AMIGOS", "s": "2023", "t": 146.76, "m": 124.74, "d": "FERNAO PIRES, MOSCATEL"},
-    {"f": "PORTUGAL - LISBOA", "n": "BAG IN BOX TINTO DOS AMIGOS", "s": "2022", "t": 146.76, "m": 124.74, "d": "TINTA RORIZ, CASTELAO. TINTA MUIDA"},
-    {"f": "PORTUGAL - LISBOA", "n": "VINHO VERDE 3 AUTORES DOC BCO", "s": "2022", "t": 56.44, "m": 47.98, "d": "LOUREIRO, TRAJADURA, ARINTO"},
-    {"f": "PORTUGAL - LISBOA", "n": "3 AUTORES DOURO DOC TTO", "s": "2019", "t": 56.44, "m": 47.98, "d": "TOURIGA FRANCA, TINTA RORIZ, TOURIGA NACIONAL"},
-    {"f": "PORTUGAL - LISBOA", "n": "3 AUTORES DOURO DOC BCO", "s": "2019", "t": 56.44, "m": 47.98, "d": "VIOSINHO, MALVASIA FINA, RABIGATO"},
-    {"f": "PORTUGAL - LISBOA", "n": "3 AUTORES GRANDE RESERVA TTO", "s": "2016", "t": 340.93, "m": 289.79, "d": "CAB. SAUVIGNON, SYRAH, TGA NACIONAL, AL. BOUSCHET"},
-    {"f": "PORTUGAL - LISBOA", "n": "CORAGEM SUPERIOR TTO", "s": "2020", "t": 95.96, "m": 81.56, "d": "TOURIGA NACIONAL"},
-    {"f": "PORTUGAL - LISBOA", "n": "CORAGEM SUPERIOR BCO", "s": "2021", "t": 95.96, "m": 81.56, "d": "CHARDONNAY"},
-    {"f": "PORTUGAL - LISBOA", "n": "CORAGEM RESERVA TTO", "s": "2019", "t": 57.39, "m": 48.78, "d": "SYRAH, CASTELÃO, ARAGONEZ"},
-    {"f": "PORTUGAL - LISBOA", "n": "CORAGEM REGIONAL LISBOA TTO", "s": "2019", "t": 45.28, "m": 38.49, "d": "CASTELÇAO, SYRAH, ARAGONEZ"},
-    {"f": "PORTUGAL - LISBOA", "n": "N.B.N.C NO BRANDING, NO CRY TTO", "s": "2020", "t": 53.06, "m": 45.1, "d": "ARAGONEZ, CASTELÃO, TINTA MIUDA"},
-    {"f": "PORTUGAL - LISBOA", "n": "BRUTALIS BY VIDIGAL TTO", "s": "2018", "t": 347.14, "m": 295.07, "d": "ALICANTE BOUSCHET, CABERNET SAUVIGNON"},
-    {"f": "PORTUGAL - LISBOA", "n": "BRUTALIS BY VIDIGAL TTO", "s": "2018", "t": 378.18, "m": 321.45, "d": "ALICANTE BOUSCHET, CABERNET SAUVIGNON"},
-    {"f": "PORTUGAL - LISBOA", "n": "VIDIGAL RESERVA TTO", "s": "2021", "t": 48.54, "m": 41.26, "d": "ARAGONEZ, SYRAH,CABERNET SAUVIGNON"},
-    {"f": "PORTUGAL - LISBOA", "n": "VIDIGAL SINGLE GRAPE TTO", "s": "", "t": 67.73, "m": 57.57, "d": "TOURIGA NACIONAL"},
-    {"f": "PORTUGAL - LISBOA", "n": "VIDIGAL CHAPEU DE PRAIA ROSÉ", "s": "2021", "t": 45.16, "m": 38.38, "d": "ARAGONEZ, CASTELÃO"},
-    {"f": "PORTUGAL - LISBOA", "n": "ZÉ DO TELHADO DOC DOURO", "s": "2019", "t": 50.8, "m": 43.18, "d": "TGA FRANCA.TTA RORIZ,TGA NACIONAL"},
-    {"f": "PORTUGAL - LISBOA", "n": "BOA NOITE LISBOAL TINTO REGIONAL LISBOA", "s": "", "t": 59.83, "m": 50.86, "d": "SYRAH,TOURIGA NACIONAL"},
-    {"f": "PORTUGAL - LISBOA", "n": "BOA NOITE LISBOA BRANCO", "s": "", "t": 59.83, "m": 50.86, "d": "REGIONAL LISBOA"},
-    {"f": "PORTUGAL - LISBOA", "n": "BOA NOITE LISBOA ROSE", "s": "", "t": 59.83, "m": 50.86, "d": "REGIONAL LISBOA"},
-    {"f": "PORTUGAL - LISBOA", "n": "JULIA FLORISTA TTO", "s": "2022", "t": 44.03, "m": 37.42, "d": "CASTELAO, ARAGONEZ"},
-    {"f": "PORTUGAL - LISBOA", "n": "JULIA FLORISTA BCO", "s": "2022", "t": 44.03, "m": 37.42, "d": "FERNAO PIRES, MOSCATEL"},
-    {"f": "PORTUGAL - LISBOA", "n": "JULIA FLORISTA ROSE", "s": "2022", "t": 44.03, "m": 37.42, "d": "CASTELÃO, TINTA RORIZ, SYRAH"},
-    {"f": "PORTUGAL - LISBOA", "n": "JULIA FLORISTA ROSE", "s": "2022", "t": 44.03, "m": 37.42, "d": "CASTELÃO, TINTA RORIZ, SYRAH"},
-    {"f": "PORTUGAL - LISBOA", "n": "JULIA FLORISTA TTO", "s": "2021", "t": 54.19, "m": 46.06, "d": "RESERVA"},
-    {"f": "PORTUGAL - LISBOA", "n": "BAG IN BOX JULIA FLORISTA BCO", "s": "2023", "t": 151.27, "m": 128.58, "d": "FERNAO PIRES, MOSCATEL"},
-    {"f": "PORTUGAL - LISBOA", "n": "BAG IN BOX JULIA FLORISTA TTO", "s": "2023", "t": 151.27, "m": 128.58, "d": "CASTAELAO, ARAGONEZ"},
-    {"f": "PORTUGAL - LISBOA", "n": "JULIA FLORISTA BITUBE TTO 2022", "s": "", "t": 121.07, "m": 102.91, "d": ""},
-    {"f": "PORTUGAL - LISBOA", "n": "ARTOLAS TINTO", "s": "2019", "t": 40.64, "m": 34.54, "d": "CASTELÃO, ARAGONEZ"},
-    {"f": "PORTUGAL - LISBOA", "n": "ARTOLAS BRANCO", "s": "2020", "t": 40.64, "m": 34.54, "d": "FERNÃO PIRES, ARINTO, SAUVIGNON BLANC"},
-    {"f": "PORTUGAL - LISBOA", "n": "ARTOLAS ROSÉ", "s": "2020", "t": 40.64, "m": 34.54, "d": "CASTELÃO, TINTA RORIZ"},
-    {"f": "PORTUGAL - BAIRRADA", "n": "DA PIPA BRANCO", "s": "2022", "t": 27.09, "m": 23.03, "d": "MARIA GOMES, BICAL"},
-    {"f": "PORTUGAL - BAIRRADA", "n": "DA PIPA TINTO", "s": "2022", "t": 27.09, "m": 23.03, "d": "BAGA, TOURIGA NACIONAL, ARAGONEZ"},
-    {"f": "PORTUGAL - BAIRRADA", "n": "DA PIPA ROSÉ", "s": "2022", "t": 27.09, "m": 23.03, "d": "BAGA"},
-    {"f": "PORTUGAL - BAIRRADA", "n": "DA PIPA BRANCO", "s": "2022", "t": 38.38, "m": 32.63, "d": "MARIA GOMES, BICAL"},
-    {"f": "PORTUGAL - BAIRRADA", "n": "DA PIPA ROSÉ", "s": "2022", "t": 38.38, "m": 32.63, "d": "BAGA"},
-    {"f": "PORTUGAL - BAIRRADA", "n": "DA PIPA TINTO", "s": "2023", "t": 38.38, "m": 32.63, "d": "BAGA, TOURIGA NACIONAL, ARAGONEZ"},
-    {"f": "PORTUGAL - BAIRRADA", "n": "DA PIPA FRISANTE BRANCO", "s": "2023", "t": 32.74, "m": 27.83, "d": ""},
-    {"f": "PORTUGAL - BAIRRADA", "n": "DA PIPA FRISANTE ROSE", "s": "2023", "t": 32.74, "m": 27.83, "d": ""},
-    {"f": "PORTUGAL - BAIRRADA", "n": "DA PIPA ESPUMANTE BRANCO", "s": "2022", "t": 52.87, "m": 44.94, "d": ""},
-    {"f": "PORTUGAL - BAIRRADA", "n": "DA PIPA ESPUMANTE ROSE", "s": "2022", "t": 52.87, "m": 44.94, "d": ""},
-    {"f": "PORTUGAL - BAIRRADA", "n": "DA PIPA BAG IN BOX BCO", "s": "2023", "t": 128.69, "m": 109.39, "d": "MARIA GOMES, BICAL"},
-    {"f": "PORTUGAL - BAIRRADA", "n": "DA PIPA BAG IN BOX ROSÉ", "s": "2023", "t": 128.69, "m": 109.39, "d": "BAGA"},
-    {"f": "PORTUGAL - BAIRRADA", "n": "DA PIPA BAG IN BOX TTO", "s": "2023", "t": 128.69, "m": 109.39, "d": "BAGA, ARAGONEZ, TOURIGA NACIONAL, CASTELÃO"},
-    {"f": "PORTUGAL - BAIRRADA", "n": "DA PIPA RESERVA IG BCO", "s": "2020", "t": 64.35, "m": 54.7, "d": "BICAL, MARIA GOMES, ARINTO"},
-    {"f": "PORTUGAL - BAIRRADA", "n": "DA PIPA RESERVA IG TTO", "s": "2018", "t": 64.35, "m": 54.7, "d": "BAGA, ARAGONEZ, TOURIGA NACIONAL"},
-    {"f": "PORTUGAL - BAIRRADA", "n": "DA PIPA SIGNATURE DOC TTO", "s": "2017", "t": 90.69, "m": 77.09, "d": "BAGA"},
-    {"f": "PORTUGAL - BAIRRADA", "n": "DA PIPA SIGNATURE DOC BCO", "s": "2019", "t": 90.69, "m": 77.09, "d": "ARINTO"},
-    {"f": "PORTUGAL -AMARALEZA VINHOS -", "n": "FONTE DA PERDIZ RESERVA, TINTO", "s": "", "t": 68.13, "m": 57.91, "d": "DOURO DOC"},
-    {"f": "PORTUGAL -AMARALEZA VINHOS -", "n": "FONTE DA PERDIZ, TINTO", "s": "", "t": 52.31, "m": 44.46, "d": "DOURO DOC"},
-    {"f": "PORTUGAL -AMARALEZA VINHOS -", "n": "FONTE DA PERDIZ , BRANCO", "s": "", "t": 52.31, "m": 44.46, "d": "DOURO DOC"},
-    {"f": "PORTUGAL -AMARALEZA VINHOS -", "n": "FONTE DA PERDIZ SUPERIOR, TINTO", "s": "2020", "t": 74.94, "m": 63.7, "d": "DOURO DOC"},
-    {"f": "PORTUGAL -AMARALEZA VINHOS -", "n": "INTIMISTA", "s": "2023", "t": 31.8, "m": 27.03, "d": "TINTO"},
-    {"f": "PORTUGAL -AMARALEZA VINHOS -", "n": "INTIMISTA", "s": "2023", "t": 31.8, "m": 27.03, "d": "BRANCO"},
-    {"f": "PORTUGAL -AMARALEZA VINHOS -", "n": "INTIMISTA", "s": "2023", "t": 31.8, "m": 27.03, "d": "ROSE"},
-    {"f": "PORTUGAL - AÇORES - DOC PICO", "n": "EURUPTIO, BLEND DOS ACORES, D.O PICO", "s": "2021", "t": 241.58, "m": 205.35, "d": "ARINTO,VERDELHO,TERRANTES"},
-    {"f": "PORTUGAL - AÇORES - DOC PICO", "n": "ERUPTIO, DOS ACORES, D.O PICO", "s": "2020", "t": 301.42, "m": 256.2, "d": "ARINTO"},
-    {"f": "PORTUGAL - AÇORES - DOC PICO", "n": "ERUPTIO, DOS ACORES, D.O PICO", "s": "2021", "t": 331.9, "m": 282.11, "d": "VERDELHO"},
-    {"f": "PORTUGAL -LISBOA - FLOR DE LISBOA", "n": "FLOR DE LISBOA TINTO REGIONAL LISBOA", "s": "2021", "t": 36.88, "m": 31.35, "d": "ALICANTE BOUSCHET,CASTELÃO,TGA NACIONAL"},
-    {"f": "PORTUGAL -LISBOA - FLOR DE LISBOA", "n": "FLOR DE LISBOA BRANCO", "s": "2023", "t": 36.88, "m": 31.35, "d": "REGIONAL LISBOA"},
-    {"f": "PORTUGAL -LISBOA - FLOR DE LISBOA", "n": "FLOR DE LISBOA ROSE", "s": "2023", "t": 36.88, "m": 31.35, "d": "REGIONAL LISBOA"},
-    {"f": "PORTUGAL - ALENTEJO - HERDADE DA MADEIRA VELHA - ABELHARUCO", "n": "ABELHARUCO TINTO COLHEITA SELECIONADA", "s": "2021", "t": 48.92, "m": 41.58, "d": "ALICANTE,TRINCADEIRA,ARAGONEZ,SYRAH"},
-    {"f": "PORTUGAL - ALENTEJO - HERDADE DA MADEIRA VELHA - ABELHARUCO", "n": "ABELHARUCO BRANCO COLHEITA SELECIONADA", "s": "2022", "t": 48.92, "m": 41.58, "d": "ANTÃO VAZ,ARINTO,VERDELHO"},
-    {"f": "HERDADE DO GAMITO - ALENTEJO", "n": "HERDADE DO GAMITO TINTO ESPECIAL", "s": "2021", "t": 98.29, "m": 83.55, "d": "ALICANTE,SYRAH,ARAGONEZ,CAB.SAUV.MERLOT"},
-    {"f": "HERDADE DO GAMITO - ALENTEJO", "n": "HERDADE DO GAMITO TINTO ESPECIAL", "s": "2021", "t": 98.29, "m": 83.55, "d": "ALICANTE,SYRAH,ARAGONEZ,CAB.SAUV.MERLOT"},
-    {"f": "HERDADE DO GAMITO - ALENTEJO", "n": "HERDADE DO GAMITO BRANCO ESPECIAL", "s": "2023", "t": 98.29, "m": 83.55, "d": "ARINTO,ALVARINHO,VERDELHO"},
-    {"f": "HERDADE DO GAMITO - ALENTEJO", "n": "HERDADE DO GAMITO BRANCO ESPECIAL", "s": "2022", "t": 98.29, "m": 83.55, "d": "ARINTO,ALVARINHO,VERDELHO"},
-    {"f": "HERDADE DO GAMITO - ALENTEJO", "n": "HERDADE DO GAMITO ROSE", "s": "", "t": 98.29, "m": 83.55, "d": ""},
-    {"f": "HERDADE DO GAMITO - ALENTEJO", "n": "HERDADE DO GAMITO BRANCO", "s": "2020", "t": 98.29, "m": 83.55, "d": "VERDELHO"},
-    {"f": "HERDADE DO GAMITO - ALENTEJO", "n": "HERDADE DO GAMITO TINTO", "s": "2021", "t": 98.29, "m": 83.55, "d": "ALICANTE BOUSCHET"},
-    {"f": "HERDADE DO GAMITO - ALENTEJO", "n": "HERDADE DO GAMITO TINTO", "s": "2021", "t": 98.29, "m": 83.55, "d": "CABERNET SAUVIGNON"},
-    {"f": "HERDADE DO GAMITO - ALENTEJO", "n": "HERDADE DO GAMITO TINTO", "s": "2023", "t": 98.29, "m": 83.55, "d": "CABERNET SAUVIGNON"},
-    {"f": "HERDADE DO GAMITO - ALENTEJO", "n": "HERDADE DO GAMITO TINTO", "s": "2022", "t": 98.29, "m": 83.55, "d": "SYRAH"},
-    {"f": "HERDADE DO GAMITO - ALENTEJO", "n": "HERDADE DO GAMITO TINTO", "s": "2023", "t": 98.29, "m": 83.55, "d": "SYRAH"},
-    {"f": "HERDADE DO GAMITO - ALENTEJO", "n": "HERDADE DO GAMITO RESERVA TINTO", "s": "2020", "t": 105.93, "m": 90.04, "d": "SYRAH,ALICANTE BOUCHET"},
-    {"f": "PORTUGAL ADEGA COOPERATIVA DE MEDA", "n": "FLOR D'PENALVA, TINTO C.S", "s": "2021", "t": 44.59, "m": 37.9, "d": "DOC DÃO"},
-    {"f": "PORTUGAL ADEGA COOPERATIVA DE MEDA", "n": "FLOR D'PENALVA, BRANCO C.S", "s": "2023", "t": 44.59, "m": 37.9, "d": "DOC DÃO"},
-    {"f": "PORTUGAL ADEGA COOPERATIVA DE MEDA", "n": "FLOR D'PENALVA, TINTO RESERVA", "s": "2021", "t": 49.67, "m": 42.22, "d": "DOC DÃO"},
-    {"f": "PORTUGAL ADEGA COOPERATIVA DE MEDA", "n": "GAIÃO", "s": "", "t": 45.05, "m": 38.29, "d": "TINTO"},
-    {"f": "PORTUGAL ADEGA COOPERATIVA DE MEDA", "n": "GAIÃO RESERVA", "s": "", "t": 112.81, "m": 95.89, "d": "TINTO"},
-    {"f": "PORTUGAL  - PONTE DA BARCA - VINHO VERDE", "n": "VINHO VERDE BRANCO GIGANTONES", "s": "2024", "t": 37.82, "m": 32.15, "d": "LOUREIRO, ARINTO, TRAJADURA"},
-    {"f": "PORTUGAL  - PONTE DA BARCA - VINHO VERDE", "n": "VINHO VERDE ROSE GIGANTONES", "s": "2022", "t": 37.82, "m": 32.15, "d": "VINHÃO, BORRAÇAL, ESPADEIRO"},
-    {"f": "PORTUGAL  - PONTE DA BARCA - VINHO VERDE", "n": "LATA VINHO VERDE BRANCO GIGANTONES", "s": "2023", "t": 21.17, "m": 17.99, "d": "LOUREIRO, ARINTO, TRAJADURA"},
-    {"f": "PORTUGAL  - PONTE DA BARCA - VINHO VERDE", "n": "LATA VINHO VERDE BRANCO GIGANTONES", "s": "2024", "t": 21.17, "m": 17.99, "d": "LOUREIRO, ARINTO, TRAJADURA"},
-    {"f": "PORTUGAL  - PONTE DA BARCA - VINHO VERDE", "n": "LATA VINHO VERDE ROSE GIGANTONES", "s": "2023", "t": 21.17, "m": 17.99, "d": "VINHÃO, BORRAÇAL, ESPADEIRO"},
-    {"f": "PORTUGAL  - PONTE DA BARCA - VINHO VERDE", "n": "LATA VINHO VERDE ROSE GIGANTONES", "s": "2024", "t": 21.17, "m": 17.99, "d": "VINHÃO, BORRAÇAL, ESPADEIRO"},
-    {"f": "PORTUGAL  - PONTE DA BARCA - VINHO VERDE", "n": "GAFA RESERVA VINHO VERDE DOC", "s": "2022", "t": 75.64, "m": 64.29, "d": "ALVARINHO"},
-    {"f": "PORTUGAL - PORTO MARTHA’S WINES & SPIRITS", "n": "MOSCATEL DO DOURO", "s": "", "t": 59.64, "m": 50.7, "d": "DOC"},
-    {"f": "PORTUGAL - PORTO MARTHA’S WINES & SPIRITS", "n": "PORTO WHITE", "s": "", "t": 71.87, "m": 61.09, "d": "Malvasia Fina Viosinho,Donzelinho,Gouveio,Moscatel,Rabigato"},
-    {"f": "PORTUGAL - PORTO MARTHA’S WINES & SPIRITS", "n": "PORTO RUBY", "s": "", "t": 71.87, "m": 61.09, "d": "Tga Nacional,Tga Franca,Tta Barroca,Tto Cão,Tta Amarela,Tta Roriz"},
-    {"f": "PORTUGAL - PORTO MARTHA’S WINES & SPIRITS", "n": "PORTO TAWNY", "s": "", "t": 71.87, "m": 61.09, "d": "Tga Nacional,Tga Franca,Tta Barroca,Tto Cão,Tta Amarela,Tta Roriz"},
-    {"f": "PORTUGAL - PORTO MARTHA’S WINES & SPIRITS", "n": "PORTO ROSE", "s": "", "t": 105.47, "m": 89.65, "d": ""},
-    {"f": "PORTUGAL - PORTO MARTHA’S WINES & SPIRITS", "n": "PORTO 10 ANOS", "s": "", "t": 219.6, "m": 186.66, "d": "Tga Nacional,Tga Franca,Tta Barroca,Tto Cão,Tta Amarela,Tta Roriz"},
-    {"f": "PORTUGAL - PORTO MARTHA’S WINES & SPIRITS", "n": "PORTO 20 ANOS", "s": "", "t": 374.31, "m": 318.17, "d": "Tga Nacional,Tga Franca,Tta Barroca,Tto Cão,Tta Amarela,Tta Roriz"},
-    {"f": "PORTUGAL . AMARELEZA VINHOS . DOURO. VERDE . AMO.TE", "n": "AMO-TE BRANCO, VERDE DOC", "s": "2023", "t": 45.16, "m": 38.38, "d": "LOUREIRO,ARINTO,TRAJADURA"},
-    {"f": "PORTUGAL . AMARELEZA VINHOS . DOURO. VERDE . AMO.TE", "n": "AMO-TE ROSE, VERDE DOC", "s": "2022", "t": 45.16, "m": 38.38, "d": "VINHÃO,BORRAÇÃL,ESPADEIRO"},
-    {"f": "PORTUGAL . AMARELEZA VINHOS . DOURO. VERDE . AMO.TE", "n": "AMO-TE ROSE, VERDE DOC", "s": "2023", "t": 45.16, "m": 38.38, "d": "VINHÃO,BORRAÇÃL,ESPADEIRO"},
-    {"f": "PORTUGAL . AMARELEZA VINHOS . DOURO. VERDE . AMO.TE", "n": "AMO-TE TINTO, DOURO DOC", "s": "2020", "t": 52.87, "m": 44.94, "d": "TGA NACIONAL,TTA RORIZ,TGA FRANCA,TTA BARROCA"},
-    {"f": "PORTUGAL . CABRIZ. DÃO", "n": "C de CABRIZ", "s": "2022", "t": 42.6, "m": 36.21, "d": "TINTO"},
-    {"f": "PORTUGAL . CABRIZ. DÃO", "n": "C de CABRIZ", "s": "2022", "t": 42.6, "m": 36.21, "d": "TINTO"},
-    {"f": "PORTUGAL . CABRIZ. DÃO", "n": "C de CABRIZ", "s": "2022", "t": 42.6, "m": 36.21, "d": "BRANCO"},
-    {"f": "PORTUGAL . CABRIZ. DÃO", "n": "C de CABRIZ", "s": "2022", "t": 42.6, "m": 36.21, "d": "ROSE"},
-    {"f": "PORTUGAL . CABRIZ. DÃO", "n": "C de CABRIZ", "s": "2022", "t": 42.6, "m": 36.21, "d": "ROSE"},
-    {"f": "PORTUGAL . CABRIZ. DÃO", "n": "C de CABRIZ", "s": "2022", "t": 53.25, "m": 45.26, "d": "VERDE BRANCO"},
-    {"f": "PORTUGAL . CABRIZ. DÃO", "n": "CABRIZ MEIA GARRAFA COLHEITA SELECIONADA DOC TINTO", "s": "2022", "t": 37.87, "m": 32.19, "d": "Alfrocheiro, Aragonez, Touriga Nacional"},
-    {"f": "PORTUGAL . CABRIZ. DÃO", "n": "CABRIZ COLHEITA SELECIONADA DOC TINTO", "s": "2022", "t": 63.59, "m": 54.06, "d": "Alfrocheiro, Aragonez, Touriga Nacional"},
-    {"f": "PORTUGAL . CABRIZ. DÃO", "n": "CABRIZ MAGNUM COLHEITA SELECIONADA DOC TINTO", "s": "2022", "t": 143.86, "m": 122.28, "d": "Alfrocheiro, Aragonez, Touriga Nacional"},
-    {"f": "PORTUGAL . CABRIZ. DÃO", "n": "CABRIZ MAGNUM COLHEITA SELECIONADA DOC TINTO", "s": "2022", "t": 143.86, "m": 122.28, "d": "Alfrocheiro, Aragonez, Touriga Nacional"},
-    {"f": "PORTUGAL . CABRIZ. DÃO", "n": "CABRIZ MEIA GARRAFA COLHEITA SELECIONADA DOC BRANCO", "s": "2023", "t": 37.87, "m": 32.19, "d": "Bical, Cerceal,Encruzado,Malvasia"},
-    {"f": "PORTUGAL . CABRIZ. DÃO", "n": "CABRIZ COLHEITA SELECIONADA DOC BRANCO", "s": "2023", "t": 63.59, "m": 54.06, "d": "Bical, Cerceal, Encruzado, Malvasia"},
-    {"f": "PORTUGAL . CABRIZ. DÃO", "n": "CABRIZ ROSE COLHEITA SELECIONADA DOC", "s": "2023", "t": 63.59, "m": 54.06, "d": "ALFORCHEIRO, TOURIGA NACIONAL"},
-    {"f": "PORTUGAL . CABRIZ. DÃO", "n": "CABRIZ RESERVA DOC TINTO", "s": "2020", "t": 130.0, "m": 110.5, "d": "TOURIGA NACIONAL,ALFROCHEIRO,ARAGONEZ"},
-    {"f": "PORTUGAL . CABRIZ. DÃO", "n": "CABRIZ RESERVA DOC BRANCO", "s": "2022", "t": 130.0, "m": 110.5, "d": "ENCRUZADO"},
-    {"f": "PORTUGAL . CABRIZ. DÃO", "n": "CABRIZ RESERVA ESPECIAL DOC TINTO", "s": "2016", "t": 350.2, "m": 297.67, "d": "TOURIGA NACIONAL,ALFROCHEIRO,ARAGONEZ"},
-    {"f": "PORTUGAL . CABRIZ. DÃO", "n": "CABRIZ RESERVA ESPECIAL DOC TINTO", "s": "2014", "t": 350.2, "m": 297.67, "d": "TOURIGA NACIONAL,ALFROCHEIRO,ARAGONEZ"},
-    {"f": "PORTUGAL . CABRIZ. DÃO", "n": "CABRIZ TOURIGA NACIONAL DOC TINTO", "s": "2016", "t": 175.1, "m": 148.83, "d": "100% TOURIGA NACIONAL"},
-    {"f": "PORTUGAL . CABRIZ. DÃO", "n": "CABRIZ BIOLÓGICO DOC TINTO", "s": "2022", "t": 69.0, "m": 58.65, "d": "TOURIGA NACIONAL, ARAGONEZ"},
-    {"f": "PORTUGAL . CABRIZ. DÃO", "n": "CABRIZ BIOLÓGICO DOC BRANCO", "s": "2022", "t": 69.0, "m": 58.65, "d": "ENCRUZADO, BICAL"},
-    {"f": "PORTUGAL . CABRIZ. DÃO", "n": "CABRIZ ÍMPAR", "s": "2011", "t": 698.24, "m": 593.5, "d": "TINTO"},
-    {"f": "PORTUGAL . CABRIZ. DÃO", "n": "CABRIZ ESPUMANTE BRANCO BRUTO DOC", "s": "2017", "t": 63.59, "m": 54.06, "d": "MALVASIA FINA, BICAL"},
-    {"f": "PORTUGAL . CABRIZ. DÃO", "n": "CABRIZ ESPUMANTE BRANCO MEIO SECO DOC", "s": "2019", "t": 63.59, "m": 54.06, "d": "MALVASIA FINA, BICAL"},
-    {"f": "PORTUGAL . CABRIZ. DÃO", "n": "BAG IN BOX CABRIZ TINTO 3L", "s": "2022", "t": 170.83, "m": 145.2, "d": "ALFROCHEIRO,TINTA RORIZ"},
-    {"f": "PORTUGAL . CABRIZ. DÃO", "n": "BAG IN BOX CABRIZ BRANCO 3L", "s": "2022", "t": 170.83, "m": 145.2, "d": "BICAL,ENCRUZADO,MALVASIA FINA"},
-    {"f": "PORTUGAL . CABRIZ. DÃO", "n": "BAG IN BOX CABRIZ TINTO 3L", "s": "2023", "t": 170.83, "m": 145.2, "d": "ALFROCHEIRO,TINTA RORIZ"},
-    {"f": "PORTUGAL . CASA DE SANTAR . DÃO", "n": "CASA DE SANTAR TINTO", "s": "2021", "t": 76.54, "m": 65.06, "d": "TGA NACIONAL,TTA RORIZ,ALFROCHEIRO"},
-    {"f": "PORTUGAL . CASA DE SANTAR . DÃO", "n": "CASA DE SANTAR BRANCO", "s": "2023", "t": 76.54, "m": 65.06, "d": "ENCRUZADO,CERCEAL BRANCO,BICAL"},
-    {"f": "PORTUGAL . CASA DE SANTAR . DÃO", "n": "CASA DE SANTAR ROSÉ", "s": "2023", "t": 76.54, "m": 65.06, "d": "TGA NACIONAL,ALFROCHEIRO"},
-    {"f": "PORTUGAL . CASA DE SANTAR . DÃO", "n": "CASA DE SANTAR RESERVA DOC TINTO", "s": "2020", "t": 195.0, "m": 165.75, "d": "TGA NACIONAL,TTA RORIZ,ALFROCHEIRO"},
-    {"f": "PORTUGAL . CASA DE SANTAR . DÃO", "n": "CASA DE SANTAR RESERVA DOC BRANCO", "s": "2021", "t": 195.0, "m": 165.75, "d": "ENCRUZADO,BICAL,CERCEAL BRANCO"},
-    {"f": "PORTUGAL . CASA DE SANTAR . DÃO", "n": "CASA DE SANTAR RESERVA DOC BRANCO", "s": "2022", "t": 195.0, "m": 165.75, "d": "ENCRUZADO,BICAL,CERCEAL BRANCO"},
-    {"f": "PORTUGAL . CASA DE SANTAR . DÃO", "n": "CASA DE SANTAR OUTONO DE SANTAR DOC TINTO", "s": "2016", "t": 147.28, "m": 125.19, "d": "COLHEITA TARDIA"},
-    {"f": "PORTUGAL . QUINTA DO ENCONTRO . BAIRRADA", "n": "ENCONTRO BAGA DOC TINTO", "s": "2016", "t": 82.52, "m": 70.14, "d": "BAGA"},
-    {"f": "PORTUGAL . QUINTA DO ENCONTRO . BAIRRADA", "n": "ENCONTRO BAGA DOC TINTO", "s": "2015", "t": 82.52, "m": 70.14, "d": "BAGA"},
-    {"f": "PORTUGAL . QUINTA DO ENCONTRO . BAIRRADA", "n": "QDO E. PRETO E BRANCO DOC TINTO", "s": "2019", "t": 68.32, "m": 58.07, "d": "BAGA, TGA NACIONAL"},
-    {"f": "PORTUGAL . QUINTA DO ENCONTRO . BAIRRADA", "n": "QDO E. PRETO E BRANCO DOC BRANCO", "s": "2022", "t": 68.32, "m": 58.07, "d": "BICAL, ARINTO"},
-    {"f": "PORTUGAL . QUINTA DO ENCONTRO . BAIRRADA", "n": "QDO E. HARMONIA DOC TINTO", "s": "2018", "t": 53.64, "m": 45.59, "d": "TOURIGA NACIONAL, BAGA"},
-    {"f": "PORTUGAL . QUINTA DO ENCONTRO . BAIRRADA", "n": "QDO E. ESPUMANTE BRUTO BCO", "s": "2016", "t": 76.54, "m": 65.06, "d": "ARINTO, BICAL, BAGA"},
-    {"f": "ESPANHA - BODEGAS RIOJANAS", "n": "VINA ALBINA RESERVA", "s": "2017", "t": 210.0, "m": 178.5, "d": "TEMPRANILLO, MAZUELO, GRACIANO"},
-    {"f": "ESPANHA - BODEGAS RIOJANAS", "n": "VINA ALBINA GRAN RESERVA", "s": "2015", "t": 280.0, "m": 238.0, "d": "TEMPRANILLO, MAZUELO, GRACIANO"},
-    {"f": "ESPANHA - BODEGAS RIOJANAS", "n": "MONTE REAL RESERVA DE FAMILIA", "s": "2019", "t": 210.0, "m": 178.5, "d": "100% TEMPRANILLO"},
-    {"f": "ESPANHA - BODEGAS RIOJANAS", "n": "MONTE REAL GRAN RESERVA", "s": "2016", "t": 280.0, "m": 238.0, "d": "100% TEMPRANILLO"},
-    {"f": "ESPANHA - BODEGAS RIOJANAS", "n": "MARQUES DE TOMARES GRAN RESERVA", "s": "2015", "t": 454.4, "m": 386.24, "d": "RIOJA"},
-    {"f": "ESPANHA - BODEGAS RIOJANAS", "n": "MARQUES DE TOMARES EXCELLENS RESERVA", "s": "2018", "t": 238.6, "m": 202.81, "d": "RIOJA"},
-    {"f": "ESPANHA - BODEGAS RIOJANAS", "n": "MARQUES DE TOMARES CRIANZA", "s": "2020", "t": 173.2, "m": 147.22, "d": "RIOJA"},
-    {"f": "ESPANHA - BODEGAS RIOJANAS", "n": "MONTECILLO RESERVA", "s": "2017", "t": 199.0, "m": 169.15, "d": "D.O RIOJA"},
-    {"f": "ESPANHA - BODEGAS RIOJANAS", "n": "MONTECILLO CRIANZA", "s": "2019", "t": 139.0, "m": 118.15, "d": "D.O RIOJA"},
-    {"f": "ESPANHA - FREIXENET", "n": "VALDUBON CRIANZA", "s": "2019", "t": 189.9, "m": 161.42, "d": "RIBERA DEL DUERO"},
-    {"f": "ESPANHA - FREIXENET", "n": "VALDUBON ROBLE", "s": "2021", "t": 129.9, "m": 110.42, "d": "RIBERA DEL DUERO"},
-    {"f": "ESPANHA - FREIXENET", "n": "SOLAR VIEJO CRIANZA", "s": "2018", "t": 129.9, "m": 110.42, "d": "RIOJA"},
-    {"f": "ESPANHA - FREIXENET", "n": "ORUBE CRIANZA", "s": "2018", "t": 169.9, "m": 144.42, "d": "RIOJA"},
-    {"f": "ESPANHA - FELIX SOLIS", "n": "LOS MOLINOS TEMPRANILLO", "s": "2023", "t": 36.12, "m": 30.71, "d": "VALDEPENAS"},
-    {"f": "ESPANHA - FELIX SOLIS", "n": "LOS MOLINOS BRANCO", "s": "2023", "t": 36.12, "m": 30.71, "d": "AIREN/VERDEJO - VALDEPENAS"},
-    {"f": "ESPANHA - FELIX SOLIS", "n": "LOS MOLINOS ROSÉ", "s": "2023", "t": 36.12, "m": 30.71, "d": "TEMPRANILLO - VALDEPENAS"},
-    {"f": "ESPANHA - FELIX SOLIS", "n": "VINA ALBALI TEMPRANILLO", "s": "2023", "t": 41.68, "m": 35.43, "d": "VALDEPENAS"},
-    {"f": "ESPANHA - FELIX SOLIS", "n": "VINA ALBALI CRIANZA", "s": "2019", "t": 53.68, "m": 45.63, "d": "VALDEPENAS"},
-    {"f": "ESPANHA - FELIX SOLIS", "n": "VINA ALBALI RESERVA", "s": "2018", "t": 60.08, "m": 51.07, "d": "VALDEPENAS"},
-    {"f": "ESPANHA - FELIX SOLIS", "n": "VINA ALBALI GRAN RESERVA SELECCION PRIVADA", "s": "2017", "t": 72.86, "m": 61.94, "d": "VALDEPENAS"},
-    {"f": "ESPANHA - FELIX SOLIS", "n": "MUCHO MAS TINTO", "s": "", "t": 57.06, "m": 48.51, "d": "BLEND"},
-    {"f": "ESPANHA - FELIX SOLIS", "n": "MUCHO MAS BRANCO", "s": "", "t": 57.06, "m": 48.51, "d": "BLEND"},
-    {"f": "ESPANHA - FELIX SOLIS", "n": "MUCHO MAS ROSE", "s": "", "t": 57.06, "m": 48.51, "d": "BLEND"},
-    {"f": "ESPANHA - FELIX SOLIS", "n": "THE GUV'NOR TINTO", "s": "", "t": 57.06, "m": 48.51, "d": "BLEND"},
-    {"f": "ESPANHA - FELIX SOLIS", "n": "THE GUV'NOR BRANCO", "s": "", "t": 57.06, "m": 48.51, "d": "BLEND"},
-    {"f": "ESPANHA - FELIX SOLIS", "n": "THE GUV'NOR ROSE", "s": "", "t": 57.06, "m": 48.51, "d": "BLEND"},
-    {"f": "ESPANHA - FELIX SOLIS", "n": "THE GUV'NOR VIP TINTO", "s": "", "t": 89.0, "m": 75.65, "d": "TEMPRANILLO"},
-    {"f": "ESPANHA - FELIX SOLIS", "n": "ALTOS DE TAMARON ROBLE", "s": "2022", "t": 89.0, "m": 75.65, "d": "TEMPRANILLO"},
-    {"f": "ESPANHA - FELIX SOLIS", "n": "LA VACHE ESPAGNOLE TINTO", "s": "2024", "t": 36.12, "m": 30.71, "d": "TEMPRANILLO"},
-    {"f": "ESPANHA - FELIX SOLIS", "n": "BAJOS RESERVA", "s": "2018", "t": 52.88, "m": 44.95, "d": "TORO"},
-    {"f": "ESPANHA - FELIX SOLIS", "n": "BAJOS CRIANZA", "s": "2020", "t": 48.88, "m": 41.55, "d": "TORO"},
-    {"f": "ARGENTINA - RUTINI WINES", "n": "RUTINI QUALITA MALBEC", "s": "2022", "t": 130.0, "m": 110.5, "d": "BLEND"},
-    {"f": "ARGENTINA - RUTINI WINES", "n": "RUTINI QUALITA CABERNET", "s": "2021", "t": 130.0, "m": 110.5, "d": "BLEND"},
-    {"f": "ARGENTINA - RUTINI WINES", "n": "RUTINI QUALITA MALBEC", "s": "2021", "t": 221.0, "m": 187.85, "d": "SINGLE VINEYARD"},
-    {"f": "ARGENTINA - RUTINI WINES", "n": "RUTINI QUALITA CABERNET", "s": "2020", "t": 221.0, "m": 187.85, "d": "SINGLE VINEYARD"},
-    {"f": "ARGENTINA - EL ENEMIGO", "n": "EL ENEMIGO CHARDONNAY", "s": "2021", "t": 260.0, "m": 221.0, "d": "MENDOZA"},
-    {"f": "ARGENTINA - EL ENEMIGO", "n": "EL ENEMIGO MALBEC", "s": "2020", "t": 260.0, "m": 221.0, "d": "MENDOZA"},
-    {"f": "ARGENTINA - EL ENEMIGO", "n": "EL ENEMIGO SYRAH/VIOGNIER", "s": "2021", "t": 260.0, "m": 221.0, "d": "MENDOZA"},
-    {"f": "ARGENTINA - EL ENEMIGO", "n": "EL ENEMIGO BONARDA", "s": "2020", "t": 260.0, "m": 221.0, "d": "MENDOZA"},
-    {"f": "ARGENTINA - EL ENEMIGO", "n": "EL ENEMIGO CABERNET FRANC", "s": "2021", "t": 260.0, "m": 221.0, "d": "MENDOZA"},
-    {"f": "ARGENTINA - CATENA ZAPATA", "n": "CATENA MALBEC", "s": "2021", "t": 182.0, "m": 154.7, "d": "MENDOZA"},
-    {"f": "ARGENTINA - CATENA ZAPATA", "n": "CATENA CABERNET SAUVIGNON", "s": "2021", "t": 182.0, "m": 154.7, "d": "MENDOZA"},
-    {"f": "ARGENTINA - CATENA ZAPATA", "n": "DV CATENA MALBEC/MALBEC", "s": "2021", "t": 234.0, "m": 198.9, "d": "MENDOZA"},
-    {"f": "ARGENTINA - CATENA ZAPATA", "n": "DV CATENA CABERNET/MALBEC", "s": "2021", "t": 234.0, "m": 198.9, "d": "MENDOZA"},
-    {"f": "ARGENTINA - CATENA ZAPATA", "n": "ANGELICA ZAPATA MALBEC", "s": "2019", "t": 416.0, "m": 353.6, "d": "ALTA"},
-    {"f": "ARGENTINA - CATENA ZAPATA", "n": "ANGELICA ZAPATA CABERNET SAUVIGNON", "s": "2019", "t": 364.0, "m": 309.4, "d": "ALTA"},
-    {"f": "ÁFRICA DO SUL", "n": "STORMHOEK SYRAH", "s": "2025", "t": 33.9, "m": 28.81, "d": "WESTERN CAPE"},
-    {"f": "ÁFRICA DO SUL", "n": "STORMHOEK PINOTAGE", "s": "2025", "t": 33.9, "m": 28.81, "d": "WESTERN CAPE"},
-    {"f": "ÁFRICA DO SUL", "n": "STORMHOEK CHENIN BLANC", "s": "2025", "t": 33.9, "m": 28.81, "d": "WESTERN CAPE"},
-    {"f": "ÁFRICA DO SUL", "n": "STORMHOEK MOSCATO ROSE", "s": "2025", "t": 33.9, "m": 28.81, "d": "WESTERN CAPE"},
-    {"f": "ÁFRICA DO SUL", "n": "STORMHOEK MOSCATO BRANCO", "s": "2025", "t": 33.9, "m": 28.81, "d": "WESTERN CAPE"},
-    {"f": "ÁFRICA DO SUL", "n": "STORMHOEK PINOTAGE/SHIRAZ", "s": "2025", "t": 33.9, "m": 28.81, "d": "BAG IN BOX 3 LITROS"},
-    {"f": "ÁFRICA DO SUL", "n": "STORMHOEK CHENIN/CHARDONNAY", "s": "2025", "t": 33.9, "m": 28.81, "d": "BAG IN BOX 3 LITROS"},
-    {"f": "ÁFRICA DO SUL", "n": "VINHO S.A TTO STORMHOEK CABERNET/MERLOT (6X750ml)", "s": "2025", "t": 33.9, "m": 28.81, "d": ""},
-    {"f": "ÁFRICA DO SUL", "n": "VINHO S.A TTO STORMHOEK SHIRAZ/CABERNET (6X750ml)", "s": "2025", "t": 33.9, "m": 28.81, "d": ""},
-    {"f": "ÁFRICA DO SUL", "n": "VINHO S.A TTO STORMHOEK PINOTAGE/MALBEC (6X750ml)", "s": "2025", "t": 33.9, "m": 28.81, "d": ""},
-    {"f": "ÁFRICA DO SUL", "n": "VINHO S.A BCO STORMHOEK PINOT GRIGIO (6X750ml)", "s": "2025", "t": 33.9, "m": 28.81, "d": ""},
-    {"f": "ÁFRICA DO SUL", "n": "VINHO S.A BCO STORMHOEK CHARD./VIOGNIER (6X750ml)", "s": "2025", "t": 33.9, "m": 28.81, "d": ""}
-];
+            {"f": "ITÁLIA - LOMBARDIA", "n": "GAGGIARONE VITGNI GIOVANI TTO", "s": "2021", "t": 145.63, "m": 123.78, "d": "CROATINA"},
+            {"f": "ITÁLIA - LOMBARDIA", "n": "GAGGIARONE VITGNI GIOVANI TTO", "s": "", "t": 260.93, "m": 221.79, "d": "CROATINA"},
+            {"f": "ITÁLIA - LOMBARDIA", "n": "CA MONTEBELLO TTO DOC", "s": "2021", "t": 85.2, "m": 72.42, "d": "PINOT NERO"},
+            {"f": "ITÁLIA - LOMBARDIA", "n": "CA MONTEBELLO BCO DOC", "s": "2022", "t": 85.2, "m": 72.42, "d": "PINOT NERO BIANCO"},
+            {"f": "ITÁLIA - LOMBARDIA", "n": "CA MONTEBELLO BCO IGT", "s": "2021", "t": 85.2, "m": 72.42, "d": "PINOT GRIGIO"},
+            {"f": "ITÁLIA - LOMBARDIA", "n": "CA MONTEBELLO TTO DOC", "s": "2021", "t": 85.2, "m": 72.42, "d": "BARBERA, UVA RARA"},
+            {"f": "ITÁLIA - LOMBARDIA", "n": "NEROPERSO ROSSO VENETO IGT", "s": "2020", "t": 139.98, "m": 118.99, "d": "APASSIMENTO DE TINTAS VERONESES"},
+            {"f": "ITÁLIA - SICILIA", "n": "LIBURNA DOC SICILIA TTO", "s": "2020", "t": 42.42, "m": 36.06, "d": "NERO D´AVOLA"},
+            {"f": "ITÁLIA - ABRUZZO", "n": "BORGO DEL FILARI DOC D'ABRUZZO", "s": "2021", "t": 53.06, "m": 45.1, "d": "MONTEPULCIANO"},
+            {"f": "ITÁLIA - PUGLIA", "n": "LA FOGLIATA DI PUGLIA", "s": "2022", "t": 63.03, "m": 53.58, "d": "PRIMITIVO"},
+            {"f": "ITÁLIA - ABRUZZO", "n": "TORRE ROMANICA", "s": "2023", "t": 37.82, "m": 32.15, "d": "ROSSO"},
+            {"f": "ITÁLIA - ABRUZZO", "n": "TORRE ROMANICA", "s": "2023", "t": 37.82, "m": 32.15, "d": "BIANCO"},
+            {"f": "ITÁLIA - ABRUZZO", "n": "TORRE ROMANICA", "s": "2023", "t": 37.82, "m": 32.15, "d": "ROSATO"},
+            {"f": "ITÁLIA - ABRUZZO", "n": "TORRE ROMANICA TTO", "s": "2023", "t": 51.93, "m": 44.14, "d": "SANGIOVESE"},
+            {"f": "ITÁLIA - ABRUZZO", "n": "TORRE ROMANICA PINOT GRIGIO", "s": "", "t": 51.93, "m": 44.14, "d": ""},
+            {"f": "ITÁLIA - ABRUZZO", "n": "TORRE ROMANICA PUGLIA", "s": "2023", "t": 72.44, "m": 61.57, "d": "PRIMITIVO"},
+            {"f": "ITÁLIA - ABRUZZO", "n": "TORRE ROMANICA PREMIUM", "s": "2021", "t": 84.67, "m": 71.97, "d": "MONTEPULCIANO"},
+            {"f": "ITÁLIA - LOMBARDIA", "n": "LE CIME PASSITO IGT", "s": "2021", "t": 225.78, "m": 191.91, "d": "GARGANEGA, MOSCATO AMARELO"},
+            {"f": "ITÁLIA - LOMBARDIA", "n": "CARPINO GARDA DOC", "s": "2018", "t": 250.62, "m": 213.02, "d": "MERLOT"},
+            {"f": "ITÁLIA - LOMBARDIA", "n": "RIBÓ GARDA DOC", "s": "2019", "t": 153.53, "m": 130.5, "d": "CABERNET FRANC, CABERNET SAUVIGNON"},
+            {"f": "ITÁLIA - LOMBARDIA", "n": "MERIDIANO GARDA DOC", "s": "2023", "t": 143.37, "m": 121.86, "d": "CHARDONNAY"},
+            {"f": "ITÁLIA - LOMBARDIA", "n": "LUGANA DOC", "s": "2023", "t": 143.37, "m": 121.86, "d": "TURBIANA"},
+            {"f": "ITÁLIA - LOMBARDIA", "n": "CORNALINO ROSSO IGT ALTO MINCIO", "s": "2021", "t": 105.36, "m": 89.56, "d": "MERLOT, CABERNET"},
+            {"f": "ITÁLIA - LOMBARDIA", "n": "I CIOTTOLI GARDA DOC", "s": "2022", "t": 96.9, "m": 82.36, "d": "CABERNET FRANC, CAB. SAUVIGNON"},
+            {"f": "ITÁLIA - LOMBARDIA", "n": "LE MURE GARDA DOC", "s": "2023", "t": 90.12, "m": 76.61, "d": "CHARDONNAY"},
+            {"f": "ITÁLIA - LOMBARDIA", "n": "MANDORLO BIANCO IGT MANTOVA", "s": "2023", "t": 90.12, "m": 76.61, "d": "TOCAI FRIULANO"},
+            {"f": "ITÁLIA - LOMBARDIA", "n": "LA CASINA BIANCO GARDA DOC", "s": "2023", "t": 90.12, "m": 76.61, "d": "GARGANEGA, TREBBIANO, CHARDONNAY"},
+            {"f": "ITÁLIA - LOMBARDIA", "n": "LA CASINA CHIARETO GARDA DOC", "s": "2023", "t": 90.12, "m": 76.61, "d": "MERLOT, CABERNET, RONDINELLA"},
+            {"f": "ITÁLIA - LOMBARDIA", "n": "LA CASINA ROSSO GARDA DOC", "s": "2022", "t": 90.12, "m": 76.61, "d": "MERLOT, RONDINELLA, CAB. SAUVIGNON, SANGIOVESE"},
+            {"f": "FRANÇA - LANGUEDOC", "n": "DIRTY RABBIT TTO", "s": "2023", "t": 63.9, "m": 54.31, "d": "PETIT VERDOT"},
+            {"f": "FRANÇA - LANGUEDOC", "n": "CHARMING RABBIT BCO", "s": "2022", "t": 63.9, "m": 54.31, "d": "CHARDONNAY"},
+            {"f": "FRANÇA - LANGUEDOC", "n": "MRS. RABBIT TTO", "s": "2021", "t": 63.9, "m": 54.31, "d": "PINOT NOIR"},
+            {"f": "FRANÇA - LANGUEDOC", "n": "PINK RABBIT ROSÉ", "s": "2022", "t": 55.02, "m": 46.77, "d": "GRENACHE, SYRAH"},
+            {"f": "FRANÇA - LANGUEDOC", "n": "MR. RABBIT TTO", "s": "2021", "t": 53.25, "m": 45.26, "d": "CABERNET SAUVIGNON"},
+            {"f": "FRANÇA - LANGUEDOC", "n": "MASTER RABBIT TTO", "s": "2020", "t": 53.25, "m": 45.26, "d": "SYRAH"},
+            {"f": "FRANÇA - LANGUEDOC", "n": "SPRING RABBIT BCO", "s": "2022", "t": 53.25, "m": 45.26, "d": "SAUVIGNON BLANC"},
+            {"f": "FRANÇA - LANGUEDOC", "n": "CHATELAIN VALMONT COTES DU RHONE TTO", "s": "2021", "t": 60.35, "m": 51.3, "d": "GRENACHE SYRAH"},
+            {"f": "PORTUGAL - VERDE", "n": "PESCADA BRANCO, DOC VERDE", "s": "2024", "t": 37.82, "m": 32.15, "d": "AZAL, TRAJADURA, LOUREIRO e ARINTO"},
+            {"f": "PORTUGAL - VERDE", "n": "PESCADA ROSE, DOC VERDE", "s": "2024", "t": 37.82, "m": 32.15, "d": "TOURIGA NACIONAL, TINTA RORIZ E RUFETE"},
+            {"f": "PORTUGAL - VERDE", "n": "PESCADA", "s": "2023", "t": 75.64, "m": 64.29, "d": "ARINTO E TRAJADURA"},
+            {"f": "PORTUGAL - VERDE", "n": "PESCADA", "s": "2023", "t": 135.84, "m": 115.47, "d": "100% ALVARINHO"},
+            {"f": "PORTUGAL - LISBOA", "n": "PORTA 6 TTO meia garrafa", "s": "2023", "t": 35.0, "m": 29.75, "d": "ARAGONES, CASTELÃO, TOURIGA NACIONAL"},
+            {"f": "PORTUGAL - LISBOA", "n": "PORTA 6 BCO meia garrafa", "s": "2023", "t": 35.0, "m": 29.75, "d": "FERNÃO PIRES, ARINTO, SAUVIGNON BLANC"},
+            {"f": "PORTUGAL - LISBOA", "n": "ESPUMANTE PORTA 6 BCO BRUT", "s": "2023", "t": 58.7, "m": 49.9, "d": "ARINTO, FERNÃO PIRES, CHARDONNAY"},
+            {"f": "PORTUGAL - LISBOA", "n": "VINHO VERDE PORTA 6 DOC", "s": "2023", "t": 58.7, "m": 49.9, "d": "LOUREIRO, TRAJADURA, ARINTO"},
+            {"f": "PORTUGAL - LISBOA", "n": "VINHO VERDE PORTA 6 DOC", "s": "2023", "t": 58.7, "m": 49.9, "d": "LOUREIRO, TRAJADURA, ARINTO"},
+            {"f": "PORTUGAL - LISBOA", "n": "PORTA 6 BCO", "s": "2023", "t": 58.7, "m": 49.9, "d": "FERNÃO PIRES, ARINTO, SAUVIGNON BLANC"},
+            {"f": "PORTUGAL - LISBOA", "n": "PORTA 6 BCO", "s": "2023", "t": 58.7, "m": 49.9, "d": "FERNÃO PIRES, ARINTO, SAUVIGNON BLANC"},
+            {"f": "PORTUGAL - LISBOA", "n": "PORTA 6 ROSE", "s": "2023", "t": 58.7, "m": 49.9, "d": "CASTELÃO, TINTA RORIZ, SYRAH"},
+            {"f": "PORTUGAL - LISBOA", "n": "PORTA 6 TTO", "s": "2024", "t": 58.7, "m": 49.9, "d": "ARAGONES, CASTELÃO, TOURIGA NACIONAL"},
+            {"f": "PORTUGAL - LISBOA", "n": "PORTA 6 RESERVA TTO", "s": "2023", "t": 86.17, "m": 73.25, "d": "SYRAH, ALICANTE BOUSCHET, CABERNET, TGA NACIONAL"},
+            {"f": "PORTUGAL - LISBOA", "n": "PORTA 6 MAGNUN TTO", "s": "2023", "t": 90.69, "m": 77.09, "d": "ARAGONES, CASTELÃO, TOURIGA NACIONAL"},
+            {"f": "PORTUGAL - LISBOA", "n": "PORTA 6 DOUBLE MAGNUM TTO", "s": "2023", "t": 279.4, "m": 237.49, "d": "ARAGONES, CASTELÃO, TOURIGA NACIONAL"},
+            {"f": "PORTUGAL - LISBOA", "n": "BAG IN BOX PORTA 6 TTO", "s": "2023", "t": 110.91, "m": 94.28, "d": "ARAGONES, CASTELÃO, TOURIGA NACIONAL"},
+            {"f": "PORTUGAL - LISBOA", "n": "BAG IN BOX PORTA 6 BBC", "s": "2024", "t": 110.91, "m": 94.28, "d": "FERNÃO PIRES, ARINTO, SAUVIGNON BLANC"},
+            {"f": "PORTUGAL - LISBOA", "n": "PACK 2UN", "s": "2023", "t": 58.7, "m": 49.9, "d": "PORTA 6 TTO"},
+            {"f": "PORTUGAL - LISBOA", "n": "PACK 2UN", "s": "2023", "t": 58.7, "m": 49.9, "d": "(1 PORTA 6 TTO 1 PORTA 6 BBCO)"},
+            {"f": "PORTUGAL - LISBOA", "n": "PORTA 6 BITUBE TTO 2023", "s": "", "t": 135.47, "m": 115.15, "d": ""},
+            {"f": "PORTUGAL - LISBOA", "n": "DOM DINIS MESA TTO", "s": "2022", "t": 40.64, "m": 34.54, "d": "CASTELÃO, ARAGONEZ"},
+            {"f": "PORTUGAL - LISBOA", "n": "DOM DINIS MESA BCO", "s": "2021", "t": 40.64, "m": 34.54, "d": "FERNÃO PIRES, MOSCATEL"},
+            {"f": "PORTUGAL - LISBOA", "n": "RESERVA DOS AMIGOS REGIONAL TTO", "s": "2020", "t": 52.68, "m": 44.78, "d": "ARAGONES, CASTELÃO, TINTA MIUDA"},
+            {"f": "PORTUGAL - LISBOA", "n": "RESERVA DOS AMIGOS MAGNUN TTO", "s": "2020", "t": 84.67, "m": 71.97, "d": "ARAGONES, CASTELÃO, TINTA MIUDA"},
+            {"f": "PORTUGAL - LISBOA", "n": "RES. DOS AMIGOS SELEÇÃO ESPECIAL TTO", "s": "2019", "t": 114.02, "m": 96.92, "d": "TOURIGA NACIONAL, SYRAH, CABERNET"},
+            {"f": "PORTUGAL - LISBOA", "n": "BAG IN BOX BRANCO DOS AMIGOS", "s": "2023", "t": 146.76, "m": 124.74, "d": "FERNAO PIRES, MOSCATEL"},
+            {"f": "PORTUGAL - LISBOA", "n": "BAG IN BOX TINTO DOS AMIGOS", "s": "2022", "t": 146.76, "m": 124.74, "d": "TINTA RORIZ, CASTELAO. TINTA MUIDA"},
+            {"f": "PORTUGAL - LISBOA", "n": "VINHO VERDE 3 AUTORES DOC BCO", "s": "2022", "t": 56.44, "m": 47.98, "d": "LOUREIRO, TRAJADURA, ARINTO"},
+            {"f": "PORTUGAL - LISBOA", "n": "3 AUTORES DOURO DOC TTO", "s": "2019", "t": 56.44, "m": 47.98, "d": "TOURIGA FRANCA, TINTA RORIZ, TOURIGA NACIONAL"},
+            {"f": "PORTUGAL - LISBOA", "n": "3 AUTORES DOURO DOC BCO", "s": "2019", "t": 56.44, "m": 47.98, "d": "VIOSINHO, MALVASIA FINA, RABIGATO"},
+            {"f": "PORTUGAL - LISBOA", "n": "3 AUTORES GRANDE RESERVA TTO", "s": "2016", "t": 340.93, "m": 289.79, "d": "CAB. SAUVIGNON, SYRAH, TGA NACIONAL, AL. BOUSCHET"},
+            {"f": "PORTUGAL - LISBOA", "n": "CORAGEM SUPERIOR TTO", "s": "2020", "t": 95.96, "m": 81.56, "d": "TOURIGA NACIONAL"},
+            {"f": "PORTUGAL - LISBOA", "n": "CORAGEM SUPERIOR BCO", "s": "2021", "t": 95.96, "m": 81.56, "d": "CHARDONNAY"},
+            {"f": "PORTUGAL - LISBOA", "n": "CORAGEM RESERVA TTO", "s": "2019", "t": 57.39, "m": 48.78, "d": "SYRAH, CASTELÃO, ARAGONEZ"},
+            {"f": "PORTUGAL - LISBOA", "n": "CORAGEM REGIONAL LISBOA TTO", "s": "2019", "t": 45.28, "m": 38.49, "d": "CASTELÇAO, SYRAH, ARAGONEZ"},
+            {"f": "PORTUGAL - LISBOA", "n": "N.B.N.C NO BRANDING, NO CRY TTO", "s": "2020", "t": 53.06, "m": 45.1, "d": "ARAGONEZ, CASTELÃO, TINTA MIUDA"},
+            {"f": "PORTUGAL - LISBOA", "n": "BRUTALIS BY VIDIGAL TTO", "s": "2018", "t": 347.14, "m": 295.07, "d": "ALICANTE BOUSCHET, CABERNET SAUVIGNON"},
+            {"f": "PORTUGAL - LISBOA", "n": "BRUTALIS BY VIDIGAL TTO", "s": "2018", "t": 378.18, "m": 321.45, "d": "ALICANTE BOUSCHET, CABERNET SAUVIGNON"},
+            {"f": "PORTUGAL - LISBOA", "n": "VIDIGAL RESERVA TTO", "s": "2021", "t": 48.54, "m": 41.26, "d": "ARAGONEZ, SYRAH,CABERNET SAUVIGNON"},
+            {"f": "PORTUGAL - LISBOA", "n": "VIDIGAL SINGLE GRAPE TTO", "s": "", "t": 67.73, "m": 57.57, "d": "TOURIGA NACIONAL"},
+            {"f": "PORTUGAL - LISBOA", "n": "VIDIGAL CHAPEU DE PRAIA ROSÉ", "s": "2021", "t": 45.16, "m": 38.38, "d": "ARAGONEZ, CASTELÃO"},
+            {"f": "PORTUGAL - LISBOA", "n": "ZÉ DO TELHADO DOC DOURO", "s": "2019", "t": 50.8, "m": 43.18, "d": "TGA FRANCA.TTA RORIZ,TGA NACIONAL"},
+            {"f": "PORTUGAL - LISBOA", "n": "BOA NOITE LISBOAL TINTO REGIONAL LISBOA", "s": "", "t": 59.83, "m": 50.86, "d": "SYRAH,TOURIGA NACIONAL"},
+            {"f": "PORTUGAL - LISBOA", "n": "BOA NOITE LISBOA BRANCO", "s": "", "t": 59.83, "m": 50.86, "d": "REGIONAL LISBOA"},
+            {"f": "PORTUGAL - LISBOA", "n": "BOA NOITE LISBOA ROSE", "s": "", "t": 59.83, "m": 50.86, "d": "REGIONAL LISBOA"},
+            {"f": "PORTUGAL - LISBOA", "n": "JULIA FLORISTA TTO", "s": "2022", "t": 44.03, "m": 37.42, "d": "CASTELAO, ARAGONEZ"},
+            {"f": "PORTUGAL - LISBOA", "n": "JULIA FLORISTA BCO", "s": "2022", "t": 44.03, "m": 37.42, "d": "FERNAO PIRES, MOSCATEL"},
+            {"f": "PORTUGAL - LISBOA", "n": "JULIA FLORISTA ROSE", "s": "2022", "t": 44.03, "m": 37.42, "d": "CASTELÃO, TINTA RORIZ, SYRAH"},
+            {"f": "PORTUGAL - LISBOA", "n": "JULIA FLORISTA ROSE", "s": "2022", "t": 44.03, "m": 37.42, "d": "CASTELÃO, TINTA RORIZ, SYRAH"},
+            {"f": "PORTUGAL - LISBOA", "n": "JULIA FLORISTA TTO", "s": "2021", "t": 54.19, "m": 46.06, "d": "RESERVA"},
+            {"f": "PORTUGAL - LISBOA", "n": "BAG IN BOX JULIA FLORISTA BCO", "s": "2023", "t": 151.27, "m": 128.58, "d": "FERNAO PIRES, MOSCATEL"},
+            {"f": "PORTUGAL - LISBOA", "n": "BAG IN BOX JULIA FLORISTA TTO", "s": "2023", "t": 151.27, "m": 128.58, "d": "CASTAELAO, ARAGONEZ"},
+            {"f": "PORTUGAL - LISBOA", "n": "JULIA FLORISTA BITUBE TTO 2022", "s": "", "t": 121.07, "m": 102.91, "d": ""},
+            {"f": "PORTUGAL - LISBOA", "n": "ARTOLAS TINTO", "s": "2019", "t": 40.64, "m": 34.54, "d": "CASTELÃO, ARAGONEZ"},
+            {"f": "PORTUGAL - LISBOA", "n": "ARTOLAS BRANCO", "s": "2020", "t": 40.64, "m": 34.54, "d": "FERNÃO PIRES, ARINTO, SAUVIGNON BLANC"},
+            {"f": "PORTUGAL - LISBOA", "n": "ARTOLAS ROSÉ", "s": "2020", "t": 40.64, "m": 34.54, "d": "CASTELÃO, TINTA RORIZ"},
+            {"f": "PORTUGAL - BAIRRADA", "n": "DA PIPA BRANCO", "s": "2022", "t": 27.09, "m": 23.03, "d": "MARIA GOMES, BICAL"},
+            {"f": "PORTUGAL - BAIRRADA", "n": "DA PIPA TINTO", "s": "2022", "t": 27.09, "m": 23.03, "d": "BAGA, TOURIGA NACIONAL, ARAGONEZ"},
+            {"f": "PORTUGAL - BAIRRADA", "n": "DA PIPA ROSÉ", "s": "2022", "t": 27.09, "m": 23.03, "d": "BAGA"},
+            {"f": "PORTUGAL - BAIRRADA", "n": "DA PIPA BRANCO", "s": "2022", "t": 38.38, "m": 32.63, "d": "MARIA GOMES, BICAL"},
+            {"f": "PORTUGAL - BAIRRADA", "n": "DA PIPA ROSÉ", "s": "2022", "t": 38.38, "m": 32.63, "d": "BAGA"},
+            {"f": "PORTUGAL - BAIRRADA", "n": "DA PIPA TINTO", "s": "2023", "t": 38.38, "m": 32.63, "d": "BAGA, TOURIGA NACIONAL, ARAGONEZ"},
+            {"f": "PORTUGAL - BAIRRADA", "n": "DA PIPA FRISANTE BRANCO", "s": "2023", "t": 32.74, "m": 27.83, "d": ""},
+            {"f": "PORTUGAL - BAIRRADA", "n": "DA PIPA FRISANTE ROSE", "s": "2023", "t": 32.74, "m": 27.83, "d": ""},
+            {"f": "PORTUGAL - BAIRRADA", "n": "DA PIPA ESPUMANTE BRANCO", "s": "2022", "t": 52.87, "m": 44.94, "d": ""},
+            {"f": "PORTUGAL - BAIRRADA", "n": "DA PIPA ESPUMANTE ROSE", "s": "2022", "t": 52.87, "m": 44.94, "d": ""},
+            {"f": "PORTUGAL - BAIRRADA", "n": "DA PIPA BAG IN BOX BCO", "s": "2023", "t": 128.69, "m": 109.39, "d": "MARIA GOMES, BICAL"},
+            {"f": "PORTUGAL - BAIRRADA", "n": "DA PIPA BAG IN BOX ROSÉ", "s": "2023", "t": 128.69, "m": 109.39, "d": "BAGA"},
+            {"f": "PORTUGAL - BAIRRADA", "n": "DA PIPA BAG IN BOX TTO", "s": "2023", "t": 128.69, "m": 109.39, "d": "BAGA, ARAGONEZ, TOURIGA NACIONAL, CASTELÃO"},
+            {"f": "PORTUGAL - BAIRRADA", "n": "DA PIPA RESERVA IG BCO", "s": "2020", "t": 64.35, "m": 54.7, "d": "BICAL, MARIA GOMES, ARINTO"},
+            {"f": "PORTUGAL - BAIRRADA", "n": "DA PIPA RESERVA IG TTO", "s": "2018", "t": 64.35, "m": 54.7, "d": "BAGA, ARAGONEZ, TOURIGA NACIONAL"},
+            {"f": "PORTUGAL - BAIRRADA", "n": "DA PIPA SIGNATURE DOC TTO", "s": "2017", "t": 90.69, "m": 77.09, "d": "BAGA"},
+            {"f": "PORTUGAL - BAIRRADA", "n": "DA PIPA SIGNATURE DOC BCO", "s": "2019", "t": 90.69, "m": 77.09, "d": "ARINTO"},
+            {"f": "PORTUGAL -AMARALEZA VINHOS -", "n": "FONTE DA PERDIZ RESERVA, TINTO", "s": "", "t": 68.13, "m": 57.91, "d": "DOURO DOC"},
+            {"f": "PORTUGAL -AMARALEZA VINHOS -", "n": "FONTE DA PERDIZ, TINTO", "s": "", "t": 52.31, "m": 44.46, "d": "DOURO DOC"},
+            {"f": "PORTUGAL -AMARALEZA VINHOS -", "n": "FONTE DA PERDIZ , BRANCO", "s": "", "t": 52.31, "m": 44.46, "d": "DOURO DOC"},
+            {"f": "PORTUGAL -AMARALEZA VINHOS -", "n": "FONTE DA PERDIZ SUPERIOR, TINTO", "s": "2020", "t": 74.94, "m": 63.7, "d": "DOURO DOC"},
+            {"f": "PORTUGAL -AMARALEZA VINHOS -", "n": "INTIMISTA", "s": "2023", "t": 31.8, "m": 27.03, "d": "TINTO"},
+            {"f": "PORTUGAL -AMARALEZA VINHOS -", "n": "INTIMISTA", "s": "2023", "t": 31.8, "m": 27.03, "d": "BRANCO"},
+            {"f": "PORTUGAL -AMARALEZA VINHOS -", "n": "INTIMISTA", "s": "2023", "t": 31.8, "m": 27.03, "d": "ROSE"},
+            {"f": "PORTUGAL - AÇORES - DOC PICO", "n": "EURUPTIO, BLEND DOS ACORES, D.O PICO", "s": "2021", "t": 241.58, "m": 205.35, "d": "ARINTO,VERDELHO,TERRANTES"},
+            {"f": "PORTUGAL - AÇORES - DOC PICO", "n": "ERUPTIO, DOS ACORES, D.O PICO", "s": "2020", "t": 301.42, "m": 256.2, "d": "ARINTO"},
+            {"f": "PORTUGAL - AÇORES - DOC PICO", "n": "ERUPTIO, DOS ACORES, D.O PICO", "s": "2021", "t": 331.9, "m": 282.11, "d": "VERDELHO"},
+            {"f": "PORTUGAL -LISBOA - FLOR DE LISBOA", "n": "FLOR DE LISBOA TINTO REGIONAL LISBOA", "s": "2021", "t": 36.88, "m": 31.35, "d": "ALICANTE BOUSCHET,CASTELÃO,TGA NACIONAL"},
+            {"f": "PORTUGAL -LISBOA - FLOR DE LISBOA", "n": "FLOR DE LISBOA BRANCO", "s": "2023", "t": 36.88, "m": 31.35, "d": "REGIONAL LISBOA"},
+            {"f": "PORTUGAL -LISBOA - FLOR DE LISBOA", "n": "FLOR DE LISBOA ROSE", "s": "2023", "t": 36.88, "m": 31.35, "d": "REGIONAL LISBOA"},
+            {"f": "PORTUGAL - ALENTEJO - HERDADE DA MADEIRA VELHA - ABELHARUCO", "n": "ABELHARUCO TINTO COLHEITA SELECIONADA", "s": "2021", "t": 48.92, "m": 41.58, "d": "ALICANTE,TRINCADEIRA,ARAGONEZ,SYRAH"},
+            {"f": "PORTUGAL - ALENTEJO - HERDADE DA MADEIRA VELHA - ABELHARUCO", "n": "ABELHARUCO BRANCO COLHEITA SELECIONADA", "s": "2022", "t": 48.92, "m": 41.58, "d": "ANTÃO VAZ,ARINTO,VERDELHO"},
+            {"f": "HERDADE DO GAMITO - ALENTEJO", "n": "HERDADE DO GAMITO TINTO ESPECIAL", "s": "2021", "t": 98.29, "m": 83.55, "d": "ALICANTE,SYRAH,ARAGONEZ,CAB.SAUV.MERLOT"},
+            {"f": "HERDADE DO GAMITO - ALENTEJO", "n": "HERDADE DO GAMITO TINTO ESPECIAL", "s": "2021", "t": 98.29, "m": 83.55, "d": "ALICANTE,SYRAH,ARAGONEZ,CAB.SAUV.MERLOT"},
+            {"f": "HERDADE DO GAMITO - ALENTEJO", "n": "HERDADE DO GAMITO BRANCO ESPECIAL", "s": "2023", "t": 98.29, "m": 83.55, "d": "ARINTO,ALVARINHO,VERDELHO"},
+            {"f": "HERDADE DO GAMITO - ALENTEJO", "n": "HERDADE DO GAMITO BRANCO ESPECIAL", "s": "2022", "t": 98.29, "m": 83.55, "d": "ARINTO,ALVARINHO,VERDELHO"},
+            {"f": "HERDADE DO GAMITO - ALENTEJO", "n": "HERDADE DO GAMITO ROSE", "s": "", "t": 98.29, "m": 83.55, "d": ""},
+            {"f": "HERDADE DO GAMITO - ALENTEJO", "n": "HERDADE DO GAMITO BRANCO", "s": "2020", "t": 98.29, "m": 83.55, "d": "VERDELHO"},
+            {"f": "HERDADE DO GAMITO - ALENTEJO", "n": "HERDADE DO GAMITO TINTO", "s": "2021", "t": 98.29, "m": 83.55, "d": "ALICANTE BOUSCHET"},
+            {"f": "HERDADE DO GAMITO - ALENTEJO", "n": "HERDADE DO GAMITO TINTO", "s": "2021", "t": 98.29, "m": 83.55, "d": "CABERNET SAUVIGNON"},
+            {"f": "HERDADE DO GAMITO - ALENTEJO", "n": "HERDADE DO GAMITO TINTO", "s": "2023", "t": 98.29, "m": 83.55, "d": "CABERNET SAUVIGNON"},
+            {"f": "HERDADE DO GAMITO - ALENTEJO", "n": "HERDADE DO GAMITO TINTO", "s": "2022", "t": 98.29, "m": 83.55, "d": "SYRAH"},
+            {"f": "HERDADE DO GAMITO - ALENTEJO", "n": "HERDADE DO GAMITO TINTO", "s": "2023", "t": 98.29, "m": 83.55, "d": "SYRAH"},
+            {"f": "HERDADE DO GAMITO - ALENTEJO", "n": "HERDADE DO GAMITO RESERVA TINTO", "s": "2020", "t": 105.93, "m": 90.04, "d": "SYRAH,ALICANTE BOUCHET"},
+            {"f": "PORTUGAL ADEGA COOPERATIVA DE MEDA", "n": "FLOR D'PENALVA, TINTO C.S", "s": "2021", "t": 44.59, "m": 37.9, "d": "DOC DÃO"},
+            {"f": "PORTUGAL ADEGA COOPERATIVA DE MEDA", "n": "FLOR D'PENALVA, BRANCO C.S", "s": "2023", "t": 44.59, "m": 37.9, "d": "DOC DÃO"},
+            {"f": "PORTUGAL ADEGA COOPERATIVA DE MEDA", "n": "FLOR D'PENALVA, TINTO RESERVA", "s": "2021", "t": 49.67, "m": 42.22, "d": "DOC DÃO"},
+            {"f": "PORTUGAL ADEGA COOPERATIVA DE MEDA", "n": "GAIÃO", "s": "", "t": 45.05, "m": 38.29, "d": "TINTO"},
+            {"f": "PORTUGAL ADEGA COOPERATIVA DE MEDA", "n": "GAIÃO RESERVA", "s": "", "t": 112.81, "m": 95.89, "d": "TINTO"},
+            {"f": "PORTUGAL  - PONTE DA BARCA - VINHO VERDE", "n": "VINHO VERDE BRANCO GIGANTONES", "s": "2024", "t": 37.82, "m": 32.15, "d": "LOUREIRO, ARINTO, TRAJADURA"},
+            {"f": "PORTUGAL  - PONTE DA BARCA - VINHO VERDE", "n": "VINHO VERDE ROSE GIGANTONES", "s": "2022", "t": 37.82, "m": 32.15, "d": "VINHÃO, BORRAÇAL, ESPADEIRO"},
+            {"f": "PORTUGAL  - PONTE DA BARCA - VINHO VERDE", "n": "LATA VINHO VERDE BRANCO GIGANTONES", "s": "2023", "t": 21.17, "m": 17.99, "d": "LOUREIRO, ARINTO, TRAJADURA"},
+            {"f": "PORTUGAL  - PONTE DA BARCA - VINHO VERDE", "n": "LATA VINHO VERDE BRANCO GIGANTONES", "s": "2024", "t": 21.17, "m": 17.99, "d": "LOUREIRO, ARINTO, TRAJADURA"},
+            {"f": "PORTUGAL  - PONTE DA BARCA - VINHO VERDE", "n": "LATA VINHO VERDE ROSE GIGANTONES", "s": "2023", "t": 21.17, "m": 17.99, "d": "VINHÃO, BORRAÇAL, ESPADEIRO"},
+            {"f": "PORTUGAL  - PONTE DA BARCA - VINHO VERDE", "n": "LATA VINHO VERDE ROSE GIGANTONES", "s": "2024", "t": 21.17, "m": 17.99, "d": "VINHÃO, BORRAÇAL, ESPADEIRO"},
+            {"f": "PORTUGAL  - PONTE DA BARCA - VINHO VERDE", "n": "GAFA RESERVA VINHO VERDE DOC", "s": "2022", "t": 75.64, "m": 64.29, "d": "ALVARINHO"},
+            {"f": "PORTUGAL - PORTO MARTHA’S WINES & SPIRITS", "n": "MOSCATEL DO DOURO", "s": "", "t": 59.64, "m": 50.7, "d": "DOC"},
+            {"f": "PORTUGAL - PORTO MARTHA’S WINES & SPIRITS", "n": "PORTO WHITE", "s": "", "t": 71.87, "m": 61.09, "d": "Malvasia Fina Viosinho,Donzelinho,Gouveio,Moscatel,Rabigato"},
+            {"f": "PORTUGAL - PORTO MARTHA’S WINES & SPIRITS", "n": "PORTO RUBY", "s": "", "t": 71.87, "m": 61.09, "d": "Tga Nacional,Tga Franca,Tta Barroca,Tto Cão,Tta Amarela,Tta Roriz"},
+            {"f": "PORTUGAL - PORTO MARTHA’S WINES & SPIRITS", "n": "PORTO TAWNY", "s": "", "t": 71.87, "m": 61.09, "d": "Tga Nacional,Tga Franca,Tta Barroca,Tto Cão,Tta Amarela,Tta Roriz"},
+            {"f": "PORTUGAL - PORTO MARTHA’S WINES & SPIRITS", "n": "PORTO ROSE", "s": "", "t": 105.47, "m": 89.65, "d": ""},
+            {"f": "PORTUGAL - PORTO MARTHA’S WINES & SPIRITS", "n": "PORTO 10 ANOS", "s": "", "t": 219.6, "m": 186.66, "d": "Tga Nacional,Tga Franca,Tta Barroca,Tto Cão,Tta Amarela,Tta Roriz"},
+            {"f": "PORTUGAL - PORTO MARTHA’S WINES & SPIRITS", "n": "PORTO 20 ANOS", "s": "", "t": 374.31, "m": 318.17, "d": "Tga Nacional,Tga Franca,Tta Barroca,Tto Cão,Tta Amarela,Tta Roriz"},
+            {"f": "PORTUGAL . AMARELEZA VINHOS . DOURO. VERDE . AMO.TE", "n": "AMO-TE BRANCO, VERDE DOC", "s": "2023", "t": 45.16, "m": 38.38, "d": "LOUREIRO,ARINTO,TRAJADURA"},
+            {"f": "PORTUGAL . AMARELEZA VINHOS . DOURO. VERDE . AMO.TE", "n": "AMO-TE ROSE, VERDE DOC", "s": "2022", "t": 45.16, "m": 38.38, "d": "VINHÃO,BORRAÇÃL,ESPADEIRO"},
+            {"f": "PORTUGAL . AMARELEZA VINHOS . DOURO. VERDE . AMO.TE", "n": "AMO-TE ROSE, VERDE DOC", "s": "2023", "t": 45.16, "m": 38.38, "d": "VINHÃO,BORRAÇÃL,ESPADEIRO"},
+            {"f": "PORTUGAL . AMARELEZA VINHOS . DOURO. VERDE . AMO.TE", "n": "AMO-TE TINTO, DOURO DOC", "s": "2020", "t": 52.87, "m": 44.94, "d": "TGA NACIONAL,TTA RORIZ,TGA FRANCA,TTA BARROCA"},
+            {"f": "PORTUGAL . CABRIZ. DÃO", "n": "C de CABRIZ", "s": "2022", "t": 42.6, "m": 36.21, "d": "TINTO"},
+            {"f": "PORTUGAL . CABRIZ. DÃO", "n": "C de CABRIZ", "s": "2022", "t": 42.6, "m": 36.21, "d": "TINTO"},
+            {"f": "PORTUGAL . CABRIZ. DÃO", "n": "C de CABRIZ", "s": "2022", "t": 42.6, "m": 36.21, "d": "BRANCO"},
+            {"f": "PORTUGAL . CABRIZ. DÃO", "n": "C de CABRIZ", "s": "2022", "t": 42.6, "m": 36.21, "d": "ROSE"},
+            {"f": "PORTUGAL . CABRIZ. DÃO", "n": "C de CABRIZ", "s": "2022", "t": 42.6, "m": 36.21, "d": "ROSE"},
+            {"f": "PORTUGAL . CABRIZ. DÃO", "n": "C de CABRIZ", "s": "2022", "t": 53.25, "m": 45.26, "d": "VERDE BRANCO"},
+            {"f": "PORTUGAL . CABRIZ. DÃO", "n": "CABRIZ MEIA GARRAFA COLHEITA SELECIONADA DOC TINTO", "s": "2022", "t": 37.87, "m": 32.19, "d": "Alfrocheiro, Aragonez, Touriga Nacional"},
+            {"f": "PORTUGAL . CABRIZ. DÃO", "n": "CABRIZ COLHEITA SELECIONADA DOC TINTO", "s": "2022", "t": 63.59, "m": 54.06, "d": "Alfrocheiro, Aragonez, Touriga Nacional"},
+            {"f": "PORTUGAL . CABRIZ. DÃO", "n": "CABRIZ MAGNUM COLHEITA SELECIONADA DOC TINTO", "s": "2022", "t": 143.86, "m": 122.28, "d": "Alfrocheiro, Aragonez, Touriga Nacional"},
+            {"f": "PORTUGAL . CABRIZ. DÃO", "n": "CABRIZ MAGNUM COLHEITA SELECIONADA DOC TINTO", "s": "2022", "t": 143.86, "m": 122.28, "d": "Alfrocheiro, Aragonez, Touriga Nacional"},
+            {"f": "PORTUGAL . CABRIZ. DÃO", "n": "CABRIZ MEIA GARRAFA COLHEITA SELECIONADA DOC BRANCO", "s": "2023", "t": 37.87, "m": 32.19, "d": "Bical, Cerceal,Encruzado,Malvasia"},
+            {"f": "PORTUGAL . CABRIZ. DÃO", "n": "CABRIZ COLHEITA SELECIONADA DOC BRANCO", "s": "2023", "t": 63.59, "m": 54.06, "d": "Bical, Cerceal, Encruzado, Malvasia"},
+            {"f": "PORTUGAL . CABRIZ. DÃO", "n": "CABRIZ ROSE COLHEITA SELECIONADA DOC", "s": "2023", "t": 63.59, "m": 54.06, "d": "ALFORCHEIRO, TOURIGA NACIONAL"},
+            {"f": "PORTUGAL . CABRIZ. DÃO", "n": "CABRIZ RESERVA DOC TINTO", "s": "2020", "t": 130.0, "m": 110.5, "d": "TOURIGA NACIONAL,ALFROCHEIRO,ARAGONEZ"},
+            {"f": "PORTUGAL . CABRIZ. DÃO", "n": "CABRIZ RESERVA DOC BRANCO", "s": "2022", "t": 130.0, "m": 110.5, "d": "ENCRUZADO"},
+            {"f": "PORTUGAL . CABRIZ. DÃO", "n": "CABRIZ RESERVA ESPECIAL DOC TINTO", "s": "2016", "t": 350.2, "m": 297.67, "d": "TOURIGA NACIONAL,ALFROCHEIRO,ARAGONEZ"},
+            {"f": "PORTUGAL . CABRIZ. DÃO", "n": "CABRIZ RESERVA ESPECIAL DOC TINTO", "s": "2014", "t": 350.2, "m": 297.67, "d": "TOURIGA NACIONAL,ALFROCHEIRO,ARAGONEZ"},
+            {"f": "PORTUGAL . CABRIZ. DÃO", "n": "CABRIZ TOURIGA NACIONAL DOC TINTO", "s": "2016", "t": 175.1, "m": 148.83, "d": "100% TOURIGA NACIONAL"},
+            {"f": "PORTUGAL . CABRIZ. DÃO", "n": "CABRIZ BIOLÓGICO DOC TINTO", "s": "2022", "t": 69.0, "m": 58.65, "d": "TOURIGA NACIONAL, ARAGONEZ"},
+            {"f": "PORTUGAL . CABRIZ. DÃO", "n": "CABRIZ BIOLÓGICO DOC BRANCO", "s": "2022", "t": 69.0, "m": 58.65, "d": "ENCRUZADO, BICAL"},
+            {"f": "PORTUGAL . CABRIZ. DÃO", "n": "CABRIZ ÍMPAR", "s": "2011", "t": 698.24, "m": 593.5, "d": "TINTO"},
+            {"f": "PORTUGAL . CABRIZ. DÃO", "n": "CABRIZ ESPUMANTE BRANCO BRUTO DOC", "s": "2017", "t": 63.59, "m": 54.06, "d": "MALVASIA FINA, BICAL"},
+            {"f": "PORTUGAL . CABRIZ. DÃO", "n": "CABRIZ ESPUMANTE BRANCO MEIO SECO DOC", "s": "2019", "t": 63.59, "m": 54.06, "d": "MALVASIA FINA, BICAL"},
+            {"f": "PORTUGAL . CABRIZ. DÃO", "n": "BAG IN BOX CABRIZ TINTO 3L", "s": "2022", "t": 170.83, "m": 145.2, "d": "ALFROCHEIRO,TINTA RORIZ"},
+            {"f": "PORTUGAL . CABRIZ. DÃO", "n": "BAG IN BOX CABRIZ BRANCO 3L", "s": "2022", "t": 170.83, "m": 145.2, "d": "BICAL,ENCRUZADO,MALVASIA FINA"},
+            {"f": "PORTUGAL . CABRIZ. DÃO", "n": "BAG IN BOX CABRIZ TINTO 3L", "s": "2023", "t": 170.83, "m": 145.2, "d": "ALFROCHEIRO,TINTA RORIZ"},
+            {"f": "PORTUGAL . CASA DE SANTAR . DÃO", "n": "CASA DE SANTAR TINTO", "s": "2021", "t": 76.54, "m": 65.06, "d": "TGA NACIONAL,TTA RORIZ,ALFROCHEIRO"},
+            {"f": "PORTUGAL . CASA DE SANTAR . DÃO", "n": "CASA DE SANTAR BRANCO", "s": "2023", "t": 76.54, "m": 65.06, "d": "ENCRUZADO,CERCEAL BRANCO,BICAL"},
+            {"f": "PORTUGAL . CASA DE SANTAR . DÃO", "n": "CASA DE SANTAR ROSÉ", "s": "2023", "t": 76.54, "m": 65.06, "d": "TGA NACIONAL,ALFROCHEIRO"},
+            {"f": "PORTUGAL . CASA DE SANTAR . DÃO", "n": "CASA DE SANTAR RESERVA DOC TINTO", "s": "2020", "t": 195.0, "m": 165.75, "d": "TGA NACIONAL,TTA RORIZ,ALFROCHEIRO"},
+            {"f": "PORTUGAL . CASA DE SANTAR . DÃO", "n": "CASA DE SANTAR RESERVA DOC BRANCO", "s": "2021", "t": 195.0, "m": 165.75, "d": "ENCRUZADO,BICAL,CERCEAL BRANCO"},
+            {"f": "PORTUGAL . CASA DE SANTAR . DÃO", "n": "CASA DE SANTAR RESERVA DOC BRANCO", "s": "2022", "t": 195.0, "m": 165.75, "d": "ENCRUZADO,BICAL,CERCEAL BRANCO"},
+            {"f": "PORTUGAL . CASA DE SANTAR . DÃO", "n": "CASA DE SANTAR OUTONO DE SANTAR DOC TINTO", "s": "2016", "t": 147.28, "m": 125.19, "d": "COLHEITA TARDIA"},
+            {"f": "PORTUGAL . QUINTA DO ENCONTRO . BAIRRADA", "n": "ENCONTRO BAGA DOC TINTO", "s": "2016", "t": 82.52, "m": 70.14, "d": "BAGA"},
+            {"f": "PORTUGAL . QUINTA DO ENCONTRO . BAIRRADA", "n": "ENCONTRO BAGA DOC TINTO", "s": "2015", "t": 82.52, "m": 70.14, "d": "BAGA"},
+            {"f": "PORTUGAL . QUINTA DO ENCONTRO . BAIRRADA", "n": "QDO E. PRETO E BRANCO DOC TINTO", "s": "2019", "t": 68.32, "m": 58.07, "d": "BAGA, TGA NACIONAL"},
+            {"f": "PORTUGAL . QUINTA DO ENCONTRO . BAIRRADA", "n": "QDO E. PRETO E BRANCO DOC BRANCO", "s": "2022", "t": 68.32, "m": 58.07, "d": "BICAL, ARINTO"},
+            {"f": "PORTUGAL . QUINTA DO ENCONTRO . BAIRRADA", "n": "QDO E. HARMONIA DOC TINTO", "s": "2018", "t": 53.64, "m": 45.59, "d": "TOURIGA NACIONAL, BAGA"},
+            {"f": "PORTUGAL . QUINTA DO ENCONTRO . BAIRRADA", "n": "QDO E. ESPUMANTE BRUTO BCO", "s": "2016", "t": 76.54, "m": 65.06, "d": "ARINTO, BICAL, BAGA"},
+            {"f": "ESPANHA - BODEGAS RIOJANAS", "n": "VINA ALBINA RESERVA", "s": "2017", "t": 210.0, "m": 178.5, "d": "TEMPRANILLO, MAZUELO, GRACIANO"},
+            {"f": "ESPANHA - BODEGAS RIOJANAS", "n": "VINA ALBINA GRAN RESERVA", "s": "2015", "t": 280.0, "m": 238.0, "d": "TEMPRANILLO, MAZUELO, GRACIANO"},
+            {"f": "ESPANHA - BODEGAS RIOJANAS", "n": "MONTE REAL RESERVA DE FAMILIA", "s": "2019", "t": 210.0, "m": 178.5, "d": "100% TEMPRANILLO"},
+            {"f": "ESPANHA - BODEGAS RIOJANAS", "n": "MONTE REAL GRAN RESERVA", "s": "2016", "t": 280.0, "m": 238.0, "d": "100% TEMPRANILLO"},
+            {"f": "ESPANHA - BODEGAS RIOJANAS", "n": "MARQUES DE TOMARES GRAN RESERVA", "s": "2015", "t": 454.4, "m": 386.24, "d": "RIOJA"},
+            {"f": "ESPANHA - BODEGAS RIOJANAS", "n": "MARQUES DE TOMARES EXCELLENS RESERVA", "s": "2018", "t": 238.6, "m": 202.81, "d": "RIOJA"},
+            {"f": "ESPANHA - BODEGAS RIOJANAS", "n": "MARQUES DE TOMARES CRIANZA", "s": "2020", "t": 173.2, "m": 147.22, "d": "RIOJA"},
+            {"f": "ESPANHA - BODEGAS RIOJANAS", "n": "MONTECILLO RESERVA", "s": "2017", "t": 199.0, "m": 169.15, "d": "D.O RIOJA"},
+            {"f": "ESPANHA - BODEGAS RIOJANAS", "n": "MONTECILLO CRIANZA", "s": "2019", "t": 139.0, "m": 118.15, "d": "D.O RIOJA"},
+            {"f": "ESPANHA - FREIXENET", "n": "VALDUBON CRIANZA", "s": "2019", "t": 189.9, "m": 161.42, "d": "RIBERA DEL DUERO"},
+            {"f": "ESPANHA - FREIXENET", "n": "VALDUBON ROBLE", "s": "2021", "t": 129.9, "m": 110.42, "d": "RIBERA DEL DUERO"},
+            {"f": "ESPANHA - FREIXENET", "n": "SOLAR VIEJO CRIANZA", "s": "2018", "t": 129.9, "m": 110.42, "d": "RIOJA"},
+            {"f": "ESPANHA - FREIXENET", "n": "ORUBE CRIANZA", "s": "2018", "t": 169.9, "m": 144.42, "d": "RIOJA"},
+            {"f": "ESPANHA - FELIX SOLIS", "n": "LOS MOLINOS TEMPRANILLO", "s": "2023", "t": 36.12, "m": 30.71, "d": "VALDEPENAS"},
+            {"f": "ESPANHA - FELIX SOLIS", "n": "LOS MOLINOS BRANCO", "s": "2023", "t": 36.12, "m": 30.71, "d": "AIREN/VERDEJO - VALDEPENAS"},
+            {"f": "ESPANHA - FELIX SOLIS", "n": "LOS MOLINOS ROSÉ", "s": "2023", "t": 36.12, "m": 30.71, "d": "TEMPRANILLO - VALDEPENAS"},
+            {"f": "ESPANHA - FELIX SOLIS", "n": "VINA ALBALI TEMPRANILLO", "s": "2023", "t": 41.68, "m": 35.43, "d": "VALDEPENAS"},
+            {"f": "ESPANHA - FELIX SOLIS", "n": "VINA ALBALI CRIANZA", "s": "2019", "t": 53.68, "m": 45.63, "d": "VALDEPENAS"},
+            {"f": "ESPANHA - FELIX SOLIS", "n": "VINA ALBALI RESERVA", "s": "2018", "t": 60.08, "m": 51.07, "d": "VALDEPENAS"},
+            {"f": "ESPANHA - FELIX SOLIS", "n": "VINA ALBALI GRAN RESERVA SELECCION PRIVADA", "s": "2017", "t": 72.86, "m": 61.94, "d": "VALDEPENAS"},
+            {"f": "ESPANHA - FELIX SOLIS", "n": "MUCHO MAS TINTO", "s": "", "t": 57.06, "m": 48.51, "d": "BLEND"},
+            {"f": "ESPANHA - FELIX SOLIS", "n": "MUCHO MAS BRANCO", "s": "", "t": 57.06, "m": 48.51, "d": "BLEND"},
+            {"f": "ESPANHA - FELIX SOLIS", "n": "MUCHO MAS ROSE", "s": "", "t": 57.06, "m": 48.51, "d": "BLEND"},
+            {"f": "ESPANHA - FELIX SOLIS", "n": "THE GUV'NOR TINTO", "s": "", "t": 57.06, "m": 48.51, "d": "BLEND"},
+            {"f": "ESPANHA - FELIX SOLIS", "n": "THE GUV'NOR BRANCO", "s": "", "t": 57.06, "m": 48.51, "d": "BLEND"},
+            {"f": "ESPANHA - FELIX SOLIS", "n": "THE GUV'NOR ROSE", "s": "", "t": 57.06, "m": 48.51, "d": "BLEND"},
+            {"f": "ESPANHA - FELIX SOLIS", "n": "THE GUV'NOR VIP TINTO", "s": "", "t": 89.0, "m": 75.65, "d": "TEMPRANILLO"},
+            {"f": "ESPANHA - FELIX SOLIS", "n": "ALTOS DE TAMARON ROBLE", "s": "2022", "t": 89.0, "m": 75.65, "d": "TEMPRANILLO"},
+            {"f": "ESPANHA - FELIX SOLIS", "n": "LA VACHE ESPAGNOLE TINTO", "s": "2024", "t": 36.12, "m": 30.71, "d": "TEMPRANILLO"},
+            {"f": "ESPANHA - FELIX SOLIS", "n": "BAJOS RESERVA", "s": "2018", "t": 52.88, "m": 44.95, "d": "TORO"},
+            {"f": "ESPANHA - FELIX SOLIS", "n": "BAJOS CRIANZA", "s": "2020", "t": 48.88, "m": 41.55, "d": "TORO"},
+            {"f": "ARGENTINA - RUTINI WINES", "n": "RUTINI QUALITA MALBEC", "s": "2022", "t": 130.0, "m": 110.5, "d": "BLEND"},
+            {"f": "ARGENTINA - RUTINI WINES", "n": "RUTINI QUALITA CABERNET", "s": "2021", "t": 130.0, "m": 110.5, "d": "BLEND"},
+            {"f": "ARGENTINA - RUTINI WINES", "n": "RUTINI QUALITA MALBEC", "s": "2021", "t": 221.0, "m": 187.85, "d": "SINGLE VINEYARD"},
+            {"f": "ARGENTINA - RUTINI WINES", "n": "RUTINI QUALITA CABERNET", "s": "2020", "t": 221.0, "m": 187.85, "d": "SINGLE VINEYARD"},
+            {"f": "ARGENTINA - EL ENEMIGO", "n": "EL ENEMIGO CHARDONNAY", "s": "2021", "t": 260.0, "m": 221.0, "d": "MENDOZA"},
+            {"f": "ARGENTINA - EL ENEMIGO", "n": "EL ENEMIGO MALBEC", "s": "2020", "t": 260.0, "m": 221.0, "d": "MENDOZA"},
+            {"f": "ARGENTINA - EL ENEMIGO", "n": "EL ENEMIGO SYRAH/VIOGNIER", "s": "2021", "t": 260.0, "m": 221.0, "d": "MENDOZA"},
+            {"f": "ARGENTINA - EL ENEMIGO", "n": "EL ENEMIGO BONARDA", "s": "2020", "t": 260.0, "m": 221.0, "d": "MENDOZA"},
+            {"f": "ARGENTINA - EL ENEMIGO", "n": "EL ENEMIGO CABERNET FRANC", "s": "2021", "t": 260.0, "m": 221.0, "d": "MENDOZA"},
+            {"f": "ARGENTINA - CATENA ZAPATA", "n": "CATENA MALBEC", "s": "2021", "t": 182.0, "m": 154.7, "d": "MENDOZA"},
+            {"f": "ARGENTINA - CATENA ZAPATA", "n": "CATENA CABERNET SAUVIGNON", "s": "2021", "t": 182.0, "m": 154.7, "d": "MENDOZA"},
+            {"f": "ARGENTINA - CATENA ZAPATA", "n": "DV CATENA MALBEC/MALBEC", "s": "2021", "t": 234.0, "m": 198.9, "d": "MENDOZA"},
+            {"f": "ARGENTINA - CATENA ZAPATA", "n": "DV CATENA CABERNET/MALBEC", "s": "2021", "t": 234.0, "m": 198.9, "d": "MENDOZA"},
+            {"f": "ARGENTINA - CATENA ZAPATA", "n": "ANGELICA ZAPATA MALBEC", "s": "2019", "t": 416.0, "m": 353.6, "d": "ALTA"},
+            {"f": "ARGENTINA - CATENA ZAPATA", "n": "ANGELICA ZAPATA CABERNET SAUVIGNON", "s": "2019", "t": 364.0, "m": 309.4, "d": "ALTA"},
+            {"f": "ÁFRICA DO SUL", "n": "STORMHOEK SYRAH", "s": "2025", "t": 33.9, "m": 28.81, "d": "WESTERN CAPE"},
+            {"f": "ÁFRICA DO SUL", "n": "STORMHOEK PINOTAGE", "s": "2025", "t": 33.9, "m": 28.81, "d": "WESTERN CAPE"},
+            {"f": "ÁFRICA DO SUL", "n": "STORMHOEK CHENIN BLANC", "s": "2025", "t": 33.9, "m": 28.81, "d": "WESTERN CAPE"},
+            {"f": "ÁFRICA DO SUL", "n": "STORMHOEK MOSCATO ROSE", "s": "2025", "t": 33.9, "m": 28.81, "d": "WESTERN CAPE"},
+            {"f": "ÁFRICA DO SUL", "n": "STORMHOEK MOSCATO BRANCO", "s": "2025", "t": 33.9, "m": 28.81, "d": "WESTERN CAPE"},
+            {"f": "ÁFRICA DO SUL", "n": "STORMHOEK PINOTAGE/SHIRAZ", "s": "2025", "t": 33.9, "m": 28.81, "d": "BAG IN BOX 3 LITROS"},
+            {"f": "ÁFRICA DO SUL", "n": "STORMHOEK CHENIN/CHARDONNAY", "s": "2025", "t": 33.9, "m": 28.81, "d": "BAG IN BOX 3 LITROS"},
+            {"f": "ÁFRICA DO SUL", "n": "VINHO S.A TTO STORMHOEK CABERNET/MERLOT (6X750ml)", "s": "2025", "t": 33.9, "m": 28.81, "d": ""},
+            {"f": "ÁFRICA DO SUL", "n": "VINHO S.A TTO STORMHOEK SHIRAZ/CABERNET (6X750ml)", "s": "2025", "t": 33.9, "m": 28.81, "d": ""},
+            {"f": "ÁFRICA DO SUL", "n": "VINHO S.A TTO STORMHOEK PINOTAGE/MALBEC (6X750ml)", "s": "2025", "t": 33.9, "m": 28.81, "d": ""},
+            {"f": "ÁFRICA DO SUL", "n": "VINHO S.A BCO STORMHOEK PINOT GRIGIO (6X750ml)", "s": "2025", "t": 33.9, "m": 28.81, "d": ""},
+            {"f": "ÁFRICA DO SUL", "n": "VINHO S.A BCO STORMHOEK CHARD./VIOGNIER (6X750ml)", "s": "2025", "t": 33.9, "m": 28.81, "d": ""}
+        ];
 
         const format = (v) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
@@ -369,8 +381,8 @@
                         <div class="text-[10px] text-gray-400 font-mono">${item.s}</div>
                     </td>
                     <td class="p-6 font-black text-amber-700 text-lg font-mono">${format(vendaML)}</td>
-                    <td class="p-6 text-gray-400 font-mono text-xs">${format(item.t)}</td>
-                    <td class="p-6 text-emerald-600 font-black font-mono text-base">${format(item.m)}</td>
+                    <td class="hidden sm:table-cell p-6 text-gray-400 font-mono text-xs">${format(item.t)}</td>
+                    <td class="hidden md:table-cell p-6 text-emerald-600 font-black font-mono text-base">${format(item.m)}</td>
                 </tr>`;
             });
             body.innerHTML = html;
@@ -419,8 +431,8 @@
                     html += `<tr class="wine-row border-b border-amber-100 bg-white hover:bg-amber-50 shadow-sm" onclick="showDetail(${originalIndex}, this)">
                         <td class="p-6"><div class="font-bold text-gray-800 text-base">${item.n}</div><div class="text-[10px] text-gray-400 font-mono">${item.s}</div></td>
                         <td class="p-6 font-black text-amber-700 text-lg font-mono">${format(vendaML)}</td>
-                        <td class="p-6 text-gray-400 font-mono text-xs">${format(item.t)}</td>
-                        <td class="p-6 text-emerald-600 font-black font-mono text-base">${format(item.m)}</td>
+                        <td class="hidden sm:table-cell p-6 text-gray-400 font-mono text-xs">${format(item.t)}</td>
+                        <td class="hidden md:table-cell p-6 text-emerald-600 font-black font-mono text-base">${format(item.m)}</td>
                     </tr>`;
                 });
             }
