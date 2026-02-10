@@ -2,7 +2,6 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>S&P - Inteligência ML</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -16,121 +15,95 @@
     </style>
 </head>
 <body class="bg-gray-50 text-gray-900">
-
-<div class="max-w-full mx-auto px-4 py-8">
-    <header class="flex flex-col lg:flex-row justify-between items-center mb-8 gap-6 bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-        <div>
-            <h1 class="text-2xl font-black text-wine uppercase tracking-tighter">Gestor Mercado Livre</h1>
-            <p class="text-[10px] text-gray-400 font-mono">247 ITENS MONITORADOS</p>
-        </div>
-        <div class="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
-            <input type="text" id="search-bar" onkeyup="filterTable()" placeholder="🔍 Pesquisar vinho..." 
+    <div class="max-w-full mx-auto px-4 py-8">
+        <header class="flex flex-col lg:flex-row justify-between items-center mb-8 gap-6 bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+            <h1 class="text-2xl font-black text-wine uppercase">Gestor Mercado Livre</h1>
+            <input type="text" id="search-bar" onkeyup="filterTable()" placeholder="🔍 Pesquisar em todos os itens..." 
                    class="w-full lg:w-96 px-5 py-3 rounded-2xl border-2 border-gray-100 outline-none focus:border-wine shadow-inner">
-            <div class="bg-ml px-6 py-2 rounded-2xl border border-yellow-400 shadow-sm flex items-center">
-                <span class="text-[11px] font-black text-amber-900 uppercase">(Tabela - 30%) + 45% ML</span>
-            </div>
-        </div>
-    </header>
+        </header>
 
-    <div class="grid grid-cols-1 xl:grid-cols-5 gap-8">
-        <div class="xl:col-span-1">
-            <div id="detail-panel" class="bg-wine p-6 rounded-[2rem] shadow-xl text-white min-h-[350px] flex flex-col justify-center sticky top-8">
-                <div id="default-msg" class="text-center">
-                    <p class="text-[10px] opacity-70 uppercase font-bold tracking-widest mb-2">Detalhes do Item</p>
-                    <p class="text-xs italic opacity-60">Clique em um vinho na tabela para ver os custos.</p>
-                </div>
-                <div id="wine-details" class="hidden space-y-5">
-                    <h2 id="det-name" class="text-lg font-black border-b border-white/20 pb-2"></h2>
-                    <div>
+        <div class="grid grid-cols-1 xl:grid-cols-5 gap-8">
+            <div class="xl:col-span-1">
+                <div id="detail-panel" class="bg-wine p-6 rounded-[2rem] shadow-xl text-white min-h-[350px] flex flex-col justify-center sticky top-8">
+                    <div id="wine-details" class="space-y-5">
+                        <h2 id="det-name" class="text-lg font-black border-b border-white/20 pb-2">Selecione um vinho</h2>
                         <p class="text-[9px] uppercase opacity-60 font-bold">Venda Sugerida ML</p>
                         <p id="det-ml" class="text-3xl font-black text-ml">R$ 0,00</p>
-                    </div>
-                    <div class="grid grid-cols-1 gap-3 border-t border-white/10 pt-4">
-                        <div class="flex justify-between text-[11px]"><span class="opacity-60 uppercase">Custo Aquisição</span><span id="det-cost" class="font-bold"></span></div>
-                        <div class="flex justify-between text-[11px]"><span class="opacity-60 uppercase">Preço Tabela</span><span id="det-tab" class="font-bold"></span></div>
-                        <div class="flex justify-between text-[11px]"><span class="text-emerald-400 font-bold uppercase">Preço Mercado</span><span id="det-mkt" class="font-bold text-emerald-400"></span></div>
+                        <div class="grid grid-cols-1 gap-3 border-t border-white/10 pt-4">
+                            <div class="flex justify-between text-[11px]"><span class="opacity-60 uppercase">Custo Aquisição</span><span id="det-cost"></span></div>
+                            <div class="flex justify-between text-[11px]"><span class="text-emerald-400 font-bold uppercase">Preço Mercado</span><span id="det-mkt"></span></div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-
-        <div class="xl:col-span-4 bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden">
-            <div class="overflow-x-auto">
+            <div class="xl:col-span-4 bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden text-sm">
                 <table class="w-full text-left border-collapse cursor-pointer">
                     <thead>
-                        <tr class="bg-gray-50 text-[10px] uppercase text-gray-400 font-black border-b border-gray-100">
+                        <tr class="bg-gray-50 text-[10px] uppercase text-gray-400 font-black">
                             <th class="p-5">Produto</th>
                             <th class="p-5">Venda ML</th>
                             <th class="p-5">Tabela</th>
-                            <th class="p-5 text-right">Ação</th>
+                            <th class="p-5">Ação</th>
                         </tr>
                     </thead>
-                    <tbody id="table-content" class="text-sm"></tbody>
+                    <tbody id="table-content"></tbody>
                 </table>
             </div>
         </div>
     </div>
-</div>
 
-<script>
-    // ETAPA 2: DADOS SERÃO COLOCADOS AQUI
-    const wineData = [
-       {"f": "ITÁLIA - LOMBARDIA", "n": "GAGGIARONE CROATINA 2021", "m": 123.78, "t": 145.63},
-{"f": "ITÁLIA - LOMBARDIA", "n": "CA MONTEBELLO PINOT NERO 2021", "m": 72.42, "t": 85.2},
-{"f": "ESPANHA - RIOJA", "n": "VINA ALBINA RESERVA 2017", "m": 178.50, "t": 210.00},
-{"f": "PORTUGAL", "n": "AZEITE EXTRA VIRGEM CABRIZ 500ML", "m": 512.8, "t": 599.0},
-{"f": "ARGENTINA", "n": "EL ENEMIGO CHARDONNAY 2021", "m": 221.0, "t": 260.0}
-    ];
+    <script>
+        let globalData = [];
+        const format = (v) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
-    const format = (v) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-
-    function init() {
-        const body = document.getElementById('table-content');
-        let html = '';
-        let currentFam = '';
-
-        wineData.forEach((item, index) => {
-            if (item.f !== currentFam) {
-                currentFam = item.f;
-                html += `<tr class="family-header"><td colspan="4" class="p-4 text-[9px] font-black text-gray-500 uppercase">${currentFam}</td></tr>`;
+        async function loadData() {
+            try {
+                const response = await fetch('vinhos.json');
+                globalData = await response.json();
+                renderTable(globalData);
+            } catch (e) {
+                console.error("Erro ao carregar vinhos.json", e);
             }
-            const custo = item.t * 0.70;
-            const vendaML = custo * 1.45;
-            const shopUrl = `https://www.google.com/search?tbm=shop&q=${encodeURIComponent(item.n)}&tbs=p_ord:p`;
+        }
 
-            html += `<tr class="wine-row border-b border-gray-50 hover:bg-amber-50" onclick="showDetail(${index}, this)">
-                <td class="p-5 font-bold text-gray-800">${item.n}</td>
-                <td class="p-5 font-black text-amber-700">${format(vendaML)}</td>
-                <td class="p-5 text-gray-400">${format(item.t)}</td>
-                <td class="p-5 text-right"><a href="${shopUrl}" target="_blank" class="text-[10px] font-black border border-emerald-200 px-2 py-1 rounded-md text-emerald-700" onclick="event.stopPropagation()">SHOPPING</a></td>
-            </tr>`;
-        });
-        body.innerHTML = html;
-    }
+        function renderTable(data) {
+            const body = document.getElementById('table-content');
+            let html = '';
+            let currentFam = '';
+            data.forEach((item, index) => {
+                if (item.f !== currentFam) {
+                    currentFam = item.f;
+                    html += `<tr class="family-header"><td colspan="4" class="p-4 text-[9px] font-black text-gray-500 uppercase">${currentFam}</td></tr>`;
+                }
+                const custo = item.t * 0.70;
+                const vendaML = custo * 1.45;
+                html += `<tr class="wine-row border-b border-gray-50 hover:bg-amber-50" onclick="showDetail(${index}, this)">
+                    <td class="p-5 font-bold">${item.n}</td>
+                    <td class="p-5 font-black text-amber-700">${format(vendaML)}</td>
+                    <td class="p-5 text-gray-400">${format(item.t)}</td>
+                    <td class="p-5"><a href="https://www.google.com/search?tbm=shop&q=${encodeURIComponent(item.n)}&tbs=p_ord:p" target="_blank" class="text-[10px] border px-2 py-1 rounded">SHOPPING</a></td>
+                </tr>`;
+            });
+            body.innerHTML = html;
+        }
 
-    function showDetail(index, element) {
-        document.querySelectorAll('.wine-row').forEach(r => r.classList.remove('selected-row'));
-        element.classList.add('selected-row');
-        const item = wineData[index];
-        const custo = item.t * 0.70;
-        const vendaML = custo * 1.45;
+        function showDetail(index, element) {
+            document.querySelectorAll('.wine-row').forEach(r => r.classList.remove('selected-row'));
+            element.classList.add('selected-row');
+            const item = globalData[index];
+            document.getElementById('det-name').innerText = item.n;
+            document.getElementById('det-ml').innerText = format((item.t * 0.7) * 1.45);
+            document.getElementById('det-cost').innerText = format(item.t * 0.7);
+            document.getElementById('det-mkt').innerText = format(item.m);
+        }
 
-        document.getElementById('default-msg').classList.add('hidden');
-        document.getElementById('wine-details').classList.remove('hidden');
-        document.getElementById('det-name').innerText = item.n;
-        document.getElementById('det-ml').innerText = format(vendaML);
-        document.getElementById('det-cost').innerText = format(custo);
-        document.getElementById('det-tab').innerText = format(item.t);
-        document.getElementById('det-mkt').innerText = format(item.m);
-    }
-
-    function filterTable() {
-        const q = document.getElementById('search-bar').value.toLowerCase();
-        document.querySelectorAll('.wine-row').forEach(row => {
-            row.classList.toggle('row-hidden', !row.innerText.toLowerCase().includes(q));
-        });
-    }
-    window.onload = init;
-</script>
+        function filterTable() {
+            const q = document.getElementById('search-bar').value.toLowerCase();
+            document.querySelectorAll('.wine-row').forEach(row => {
+                row.classList.toggle('row-hidden', !row.innerText.toLowerCase().includes(q));
+            });
+        }
+        window.onload = loadData;
+    </script>
 </body>
 </html>
