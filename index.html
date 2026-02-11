@@ -3,463 +3,217 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Catálogo S&P — Vinhos e Harmonizador</title>
+  <title>Harmonizador Visual — Foto do Prato + Sugestões de Vinho</title>
   <style>
     :root{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;line-height:1.4}
-    body{max-width:1200px;margin:20px auto;padding:18px;background:#f6f7fb;color:#111}
+    body{max-width:980px;margin:28px auto;padding:18px;background:#f6f7fb;color:#111}
     header{display:flex;align-items:center;justify-content:space-between;gap:12px}
     h1{margin:0;font-size:1.25rem}
-    .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-    input,select,button{padding:8px;border:1px solid #d1d5db;border-radius:6px}
-    .families{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-top:18px}
-    .family{background:#fff;padding:12px;border-radius:8px;box-shadow:0 1px 6px rgba(16,24,40,.06);display:flex;flex-direction:column;gap:10px}
-    .family .img{height:160px;background:#fff;border-radius:6px;overflow:hidden;display:flex;align-items:center;justify-content:center;border:1px solid #eef2f7}
-    .family h2{margin:0;font-size:1rem;display:flex;justify-content:space-between;align-items:center;gap:8px}
-    .list{margin:0;padding:0;list-style:none;max-height:260px;overflow:auto}
-    .list li{padding:6px 0;border-bottom:1px solid #f1f5f9;font-size:0.95rem}
-    .muted{color:#6b7280;font-size:0.9rem}
-    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-top:18px}
-    .card{background:#fff;padding:12px;border-radius:8px;box-shadow:0 1px 6px rgba(16,24,40,.06)}
-    .thumb{height:160px;background:#f3f4f6;border-radius:6px;overflow:hidden;display:flex;align-items:center;justify-content:center}
-    .thumb img{width:100%;height:100%;object-fit:cover}
-    .actions{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
-    pre{background:#0f172a;color:#fff;padding:12px;border-radius:6px;overflow:auto;max-height:320px}
+    .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:12px}
+    input,select,button,textarea{padding:8px;border:1px solid #d1d5db;border-radius:6px}
+    .main{display:grid;grid-template-columns:1fr 360px;gap:18px;margin-top:18px}
+    .panel{background:#fff;padding:14px;border-radius:10px;box-shadow:0 1px 6px rgba(16,24,40,.06)}
+    .dish{display:flex;flex-direction:column;align-items:center;gap:12px}
+    .dish img{width:100%;max-width:640px;height:auto;border-radius:8px;object-fit:cover;border:1px solid #e6eef8}
+    .muted{color:#6b7280;font-size:0.95rem}
+    .wine-list{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+    .wine-item{background:#f8fafc;padding:8px;border-radius:8px;border:1px solid #e6eef8}
+    .teach{display:flex;flex-direction:column;gap:8px}
+    .small{font-size:0.9rem;color:#6b7280}
+    .placeholder{width:100%;max-width:640px;height:360px;border-radius:8px;background:#f3f4f6;display:flex;align-items:center;justify-content:center;color:#9ca3af;border:1px dashed #e6eef8}
+    .actions{display:flex;gap:8px;flex-wrap:wrap}
     footer{margin-top:18px;color:#6b7280;font-size:0.9rem}
-    .badge{background:#eef2ff;color:#1e3a8a;padding:4px 8px;border-radius:999px;font-weight:600}
-    /* Harmonization SVG styling */
-    .harmo-svg{width:100%;height:160px;display:block}
-    .harmo-panel{background:#fff;padding:12px;border-radius:8px;box-shadow:0 1px 6px rgba(16,24,40,.04);margin-top:12px}
   </style>
 </head>
 <body>
   <header>
     <div>
-      <h1>Catálogo S&P — Vinhos e Harmonizador</h1>
-      <div class="muted">Exibe nomes por família; a imagem de rótulo foi substituída por um ícone de harmonização (chef + sommelier + enólogo).</div>
-    </div>
-
-    <div class="controls">
-      <input id="search" placeholder="Pesquisar por nome de vinho" style="width:300px" />
-      <select id="filterFamily"><option value="">Todas as famílias</option></select>
-      <button id="btnShowAll">Mostrar Todos</button>
+      <h1>Harmonizador Visual</h1>
+      <div class="muted">Mostra a foto do prato (buscada na web) e as sugestões de vinhos abaixo.</div>
     </div>
   </header>
 
-  <section id="info" style="margin-top:12px;background:#fff;padding:10px;border-radius:6px;box-shadow:0 1px 4px rgba(0,0,0,.04)">
-    <strong>Total de rótulos:</strong> <span id="totalCount">0</span>
-    &nbsp;•&nbsp;
-    <strong>Famílias:</strong> <span id="familyCount">0</span>
-  </section>
+  <div class="controls">
+    <select id="wineSelect" style="min-width:360px"></select>
+    <input id="termInput" placeholder="Ou digite um termo de prato (ex.: salmon, paella)" style="min-width:260px" />
+    <button id="btnFind">Buscar prato</button>
+    <button id="btnRandom">Aleatório</button>
+  </div>
 
-  <main>
-    <section id="families" class="families" aria-live="polite"></section>
-  </main>
-
-  <hr style="margin:18px 0" />
-
-  <section class="harmo-panel" aria-live="polite">
-    <h2 style="margin:0 0 8px">Harmonização guiada</h2>
-    <div class="muted" style="margin-bottom:8px">Quando você escolher um prato, o chef, o sommelier e o enólogo colaboram para sugerir a melhor harmonização.</div>
-
-    <!-- Inline SVG representando Chef + Sommelier + Enólogo (substitui foto do vinho) -->
-    <svg class="harmo-svg" viewBox="0 0 1200 300" role="img" aria-label="Ícone de harmonização: chef, sommelier e enólogo">
-      <defs>
-        <linearGradient id="g1" x1="0" x2="1">
-          <stop offset="0" stop-color="#fef3c7"/>
-          <stop offset="1" stop-color="#fee2e2"/>
-        </linearGradient>
-        <linearGradient id="g2" x1="0" x2="1">
-          <stop offset="0" stop-color="#dbeafe"/>
-          <stop offset="1" stop-color="#e9d5ff"/>
-        </linearGradient>
-      </defs>
-
-      <!-- background -->
-      <rect x="0" y="0" width="1200" height="300" fill="#ffffff"/>
-
-      <!-- Chef (left) -->
-      <g transform="translate(120,40)">
-        <rect x="-100" y="-20" width="240" height="220" rx="18" fill="#fff" stroke="#eef2f7"/>
-        <circle cx="20" cy="40" r="36" fill="#fde68a" stroke="#f59e0b" />
-        <rect x="-10" y="80" width="60" height="80" rx="8" fill="#fff" stroke="#f3f4f6"/>
-        <path d="M-20 170 q40 30 80 0" fill="#f3f4f6"/>
-        <text x="20" y="220" font-size="18" text-anchor="middle" fill="#374151">Chef</text>
-      </g>
-
-      <!-- Sommelier (center) -->
-      <g transform="translate(520,20)">
-        <rect x="-120" y="-10" width="240" height="240" rx="18" fill="#fff" stroke="#eef2f7"/>
-        <ellipse cx="0" cy="60" rx="36" ry="36" fill="#fce7f3" stroke="#db2777"/>
-        <rect x="-30" y="110" width="60" height="70" rx="8" fill="#fff" stroke="#f3f4f6"/>
-        <!-- wine glass icon -->
-        <g transform="translate(0,40)">
-          <path d="M0 0 q20 30 0 60 q-20 -30 0 -60 z" fill="#fff" stroke="#7c3aed"/>
-          <rect x="-6" y="60" width="12" height="40" fill="#7c3aed"/>
-          <rect x="-18" y="100" width="36" height="8" rx="4" fill="#7c3aed"/>
-        </g>
-        <text x="0" y="230" font-size="18" text-anchor="middle" fill="#374151">Sommelier</text>
-      </g>
-
-      <!-- Enólogo (right) -->
-      <g transform="translate(920,40)">
-        <rect x="-100" y="-20" width="240" height="220" rx="18" fill="#fff" stroke="#eef2f7"/>
-        <circle cx="20" cy="40" r="36" fill="#dbeafe" stroke="#2563eb" />
-        <rect x="-10" y="80" width="60" height="80" rx="8" fill="#fff" stroke="#f3f4f6"/>
-        <!-- grape cluster -->
-        <g transform="translate(20,120)">
-          <circle cx="-18" cy="-10" r="10" fill="#7c3aed"/>
-          <circle cx="0" cy="-6" r="12" fill="#6d28d9"/>
-          <circle cx="18" cy="-10" r="10" fill="#7c3aed"/>
-          <path d="M0 6 q0 12 -6 18" stroke="#4b5563" stroke-width="2" fill="none"/>
-        </g>
-        <text x="20" y="220" font-size="18" text-anchor="middle" fill="#374151">Enólogo</text>
-      </g>
-
-      <!-- central message -->
-      <g transform="translate(600,260)">
-        <rect x="-420" y="-40" width="840" height="48" rx="8" fill="#111827" opacity="0.06"/>
-        <text x="0" y="0" font-size="20" text-anchor="middle" fill="#111827">Harmonização colaborativa: Chef + Sommelier + Enólogo</text>
-      </g>
-    </svg>
-
-    <div style="margin-top:12px">
-      <label for="wineSelectHarmo" class="muted">Escolha um rótulo para iniciar a sugestão:</label>
-      <select id="wineSelectHarmo" style="width:100%;padding:8px;border-radius:6px;border:1px solid #d1d5db;margin-top:6px"></select>
-      <div style="margin-top:8px;display:flex;gap:8px">
-        <button id="btnSearchHarmo">Buscar Top 3</button>
-        <button id="btnRandomHarmo">Aleatório</button>
+  <div class="main">
+    <section class="panel">
+      <div id="dishArea" class="dish" aria-live="polite">
+        <div id="dishPlaceholder" class="placeholder">Nenhuma imagem carregada</div>
+        <div id="dishTitle" class="muted"></div>
+        <div id="dishSource" class="muted"></div>
       </div>
-    </div>
-  </section>
 
-  <section style="margin-top:12px">
-    <div id="status" class="muted">Pronto. Selecione um rótulo e clique em Buscar Top 3.</div>
-    <main id="results" class="grid" style="margin-top:12px"></main>
-  </section>
+      <div style="margin-top:12px">
+        <strong>Sugestões de vinhos</strong>
+        <div id="wineSuggestions" class="wine-list"></div>
+      </div>
+    </section>
+
+    <aside class="panel">
+      <div>
+        <strong>Ensinar mapeamento vinho → prato</strong>
+        <div class="small muted" style="margin-top:6px">Associe um rótulo a um termo de busca (palavra-chave de prato). O app usará isso para buscar a foto do prato.</div>
+        <div class="teach" style="margin-top:10px">
+          <input id="teachWine" placeholder="Nome do vinho (ex.: Porta 6 Reserva)" />
+          <input id="teachTerm" placeholder="Termo de prato (ex.: salmon, paella, prawns)" />
+          <div class="actions">
+            <button id="btnTeach">Salvar associação</button>
+            <button id="btnListMappings">Ver associações</button>
+            <button id="btnClearMappings" style="background:#fff;border:1px solid #f87171;color:#b91c1c">Limpar todas</button>
+          </div>
+          <pre id="mappingsPreview" style="margin-top:8px;white-space:pre-wrap;max-height:220px;overflow:auto;background:#f8fafc;padding:8px;border-radius:6px;border:1px solid #eef2f7">Nenhuma associação.</pre>
+        </div>
+      </div>
+
+      <hr style="margin:12px 0" />
+
+      <div>
+        <strong>Configuração de sugestões</strong>
+        <div class="small muted" style="margin-top:6px">Edite a lista de vinhos sugeridos por padrão (aparecem abaixo da foto do prato).</div>
+        <textarea id="defaultWines" rows="6" style="width:100%;margin-top:8px"></textarea>
+        <div style="margin-top:8px" class="actions">
+          <button id="btnSaveDefaults">Salvar lista</button>
+          <button id="btnResetDefaults">Restaurar padrão</button>
+        </div>
+      </div>
+    </aside>
+  </div>
 
   <footer>
-    <div class="muted">Se quiser que eu altere o estilo do ícone (cores, texto, layout) eu atualizo o SVG conforme preferir.</div>
+    <div class="muted">Busca de pratos via TheMealDB (chave pública). O app salva associações localmente no navegador.</div>
   </footer>
 
   <script>
-    /* ====== Dados (mantidos) ====== */
+    // ---------- Dados iniciais ----------
     const PRODUCTS = [
-      {"code":"3000211","product":"Gaggiarone Vitgni Giovani Tto - Croatina","family":"Gaggiarone"},
-      {"code":"3000420","product":"Gaggiarone Vitgni Giovani Tto - Croatina","family":"Gaggiarone"},
-      {"code":"208","product":"Ca Montebello Tto DOC - Pinot Nero","family":"Ca Montebello"},
-      {"code":"284","product":"Ca Montebello Bco DOC - Pinot Nero Bianco","family":"Ca Montebello"},
-      {"code":"3000209","product":"Ca Montebello Bco IGT - Pinot Grigio","family":"Ca Montebello"},
-      {"code":"3000210","product":"Ca Montebello Tto DOC - Barbera, Uva Rara","family":"Ca Montebello"},
-      {"code":"290","product":"Neroperso Rosso Veneto IGT - Apassimento","family":"Neroperso"},
-      {"code":"3000291","product":"Liburna DOC Sicilia Tto - Nero d'Avola","family":"Liburna"},
-      {"code":"3000288","product":"Borgo del Filari DOC d'Abruzzo - Montepulciano","family":"Borgo del Filari"},
-      {"code":"355","product":"La Fogliata di Puglia - Primitivo","family":"La Fogliata"},
-      {"code":"3000388","product":"Torre Romanica - Rosso","family":"Torre Romanica"},
-      {"code":"405","product":"Torre Romanica - Bianco","family":"Torre Romanica"},
-      {"code":"3000405","product":"Torre Romanica - Bianco","family":"Torre Romanica"},
-      {"code":"422","product":"Torre Romanica - Rosato","family":"Torre Romanica"},
-      {"code":"3000422","product":"Torre Romanica - Rosato","family":"Torre Romanica"},
-      {"code":"3000406","product":"Torre Romanica Tto - Sangiovese","family":"Torre Romanica"},
-      {"code":"3000428","product":"Torre Romanica Pinot Grigio","family":"Torre Romanica"},
-      {"code":"3000389","product":"Torre Romanica Puglia - Primitivo","family":"Torre Romanica"},
-      {"code":"397","product":"Torre Romanica Premium - Montepulciano","family":"Torre Romanica"},
-      {"code":"413","product":"Le Cime Passito IGT – Garganega, Moscato Amarelo","family":"Le Cime"},
-      {"code":"412","product":"Carpino Garda DOC – Merlot","family":"Carpino"},
-      {"code":"216","product":"Ribó Garda DOC - Cabernet Franc, Cabernet Sauvignon","family":"Ribó"},
-      {"code":"415","product":"Meridiano Garda DOC – Chardonnay","family":"Meridiano"},
-      {"code":"414","product":"Lugana DOC – Turbiana","family":"Lugana"},
-      {"code":"408","product":"Cornalino Rosso IGT Alto Mincio – Merlot, Cabernet","family":"Cornalino"},
-      {"code":"407","product":"I Ciottoli Garda DOC – Cabernet Franc, Cab. Sauvignon","family":"I Ciottoli"},
-      {"code":"411","product":"Le Mure Garda DOC – Chardonnay","family":"Le Mure"},
-      {"code":"215","product":"Mandorlo Bianco IGT Mantova – Tocai Friulano","family":"Mandorlo"},
-      {"code":"410","product":"La Casina Bianco Garda DOC – Garganega, Trebbiano, Chardonnay","family":"La Casina"},
-      {"code":"214","product":"La Casina Chiaretto Garda DOC – Merlot, Cabernet, Rondinella","family":"La Casina"},
-      {"code":"409","product":"La Casina Rosso Garda DOC – Merlot, Rondinella, Cab. Sauvignon, Sangiovese","family":"La Casina"},
-      {"code":"3000221","product":"Dirty Rabbit Tto - Petit Verdot","family":"Rabbit"},
-      {"code":"220","product":"Charming Rabbit Bco - Chardonnay","family":"Rabbit"},
-      {"code":"3000222","product":"Mrs. Rabbit Tto - Pinot Noir","family":"Rabbit"},
-      {"code":"245","product":"Pink Rabbit Rosé - Grenache, Syrah","family":"Rabbit"},
-      {"code":"223","product":"Mr. Rabbit Tto - Cabernet Sauvignon","family":"Rabbit"},
-      {"code":"224","product":"Master Rabbit Tto - Syrah","family":"Rabbit"},
-      {"code":"272","product":"Spring Rabbit Bco - Sauvignon Blanc","family":"Rabbit"},
-      {"code":"225","product":"Chatelain Valmont Cotes du Rhone Tto - Grenache Syrah","family":"Chatelain"},
-      {"code":"3000444","product":"Pescada Branco, DOC Verde","family":"Pescada"},
-      {"code":"3000467","product":"Pescada Rosé, DOC Verde","family":"Pescada"},
-      {"code":"445","product":"Pescada - Arinto e Trajadura","family":"Pescada"},
-      {"code":"446","product":"Pescada - 100% Alvarinho","family":"Pescada"},
-      {"code":"171","product":"Porta 6 Tto meia garrafa","family":"Porta 6"},
-      {"code":"172","product":"Porta 6 Bco meia garrafa","family":"Porta 6"},
-      {"code":"130","product":"Espumante Porta 6 Bco Brut","family":"Porta 6"},
-      {"code":"160","product":"Vinho Verde Porta 6 DOC","family":"Porta 6"},
-      {"code":"3000160","product":"Vinho Verde Porta 6 DOC","family":"Porta 6"},
-      {"code":"931","product":"Porta 6 Bco","family":"Porta 6"},
-      {"code":"300093","product":"Porta 6 Bco","family":"Porta 6"},
-      {"code":"185","product":"Porta 6 Rosé","family":"Porta 6"},
-      {"code":"300078","product":"Porta 6 Tto","family":"Porta 6"},
-      {"code":"170","product":"Porta 6 Reserva Tto","family":"Porta 6"},
-      {"code":"3000157","product":"Porta 6 Magnum Tto","family":"Porta 6"},
-      {"code":"3000250","product":"Porta 6 Double Magnum Tto","family":"Porta 6"},
-      {"code":"3000173","product":"Bag in Box Porta 6 Tto","family":"Porta 6"},
-      {"code":"3000466","product":"Bag in Box Porta 6 Bco","family":"Porta 6"},
-      {"code":"3000296","product":"Pack 2un - Porta 6 Tto","family":"Porta 6"},
-      {"code":"3000400","product":"Pack 2un - (1 Porta 6 Tto 1 Porta 6 Bco)","family":"Porta 6"},
-      {"code":"3000348","product":"Porta 6 Bitube Tto","family":"Porta 6"},
-      {"code":"110","product":"Dom Dinis Reserva Tto","family":"Dom Dinis"},
-      {"code":"161","product":"Dom Dinis Mesa Bco","family":"Dom Dinis"},
-      {"code":"39","product":"Reserva dos Amigos Tinto","family":"Reserva dos Amigos"},
-      {"code":"83","product":"Reserva dos Amigos Magnum Tto","family":"Reserva dos Amigos"},
-      {"code":"162","product":"Reserva dos Amigos Seleção Especial Tto","family":"Reserva dos Amigos"},
-      {"code":"3000163","product":"Bag in Box Branco dos Amigos","family":"Reserva dos Amigos"},
-      {"code":"97","product":"Bag in Box Tinto dos Amigos","family":"Reserva dos Amigos"},
-      {"code":"120","product":"3 Autores Verde DOC Branco","family":"3 Autores"},
-      {"code":"96","product":"3 Autores Douro DOC Tinto","family":"3 Autores"},
-      {"code":"246","product":"3 Autores Douro DOC Branco","family":"3 Autores"},
-      {"code":"114","product":"3 Autores Grande Reserva Tto","family":"3 Autores"},
-      {"code":"3000116","product":"Coragem Superior Tto","family":"Coragem"},
-      {"code":"115","product":"Coragem Superior Bco","family":"Coragem"},
-      {"code":"178","product":"Coragem Reserva Tto","family":"Coragem"},
-      {"code":"180","product":"Coragem Regional Lisboa Tto","family":"Coragem"},
-      {"code":"111","product":"N.B.N.C No Branding No Cry Tto (Vidigal)","family":"Vidigal"},
-      {"code":"300046","product":"Brutalis by Vidigal Tto","family":"Vidigal"},
-      {"code":"3000297","product":"Brutalis by Vidigal Tto","family":"Vidigal"},
-      {"code":"41","product":"Vidigal Reserva Tto","family":"Vidigal"},
-      {"code":"300043","product":"Vidigal Single Grape Tto - Touriga Nacional","family":"Vidigal"},
-      {"code":"159","product":"Vidigal Chapeu de Praia Rosé","family":"Vidigal"},
-      {"code":"326","product":"Zé do Telhado DOC Douro","family":"Vidigal"},
-      {"code":"333","product":"Boa Noite Lisboa Tinto","family":"Boa Noite Lisboa"},
-      {"code":"334","product":"Boa Noite Lisboa Branco","family":"Boa Noite Lisboa"},
-      {"code":"344","product":"Boa Noite Lisboa Rosé","family":"Boa Noite Lisboa"},
-      {"code":"3000154","product":"Júlia Florista Tto","family":"Júlia Florista"},
-      {"code":"3000181","product":"Júlia Florista Bco","family":"Júlia Florista"},
-      {"code":"3000346","product":"Júlia Florista Rosé","family":"Júlia Florista"},
-      {"code":"3000345","product":"Júlia Florista Reserva Tto","family":"Júlia Florista"},
-      {"code":"3000196","product":"Bag in Box Júlia Florista Bco","family":"Júlia Florista"},
-      {"code":"3000179","product":"Bag in Box Júlia Florista Tto","family":"Júlia Florista"},
-      {"code":"347","product":"Júlia Florista Bitube Tto","family":"Júlia Florista"},
-      {"code":"232","product":"Artolas Reserva Tto","family":"Artolas"},
-      {"code":"153","product":"Artolas Tinto","family":"Artolas"},
-      {"code":"158","product":"Artolas Branco","family":"Artolas"},
-      {"code":"3000233","product":"Artolas Rosé","family":"Artolas"},
-      {"code":"90","product":"Da Pipa Branco","family":"Da Pipa"},
-      {"code":"3000273","product":"Da Pipa Tinto","family":"Da Pipa"},
-      {"code":"298","product":"Da Pipa Rosé","family":"Da Pipa"},
-      {"code":"241","product":"Da Pipa Branco","family":"Da Pipa"},
-      {"code":"247","product":"Da Pipa Rosé","family":"Da Pipa"},
-      {"code":"3000242","product":"Da Pipa Tinto","family":"Da Pipa"},
-      {"code":"358","product":"Da Pipa Frisante Branco","family":"Da Pipa"},
-      {"code":"359","product":"Da Pipa Frisante Rosé","family":"Da Pipa"},
-      {"code":"356","product":"Da Pipa Espumante Branco (Blanc de Blancs)","family":"Da Pipa"},
-      {"code":"357","product":"Da Pipa Espumante Rosé","family":"Da Pipa"},
-      {"code":"3000243","product":"Da Pipa Bag in Box Bco","family":"Da Pipa"},
-      {"code":"3000248","product":"Da Pipa Bag in Box Rosé","family":"Da Pipa"},
-      {"code":"3000244","product":"Da Pipa Bag in Box Tto","family":"Da Pipa"},
-      {"code":"266","product":"Da Pipa Reserva IG Bco","family":"Da Pipa"},
-      {"code":"3000267","product":"Da Pipa Reserva IG Tto","family":"Da Pipa"},
-      {"code":"3000268","product":"Da Pipa Colheita Selecionada Tto","family":"Da Pipa"},
-      {"code":"270","product":"Da Pipa Signature Bco","family":"Da Pipa"},
-      {"code":"3000314","product":"Fonte da Perdiz Reserva Tinto - Douro DOC","family":"Fonte da Perdiz"},
-      {"code":"3000317","product":"Fonte da Perdiz Tinto - Douro DOC","family":"Fonte da Perdiz"},
-      {"code":"3000315","product":"Fonte da Perdiz Branco - Douro DOC","family":"Fonte da Perdiz"},
-      {"code":"3000427","product":"Fonte da Perdiz Superior Tinto","family":"Fonte da Perdiz"},
-      {"code":"3000327","product":"Intimista Tinto","family":"Amareleza"},
-      {"code":"3000343","product":"Intimista Branco","family":"Amareleza"},
-      {"code":"3000310","product":"Intimista Rosé","family":"Amareleza"},
-      {"code":"3000299","product":"Eruptio Blend Açores D.O Pico","family":"Eruptio"},
-      {"code":"3000300","product":"Eruptio Arinto D.O Pico","family":"Eruptio"},
-      {"code":"3000301","product":"Eruptio Verdelho D.O Pico","family":"Eruptio"},
-      {"code":"3000354","product":"Moscatel do Douro - Martha's","family":"Martha's"},
-      {"code":"3000350","product":"Porto White - Martha's","family":"Martha's"},
-      {"code":"3000351","product":"Porto Ruby - Martha's","family":"Martha's"},
-      {"code":"3000423","product":"Porto Rosé - Martha's","family":"Martha's"},
-      {"code":"353","product":"Porto 10 anos - Martha's","family":"Martha's"},
-      {"code":"423","product":"Porto 20 anos - Martha's","family":"Martha's"},
-      {"code":"3000360","product":"Isla Negra Reserva - Cabernet Sauvignon","family":"Isla Negra"},
-      {"code":"3000361","product":"Isla Negra Reserva - Carmenere","family":"Isla Negra"},
-      {"code":"3000362","product":"Isla Negra Reserva - Merlot","family":"Isla Negra"},
-      {"code":"3000363","product":"Isla Negra Reserva - Sauvignon Blanc","family":"Isla Negra"},
-      {"code":"3000263","product":"New Roads Tto - Malbec, Tempranillo, Bonarda","family":"New Roads"},
-      {"code":"3000271","product":"New Roads Bco - Ugni Blanc, Chenin, Pedro Gimenez","family":"New Roads"},
-      {"code":"456","product":"New Roads Tto - Malbec 100%","family":"New Roads"},
-      {"code":"382","product":"Viñas del Tango Rosé","family":"Viñas del Tango"},
-      {"code":"381","product":"Viñas del Tango Varietal - Chardonnay","family":"Viñas del Tango"},
-      {"code":"3000404","product":"Viñas del Tango Varietal - Torrontes","family":"Viñas del Tango"},
-      {"code":"3000402","product":"Viñas del Tango Varietal - Cabernet Franc","family":"Viñas del Tango"},
-      {"code":"403","product":"Viñas del Tango Varietal - Cabernet Sauvignon","family":"Viñas del Tango"},
-      {"code":"3000403","product":"Viñas del Tango Varietal - Cabernet Sauvignon","family":"Viñas del Tango"},
-      {"code":"383","product":"Viñas del Tango Varietal - Malbec","family":"Viñas del Tango"},
-      {"code":"3000383","product":"Viñas del Tango Varietal - Malbec","family":"Viñas del Tango"},
-      {"code":"385","product":"Viñas del Tango Gran - Malbec","family":"Viñas del Tango"},
-      {"code":"3000385","product":"Viñas del Tango Selection - Malbec","family":"Viñas del Tango"},
-      {"code":"3000387","product":"Viñas del Tango Selection - Cabernet Sauvignon","family":"Viñas del Tango"},
-      {"code":"452","product":"Viñas del Tango Malbec Premium","family":"Viñas del Tango"},
-      {"code":"3000452","product":"Viñas del Tango Malbec Premium","family":"Viñas del Tango"},
-      {"code":"3000191","product":"Cava Bonaval Brut Rosé - Garnacha","family":"Cava Bonaval"},
-      {"code":"3000192","product":"Cava Bonaval Brut Branco - Macabeo","family":"Cava Bonaval"},
-      {"code":"3000468","product":"Cava Bonaval Branca Brut Sleeve","family":"Cava Bonaval"},
-      {"code":"3000251","product":"La Vache Espagnole Tto - Tempranillo, Monastrell","family":"La Vache"},
-      {"code":"3000269","product":"La Vache Espagnole Bco - Macabeo","family":"La Vache"},
-      {"code":"3000492","product":"Vinho Vidigal Rosé (6x750ml)","family":"Marques de Vitoria / Vidigal"},
-      {"code":"3000491","product":"Vinho Prado Molar Tinto (6x750ml)","family":"Marques de Vitoria"},
-      {"code":"3000490","product":"Vinho Marques de Vitoria Joven (6x750ml)","family":"Marques de Vitoria"},
-      {"code":"3000489","product":"Vinho Marques de Vitoria Rosé (6x750ml)","family":"Marques de Vitoria"},
-      {"code":"3000488","product":"Vinho Marques de Vitoria Blanco (6x750ml)","family":"Marques de Vitoria"},
-      {"code":"3000487","product":"Vinho Marques de Vitoria Crianza (6x750ml)","family":"Marques de Vitoria"},
-      {"code":"3000486","product":"Vinho Marques de Vitoria Reserva (6x750ml)","family":"Marques de Vitoria"},
-      {"code":"3000485","product":"Vinho Marques de Vitoria Gran Reserva (6x750ml)","family":"Marques de Vitoria"},
-      {"code":"3000476","product":"Vinho S.A Tto Stormhoek Pure Shiraz","family":"Stormhoek"},
-      {"code":"3000475","product":"Vinho S.A Tto Stormhoek Cabernet/Merlot","family":"Stormhoek"},
-      {"code":"3000474","product":"Vinho S.A Tto Stormhoek Syrah","family":"Stormhoek"},
-      {"code":"3000473","product":"Vinho S.A Bco Stormhoek Sauvignon Blanc","family":"Stormhoek"},
-      {"code":"3000472","product":"Vinho S.A Tto Stormhoek Pinotage","family":"Stormhoek"},
-      {"code":"3000471","product":"Vinho S.A Tto Stormhoek Pinotage/Malbec","family":"Stormhoek"},
-      {"code":"3000470","product":"Vinho S.A Bco Stormhoek Pinot Grigio","family":"Stormhoek"},
-      {"code":"3000469","product":"Vinho S.A Bco Stormhoek Chard./Viognier","family":"Stormhoek"}
+      "Porta 6 Reserva","Porta 6 Tinto","Porta 6 Branco","Brutalis by Vidigal","Júlia Florista Tinto",
+      "Da Pipa Tinto","Vidigal Reserva","Coragem Reserva","3 Autores Douro","Reserva dos Amigos",
+      "N.B.N.C No Branding No Cry","Brutalis","Boa Noite Lisboa","Artolas","Da Pipa"
     ];
 
-    /* ====== Catalog rendering (families) ====== */
-    function escapeHtml(s){ return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-    function groupByFamily(items){
-      const map = new Map();
-      for(const p of items){
-        const fam = (p.family || 'Outros').trim();
-        if(!map.has(fam)) map.set(fam, []);
-        map.get(fam).push(p);
-      }
-      return map;
-    }
-
-    const familiesEl = document.getElementById('families');
-    const filterFamily = document.getElementById('filterFamily');
-    const searchInput = document.getElementById('search');
-    const totalCountEl = document.getElementById('totalCount');
-    const familyCountEl = document.getElementById('familyCount');
-    const btnShowAll = document.getElementById('btnShowAll');
-
-    let grouped;
-    function populateFilter(){
-      grouped = groupByFamily(PRODUCTS);
-      const families = Array.from(grouped.keys()).sort((a,b)=>a.localeCompare(b,'pt-BR'));
-      filterFamily.innerHTML = '<option value="">Todas as famílias</option>';
-      for(const f of families){
-        const opt = document.createElement('option');
-        opt.value = f;
-        opt.textContent = f;
-        filterFamily.appendChild(opt);
-      }
-      familyCountEl.textContent = families.length;
-    }
-
-    function createFamilyCard(family, items){
-      const section = document.createElement('section');
-      section.className = 'family';
-      // Instead of wine photo, show the harmonization SVG icon (inline small version)
-      const imgWrap = document.createElement('div');
-      imgWrap.className = 'img';
-      imgWrap.innerHTML = `
-        <svg width="220" height="140" viewBox="0 0 220 140" role="img" aria-label="Ícone de harmonização">
-          <rect width="100%" height="100%" rx="8" fill="#fff"/>
-          <g transform="translate(20,10)">
-            <circle cx="20" cy="30" r="18" fill="#fde68a" stroke="#f59e0b"/>
-            <rect x="0" y="60" width="40" height="20" rx="4" fill="#f3f4f6"/>
-            <text x="20" y="110" font-size="10" text-anchor="middle" fill="#374151">Chef</text>
-          </g>
-          <g transform="translate(90,10)">
-            <circle cx="20" cy="30" r="18" fill="#fce7f3" stroke="#db2777"/>
-            <rect x="6" y="60" width="28" height="20" rx="4" fill="#f3f4f6"/>
-            <text x="20" y="110" font-size="10" text-anchor="middle" fill="#374151">Sommelier</text>
-          </g>
-          <g transform="translate(160,10)">
-            <circle cx="20" cy="30" r="18" fill="#dbeafe" stroke="#2563eb"/>
-            <rect x="0" y="60" width="40" height="20" rx="4" fill="#f3f4f6"/>
-            <text x="20" y="110" font-size="10" text-anchor="middle" fill="#374151">Enólogo</text>
-          </g>
-        </svg>
-      `;
-      const h = document.createElement('h2');
-      h.innerHTML = `${escapeHtml(family)} <span class="muted">(${items.length})</span>`;
-      const ul = document.createElement('ul');
-      ul.className = 'list';
-      for(const it of items){
-        const li = document.createElement('li');
-        li.textContent = it.product;
-        ul.appendChild(li);
-      }
-      section.appendChild(imgWrap);
-      section.appendChild(h);
-      section.appendChild(ul);
-      return section;
-    }
-
-    function renderAll(selectedFamily = '', q = ''){
-      familiesEl.innerHTML = '';
-      const families = Array.from(grouped.keys()).sort((a,b)=>a.localeCompare(b,'pt-BR'));
-      let shown = 0;
-      for(const fam of families){
-        if(selectedFamily && fam !== selectedFamily) continue;
-        const items = grouped.get(fam).filter(p => !q || p.product.toLowerCase().includes(q));
-        if(items.length === 0) continue;
-        familiesEl.appendChild(createFamilyCard(fam, items));
-        shown += items.length;
-      }
-      totalCountEl.textContent = shown;
-      console.log('Renderizado', shown, 'rótulos (filtro:', selectedFamily || 'todas', 'pesquisa:', q || '—', ')');
-    }
-
-    filterFamily.addEventListener('change', ()=> renderAll(filterFamily.value, searchInput.value.trim().toLowerCase()));
-    searchInput.addEventListener('input', ()=> renderAll(filterFamily.value, searchInput.value.trim().toLowerCase()));
-    btnShowAll.addEventListener('click', ()=> { filterFamily.value = ''; searchInput.value = ''; renderAll(); });
-
-    (function initCatalog(){
-      try{
-        if(!Array.isArray(PRODUCTS)) throw new Error('PRODUCTS não é um array.');
-        populateFilter();
-        renderAll();
-        console.log('PRODUCTS length =', PRODUCTS.length);
-      } catch(err){
-        console.error('Erro inicializando catálogo:', err);
-        familiesEl.innerHTML = '<div class="muted">Erro ao carregar catálogo. Veja console para detalhes.</div>';
-      }
-    })();
-
-    /* ====== Harmonizador (TheMealDB) - mantém funcionalidade, usa o painel acima ====== */
-    const WINES = Array.from(new Set(PRODUCTS.map(p => p.product))).slice(0, 200);
-    const wineSelect = document.getElementById('wineSelectHarmo');
-    const btnSearch = document.getElementById('btnSearchHarmo');
-    const btnRandom = document.getElementById('btnRandomHarmo');
-    const results = document.getElementById('results');
-    const status = document.getElementById('status');
-
-    (function populateWines(){
-      wineSelect.innerHTML = '<option value="">— selecione um rótulo (ou deixe em branco para aleatório) —</option>';
-      for(const w of WINES){
-        const o = document.createElement('option');
-        o.value = w;
-        o.textContent = w;
-        wineSelect.appendChild(o);
-      }
-    })();
+    const DEFAULT_WINES = [
+      "Porta 6 Reserva",
+      "Vidigal Reserva",
+      "Brutalis by Vidigal",
+      "Júlia Florista Tinto",
+      "Da Pipa Tinto"
+    ];
 
     const API_KEY = '1';
     const BASE = `https://www.themealdb.com/api/json/v1/${API_KEY}`;
 
+    // ---------- Elementos ----------
+    const wineSelect = document.getElementById('wineSelect');
+    const termInput = document.getElementById('termInput');
+    const btnFind = document.getElementById('btnFind');
+    const btnRandom = document.getElementById('btnRandom');
+    const dishPlaceholder = document.getElementById('dishPlaceholder');
+    const dishTitle = document.getElementById('dishTitle');
+    const dishSource = document.getElementById('dishSource');
+    const wineSuggestions = document.getElementById('wineSuggestions');
+
+    const teachWine = document.getElementById('teachWine');
+    const teachTerm = document.getElementById('teachTerm');
+    const btnTeach = document.getElementById('btnTeach');
+    const btnListMappings = document.getElementById('btnListMappings');
+    const btnClearMappings = document.getElementById('btnClearMappings');
+    const mappingsPreview = document.getElementById('mappingsPreview');
+
+    const defaultWinesEl = document.getElementById('defaultWines');
+    const btnSaveDefaults = document.getElementById('btnSaveDefaults');
+    const btnResetDefaults = document.getElementById('btnResetDefaults');
+
+    // ---------- Storage keys ----------
+    const KEY_MAPPINGS = 'harmo_mappings_v1';
+    const KEY_DEFAULT_WINES = 'harmo_default_wines_v1';
+
+    // ---------- Helpers ----------
+    function readMappings(){
+      try{
+        const raw = localStorage.getItem(KEY_MAPPINGS);
+        return raw ? JSON.parse(raw) : {};
+      } catch(e){ return {}; }
+    }
+    function saveMappings(obj){
+      localStorage.setItem(KEY_MAPPINGS, JSON.stringify(obj));
+    }
+    function readDefaultWines(){
+      try{
+        const raw = localStorage.getItem(KEY_DEFAULT_WINES);
+        return raw ? JSON.parse(raw) : DEFAULT_WINES.slice();
+      } catch(e){ return DEFAULT_WINES.slice(); }
+    }
+    function saveDefaultWines(arr){
+      localStorage.setItem(KEY_DEFAULT_WINES, JSON.stringify(arr));
+    }
+
+    function setPlaceholder(text){
+      dishPlaceholder.innerHTML = `<div style="padding:12px;text-align:center">${escapeHtml(text)}</div>`;
+      dishTitle.textContent = '';
+      dishSource.textContent = '';
+      wineSuggestions.innerHTML = '';
+    }
+
+    function escapeHtml(s){ return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+    // ---------- Populate UI ----------
+    function populateWineSelect(){
+      wineSelect.innerHTML = '<option value="">— selecione um rótulo —</option>';
+      const unique = Array.from(new Set(PRODUCTS));
+      unique.forEach(w => {
+        const o = document.createElement('option');
+        o.value = w;
+        o.textContent = w;
+        wineSelect.appendChild(o);
+      });
+    }
+
+    function updateMappingsPreview(){
+      const m = readMappings();
+      const keys = Object.keys(m).sort((a,b)=>a.localeCompare(b,'pt-BR'));
+      if(keys.length === 0){
+        mappingsPreview.textContent = 'Nenhuma associação.';
+        return;
+      }
+      mappingsPreview.textContent = keys.map(k => `${k} → ${m[k]}`).join('\\n');
+    }
+
+    function loadDefaultWinesToUI(){
+      const arr = readDefaultWines();
+      defaultWinesEl.value = arr.join('\\n');
+    }
+
+    // ---------- TheMealDB helpers ----------
     async function fetchJson(url){
       const res = await fetch(url);
       if(!res.ok) throw new Error('Erro na requisição: ' + res.status);
       return res.json();
     }
 
-    async function searchByName(q){
-      const url = `${BASE}/search.php?s=${encodeURIComponent(q)}`;
-      status.textContent = 'Buscando por nome: ' + q + ' ...';
+    async function searchMealsByTerm(term){
+      // tenta search.php?s=term (busca por nome)
+      const url = `${BASE}/search.php?s=${encodeURIComponent(term)}`;
       const json = await fetchJson(url);
-      return json.meals;
+      if(json.meals) return json.meals;
+      // fallback: buscar por letra inicial se nada encontrado (tenta primeira letra)
+      if(term && term.length){
+        const letter = term[0].toLowerCase();
+        const url2 = `${BASE}/search.php?f=${encodeURIComponent(letter)}`;
+        const json2 = await fetchJson(url2);
+        return json2.meals || null;
+      }
+      return null;
     }
 
     async function filterByCategory(cat){
       const url = `${BASE}/filter.php?c=${encodeURIComponent(cat)}`;
-      status.textContent = 'Fallback: buscando por categoria: ' + cat + ' ...';
       const json = await fetchJson(url);
-      return json.meals;
+      return json.meals || null;
     }
 
     async function lookupById(id){
@@ -468,120 +222,201 @@
       return json.meals ? json.meals[0] : null;
     }
 
-    function createMealCard(meal){
-      const div = document.createElement('div');
-      div.className = 'card';
-      const thumb = meal.strMealThumb || '';
-      const name = meal.strMeal || '—';
-      const id = meal.idMeal || '';
-      const source = meal.strSource || meal.strYoutube || '#';
-      div.innerHTML = `
-        <div style="display:flex;gap:12px;align-items:flex-start">
-          <div style="flex:0 0 120px">
-            <div class="thumb" aria-hidden="true">
-              ${ thumb ? `<img src="${thumb}" alt="${escapeHtml(name)}" onerror="this.src='';this.parentNode.innerHTML='<div style=&quot;width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#f3f4f6;color:#9ca3af&quot;>Imagem indisponível</div>'" />` : '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#f3f4f6;color:#9ca3af">Imagem indisponível</div>' }
-            </div>
-          </div>
-          <div style="flex:1">
-            <h3 style="margin:0 0 6px">${escapeHtml(name)}</h3>
-            <div class="muted">ID: ${escapeHtml(id)}</div>
-            <div class="actions" style="margin-top:8px">
-              <a class="badge" href="${source || '#'}" target="_blank" rel="noopener">Abrir receita</a>
-              <button class="btnSuggest" style="padding:6px 10px;border-radius:6px">Sugerir Harmonização</button>
-            </div>
-            <div class="muted" style="margin-top:8px;font-size:0.95rem">Clique em "Sugerir Harmonização" para ver a proposta do Chef + Sommelier + Enólogo.</div>
-            <div class="harmo-result" style="margin-top:10px"></div>
-          </div>
-        </div>
-      `;
-      const btn = div.querySelector('.btnSuggest');
-      const harmoResult = div.querySelector('.harmo-result');
-      btn.addEventListener('click', ()=>{
-        // Simulação de sugestão colaborativa (exemplo simples)
-        const suggestions = [
-          `Chef: preparar o prato com redução cítrica; Sommelier: sugerir vinho branco fresco; Enólogo: destacar notas minerais.`,
-          `Chef: grelhar levemente; Sommelier: vinho tinto leve; Enólogo: realçar taninos suaves.`,
-          `Chef: usar ervas aromáticas; Sommelier: rosé jovem; Enólogo: acidez equilibrada.`
-        ];
-        const pick = suggestions[Math.floor(Math.random()*suggestions.length)];
-        harmoResult.innerHTML = `<div style="background:#f8fafc;border:1px solid #e6eef8;padding:10px;border-radius:6px">${escapeHtml(pick)}</div>`;
-      });
-      return div;
+    async function fetchRandomMeal(){
+      const url = `${BASE}/random.php`;
+      const json = await fetchJson(url);
+      return json.meals ? json.meals[0] : null;
     }
 
-    function pickTopN(arr, n=3){ if(!Array.isArray(arr)) return []; return arr.slice(0,n); }
-
-    async function findTop3ForWine(wineName){
-      results.innerHTML = '';
+    // ---------- Core logic: given wine or term, show dish image + wine suggestions ----------
+    async function showDishFor(wineName, explicitTerm){
       try{
-        status.textContent = 'Iniciando busca...';
-        if(wineName){
-          const byName = await searchByName(wineName);
-          if(byName && byName.length){
-            status.textContent = `Encontradas ${byName.length} receitas por nome. Exibindo top 3.`;
-            const top = pickTopN(byName, 3);
-            for(const m of top) results.appendChild(createMealCard(m));
+        setPlaceholder('Buscando imagem do prato...');
+        // determine search term: explicitTerm > mapping > wineName words
+        const mappings = readMappings();
+        let term = (explicitTerm || '').trim();
+        if(!term && wineName){
+          term = mappings[wineName] || '';
+        }
+        if(!term && wineName){
+          // fallback: try last word(s) of wine name as term
+          const parts = wineName.split(/\\s+/).filter(Boolean);
+          term = parts.slice(-2).join(' ');
+        }
+        // final fallback: seafood category
+        let meals = null;
+        if(term){
+          meals = await searchMealsByTerm(term);
+        }
+        if(!meals){
+          meals = await filterByCategory('Seafood');
+        }
+        if(!meals){
+          const random = await fetchRandomMeal();
+          if(random){
+            renderDish(random, wineName);
             return;
           }
+          setPlaceholder('Nenhuma imagem encontrada.');
+          return;
         }
-
-        const cat = 'Seafood';
-        const byCat = await filterByCategory(cat);
-        if(byCat && byCat.length){
-          status.textContent = `Nenhuma receita por nome. Usando categoria "${cat}". Exibindo top 3.`;
-          const top = pickTopN(byCat, 3);
-          for(const item of top){
-            const full = await lookupById(item.idMeal);
-            results.appendChild(createMealCard(full || item));
+        // pick first meal that has an image
+        let chosen = null;
+        for(const m of meals){
+          // if filter.php results, items may have idMeal and strMealThumb but not full details
+          const full = m.idMeal && m.strMeal ? m : await lookupById(m.idMeal);
+          if(full && (full.strMealThumb || full.strMeal)){
+            chosen = full;
+            break;
           }
+        }
+        if(!chosen){
+          chosen = meals[0];
+        }
+        if(!chosen){
+          setPlaceholder('Nenhuma imagem encontrada.');
           return;
         }
-
-        status.textContent = 'Nenhum prato encontrado; buscando aleatório...';
-        const r = await fetch(`${BASE}/random.php`);
-        const j = await r.json();
-        if(j.meals && j.meals.length){
-          status.textContent = 'Exibindo sugestão aleatória.';
-          results.appendChild(createMealCard(j.meals[0]));
-          return;
-        }
-
-        status.textContent = 'Nenhum prato encontrado.';
+        renderDish(chosen, wineName);
       } catch(err){
         console.error(err);
-        status.textContent = 'Erro ao buscar: ' + (err.message || err);
+        setPlaceholder('Erro ao buscar imagem. Verifique sua conexão.');
       }
     }
 
-    btnSearch.addEventListener('click', ()=> {
-      const wine = wineSelect.value.trim();
-      findTop3ForWine(wine);
+    function renderDish(meal, wineName){
+      // show image (only the dish image)
+      const thumb = meal.strMealThumb || '';
+      const title = meal.strMeal || '';
+      const source = meal.strSource || meal.strYoutube || '';
+      if(thumb){
+        dishPlaceholder.innerHTML = `<img src="${escapeHtml(thumb)}" alt="${escapeHtml(title)}" />`;
+      } else {
+        dishPlaceholder.innerHTML = `<div style="padding:12px;text-align:center">Imagem não disponível</div>`;
+      }
+      dishTitle.textContent = title ? `Prato: ${title}` : '';
+      dishSource.textContent = source ? `Fonte: ${source}` : '';
+      // suggestions: use mapping of wine -> suggested wines (if mapping exists), else default list
+      const defaults = readDefaultWines();
+      const suggestions = buildSuggestionsForWine(wineName, defaults);
+      renderWineSuggestions(suggestions);
+    }
+
+    function buildSuggestionsForWine(wineName, defaults){
+      // Simple logic: if wineName contains keywords (tinto, branco, rosé, reserva, etc.) adjust suggestions
+      const lower = (wineName || '').toLowerCase();
+      const suggestions = [];
+      if(lower.includes('tinto') || lower.includes('reserva') || lower.includes('malbec') || lower.includes('cab')){
+        // prefer reds
+        suggestions.push(...defaults.filter(w => /tto|tinto|red|brutalis|vidigal|malbec|cab/i.test(w)).slice(0,3));
+      } else if(lower.includes('branco') || lower.includes('verde') || lower.includes('sauvignon') || lower.includes('chardonnay')){
+        // prefer whites
+        suggestions.push(...defaults.filter(w => /bco|branco|white|sauvignon|chardonnay/i.test(w)).slice(0,3));
+      } else if(lower.includes('ros') || lower.includes('rose')){
+        suggestions.push(...defaults.filter(w => /ros|rose/i.test(w)).slice(0,3));
+      }
+      // fill up to 3 with defaults if needed
+      for(const d of defaults){
+        if(suggestions.length >= 3) break;
+        if(!suggestions.includes(d)) suggestions.push(d);
+      }
+      return suggestions.slice(0,3);
+    }
+
+    function renderWineSuggestions(list){
+      wineSuggestions.innerHTML = '';
+      if(!list || list.length === 0){
+        wineSuggestions.innerHTML = '<div class="muted">Nenhuma sugestão disponível.</div>';
+        return;
+      }
+      for(const w of list){
+        const div = document.createElement('div');
+        div.className = 'wine-item';
+        div.textContent = w;
+        wineSuggestions.appendChild(div);
+      }
+    }
+
+    // ---------- Teach mapping UI ----------
+    btnTeach.addEventListener('click', ()=>{
+      const wine = (teachWine.value || '').trim();
+      const term = (teachTerm.value || '').trim();
+      if(!wine || !term){
+        alert('Preencha o nome do vinho e o termo de prato.');
+        return;
+      }
+      const m = readMappings();
+      m[wine] = term;
+      saveMappings(m);
+      updateMappingsPreview();
+      teachWine.value = '';
+      teachTerm.value = '';
+      alert('Associação salva: ' + wine + ' → ' + term);
+    });
+
+    btnListMappings.addEventListener('click', updateMappingsPreview);
+
+    btnClearMappings.addEventListener('click', ()=>{
+      if(!confirm('Remover todas as associações?')) return;
+      saveMappings({});
+      updateMappingsPreview();
+    });
+
+    // ---------- Defaults UI ----------
+    btnSaveDefaults.addEventListener('click', ()=>{
+      const lines = defaultWinesEl.value.split('\\n').map(s=>s.trim()).filter(Boolean);
+      if(lines.length === 0){
+        alert('A lista não pode ficar vazia.');
+        return;
+      }
+      saveDefaultWines(lines);
+      alert('Lista salva.');
+    });
+
+    btnResetDefaults.addEventListener('click', ()=>{
+      if(!confirm('Restaurar lista padrão?')) return;
+      saveDefaultWines(DEFAULT_WINES.slice());
+      loadDefaultWinesToUI();
+      alert('Padrão restaurado.');
+    });
+
+    // ---------- Controls ----------
+    btnFind.addEventListener('click', ()=>{
+      const wine = (wineSelect.value || '').trim();
+      const explicit = (termInput.value || '').trim();
+      if(!wine && !explicit){
+        alert('Selecione um vinho ou digite um termo de prato.');
+        return;
+      }
+      showDishFor(wine, explicit);
     });
 
     btnRandom.addEventListener('click', async ()=>{
-      results.innerHTML = '';
-      status.textContent = 'Buscando 3 receitas aleatórias...';
+      setPlaceholder('Buscando prato aleatório...');
       try{
-        for(let i=0;i<3;i++){
-          const r = await fetch(`${BASE}/random.php`);
-          const j = await r.json();
-          if(j.meals && j.meals[0]) results.appendChild(createMealCard(j.meals[0]));
-        }
-        status.textContent = 'Pronto — 3 receitas aleatórias.';
+        const meal = await fetchRandomMeal();
+        if(meal) renderDish(meal, '');
+        else setPlaceholder('Nenhuma imagem encontrada.');
       } catch(e){
         console.error(e);
-        status.textContent = 'Erro ao buscar aleatórias.';
+        setPlaceholder('Erro ao buscar aleatório.');
       }
     });
 
-    // inicial harmonizador
-    (function initHarmonizador(){
-      wineSelect.selectedIndex = 0;
-      status.textContent = 'Pronto. Selecione um rótulo e clique em Buscar Top 3.';
+    // ---------- Init ----------
+    (function init(){
+      populateWineSelect();
+      updateMappingsPreview();
+      loadDefaultWinesToUI();
+      // initial suggestions empty
+      renderWineSuggestions(readDefaultWines().slice(0,3));
+      setPlaceholder('Selecione um rótulo e clique em Buscar prato, ou digite um termo e busque.');
     })();
 
-    // expose for debugging
-    window.PRODUCTS = PRODUCTS;
+    // expose for debug
+    window._harmo = {
+      readMappings, saveMappings, readDefaultWines, saveDefaultWines
+    };
   </script>
 </body>
 </html>
