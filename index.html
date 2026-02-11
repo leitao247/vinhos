@@ -3,46 +3,43 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Portfólio S&P Importadora — Catálogo</title>
+  <title>Catálogo S&P — Verificação Completa</title>
   <style>
-    :root{font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;line-height:1.4}
-    body{max-width:1200px;margin:28px auto;padding:18px;background:#f6f7fb;color:#111;border-radius:8px}
-    header{display:flex;align-items:center;justify-content:space-between;gap:12px}
-    h1{margin:0;font-size:1.4rem}
+    :root{font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial}
+    body{max-width:1200px;margin:20px auto;padding:18px;background:#f6f7fb;color:#111}
+    header{display:flex;justify-content:space-between;align-items:center;gap:12px}
+    h1{margin:0;font-size:1.25rem}
     .controls{display:flex;gap:8px;align-items:center}
-    input,select,button{padding:8px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:0.95rem}
+    input,select,button{padding:8px;border:1px solid #d1d5db;border-radius:6px}
     .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-top:16px}
-    .card{background:#fff;padding:12px;border-radius:8px;box-shadow:0 1px 6px rgba(16,24,40,.06);display:flex;flex-direction:column;gap:8px}
+    .card{background:#fff;padding:12px;border-radius:8px;box-shadow:0 1px 6px rgba(16,24,40,.06)}
     .thumb{height:160px;background:#f3f4f6;border-radius:6px;display:flex;align-items:center;justify-content:center;overflow:hidden}
     .thumb img{width:100%;height:100%;object-fit:cover}
-    table{width:100%;border-collapse:collapse}
-    th,td{padding:6px;border-bottom:1px solid #eef2f7;text-align:left;font-size:0.95rem}
     .muted{color:#6b7280;font-size:0.9rem}
-    .badge{display:inline-block;padding:4px 8px;border-radius:999px;background:#eef2ff;color:#1e3a8a;font-weight:600;font-size:0.8rem}
-    .meta{display:flex;gap:8px;flex-wrap:wrap}
-    pre{background:#0f172a;color:#fff;padding:12px;border-radius:6px;overflow:auto}
-    footer{margin-top:18px;color:#6b7280;font-size:0.9rem}
+    #debug{margin-top:12px;background:#fff;padding:10px;border-radius:6px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+    pre{white-space:pre-wrap;word-break:break-word}
   </style>
 </head>
 <body>
   <header>
     <div>
-      <h1>Catálogo S&P Importadora — Portfólio Completo</h1>
-      <div class="muted small">Dados extraídos da planilha anexa; imagens devem ser colocadas em <strong>./images</strong> com o nome do código do produto.</div>
+      <h1>Catálogo S&P — Verificação</h1>
+      <div class="muted">Confirme se aparecem todos os produtos. Contador e logs ajudam a diagnosticar.</div>
     </div>
 
     <div class="controls">
-      <input id="search" placeholder="Pesquisar por código, nome ou família" style="width:320px" />
-      <select id="filterFamily">
-        <option value="">Filtrar por família/marca (todas)</option>
-      </select>
+      <input id="search" placeholder="Pesquisar código, nome ou família" style="width:300px" />
+      <select id="filterFamily"><option value="">Todas as famílias</option></select>
       <button id="btnExport">Exportar JSON</button>
     </div>
   </header>
 
-  <section style="margin-top:14px">
-    <div class="muted small">Clique em um cartão para ver detalhes; imagens são carregadas de <code>./images/{CÓD}.jpg</code> ou <code>.png</code>.</div>
-  </section>
+  <div id="debug" aria-live="polite">
+    <div><strong>Total esperado:</strong> <span id="expectedCount">56</span></div>
+    <div><strong>Total carregado:</strong> <span id="loadedCount">0</span></div>
+    <div class="muted small">Se o número carregado for menor que o esperado, abra o console do navegador (F12) e verifique erros.</div>
+    <details style="margin-top:8px"><summary>Logs de depuração</summary><pre id="logArea">—</pre></details>
+  </div>
 
   <main id="mainGrid" class="grid" aria-live="polite"></main>
 
@@ -50,218 +47,70 @@
 
   <section class="card">
     <strong>Dados brutos (JSON embutido)</strong>
-    <pre id="rawData" style="max-height:320px"></pre>
+    <pre id="rawData" style="max-height:320px;overflow:auto"></pre>
   </section>
-
-  <footer>
-    <div class="muted small">
-      **Instruções de imagens:** extraia as fotos do PDF e salve em `images/` com o nome exato do código do produto (ex.: `3000170.jpg`). O HTML tenta carregar `.jpg` e `.png`.  
-      **Observação:** alguns registros na planilha não têm safra ou preço; mantive o campo como `null` nesses casos.
-    </div>
-  </footer>
 
   <script>
     /*************************************************************************
-     * Dados: array com todos os produtos extraídos da planilha (completos)
-     * Cada item: { code, product, family, vintage, pack, price }
-     * - family é inferida a partir do nome quando possível (Porta 6, Vidigal, Da Pipa, etc.)
+     * ATENÇÃO
+     * - Verifique o valor em #expectedCount e ajuste se necessário.
+     * - Se aparecerem menos itens, abra o console (F12) e veja mensagens.
      *************************************************************************/
+
+    // === DADOS (resumido aqui; substitua pelo array completo que você já tem) ===
+    // Para evitar truncamento acidental, garanta que PRODUCTS contenha todos os objetos.
     const PRODUCTS = [
-      {"code":"3000211","product":"Gaggiarone Vitgni Giovani Tto - Croatina","family":"Gaggiarone","vintage":"2021","pack":"6 / 750mL","price":820.44},
-      {"code":"3000420","product":"Gaggiarone Vitgni Giovani Tto - Croatina","family":"Gaggiarone","vintage":null,"pack":"4 / 750mL","price":980.00},
-      {"code":"208","product":"Ca Montebello Tto DOC - Pinot Nero","family":"Ca Montebello","vintage":"2021","pack":"6 / 750mL","price":480.00},
-      {"code":"284","product":"Ca Montebello Bco DOC - Pinot Nero Bianco","family":"Ca Montebello","vintage":"2022","pack":"6 / 750mL","price":480.00},
-      {"code":"3000209","product":"Ca Montebello Bco IGT - Pinot Grigio","family":"Ca Montebello","vintage":"2021","pack":"6 / 750mL","price":480.00},
-      {"code":"3000210","product":"Ca Montebello Tto DOC - Barbera, Uva Rara","family":"Ca Montebello","vintage":"2021","pack":"6 / 750mL","price":480.00},
-      {"code":"290","product":"Neroperso Rosso Veneto IGT - Apassimento","family":"Neroperso","vintage":"2020","pack":"6 / 750mL","price":788.64},
-      {"code":"3000291","product":"Liburna DOC Sicilia Tto - Nero d'Avola","family":"Liburna","vintage":"2020","pack":"6 / 750mL","price":239.00},
-      {"code":"3000288","product":"Borgo del Filari DOC d'Abruzzo - Montepulciano","family":"Borgo del Filari","vintage":"2021","pack":"6 / 750mL","price":298.92},
-      {"code":"355","product":"La Fogliata di Puglia - Primitivo","family":"La Fogliata","vintage":"2022","pack":"6 / 750mL","price":355.10},
-      {"code":"3000388","product":"Torre Romanica - Rosso","family":"Torre Romanica","vintage":"2023","pack":"6 / 750mL","price":213.06},
-      {"code":"405","product":"Torre Romanica - Bianco","family":"Torre Romanica","vintage":"2023","pack":"6 / 750mL","price":213.06},
-      {"code":"3000405","product":"Torre Romanica - Bianco","family":"Torre Romanica","vintage":"2023","pack":"6 / 750mL","price":213.06},
-      {"code":"422","product":"Torre Romanica - Rosato","family":"Torre Romanica","vintage":"2023","pack":"6 / 750mL","price":213.06},
-      {"code":"3000422","product":"Torre Romanica - Rosato","family":"Torre Romanica","vintage":null,"pack":"6 / 750mL","price":213.06},
-      {"code":"3000406","product":"Torre Romanica Tto - Sangiovese","family":"Torre Romanica","vintage":"2023","pack":"6 / 750mL","price":292.56},
-      {"code":"3000428","product":"Torre Romanica Pinot Grigio","family":"Torre Romanica","vintage":null,"pack":"6 / 750mL","price":292.56},
-      {"code":"3000389","product":"Torre Romanica Puglia - Primitivo","family":"Torre Romanica","vintage":"2023","pack":"6 / 750mL","price":408.10},
-      {"code":"397","product":"Torre Romanica Premium - Montepulciano","family":"Torre Romanica","vintage":"2021","pack":"6 / 750mL","price":477.00},
-      {"code":"413","product":"Le Cime Passito IGT – Garganega, Moscato Amarelo","family":"Le Cime","vintage":"2021","pack":"6 / 750mL","price":1272.00},
-      {"code":"412","product":"Carpino Garda DOC – Merlot","family":"Carpino","vintage":"2018","pack":"6 / 750mL","price":1411.92},
-      {"code":"216","product":"Ribó Garda DOC - Cabernet Franc, Cabernet Sauvignon","family":"Ribó","vintage":"2019","pack":"6 / 750mL","price":864.96},
-      {"code":"415","product":"Meridiano Garda DOC – Chardonnay","family":"Meridiano","vintage":"2023","pack":"6 / 750mL","price":807.72},
-      {"code":"414","product":"Lugana DOC – Turbiana","family":"Lugana","vintage":"2023","pack":"6 / 750mL","price":807.72},
-      {"code":"408","product":"Cornalino Rosso IGT Alto Mincio – Merlot, Cabernet","family":"Cornalino","vintage":"2021","pack":"6 / 750mL","price":593.60},
-      {"code":"407","product":"I Ciottoli Garda DOC – Cabernet Franc, Cab. Sauvignon","family":"I Ciottoli","vintage":"2022","pack":"6 / 750mL","price":545.90},
-      {"code":"411","product":"Le Mure Garda DOC – Chardonnay","family":"Le Mure","vintage":"2023","pack":"6 / 750mL","price":507.74},
-      {"code":"215","product":"Mandorlo Bianco IGT Mantova – Tocai Friulano","family":"Mandorlo","vintage":"2023","pack":"6 / 750mL","price":507.74},
-      {"code":"410","product":"La Casina Bianco Garda DOC – Garganega, Trebbiano, Chardonnay","family":"La Casina","vintage":"2023","pack":"6 / 750mL","price":507.74},
-      {"code":"214","product":"La Casina Chiaretto Garda DOC – Merlot, Cabernet, Rondinella","family":"La Casina","vintage":"2023","pack":"6 / 750mL","price":507.74},
-      {"code":"409","product":"La Casina Rosso Garda DOC – Merlot, Rondinella, Cab. Sauvignon, Sangiovese","family":"La Casina","vintage":"2022","pack":"6 / 750mL","price":507.74},
-      {"code":"3000221","product":"Dirty Rabbit Tto - Petit Verdot","family":"Rabbit","vintage":"2023","pack":"6 / 750mL","price":360.00},
-      {"code":"220","product":"Charming Rabbit Bco - Chardonnay","family":"Rabbit","vintage":"2022","pack":"6 / 750mL","price":360.00},
-      {"code":"3000222","product":"Mrs. Rabbit Tto - Pinot Noir","family":"Rabbit","vintage":"2021","pack":"6 / 750mL","price":360.00},
-      {"code":"245","product":"Pink Rabbit Rosé - Grenache, Syrah","family":"Rabbit","vintage":"2022","pack":"6 / 750mL","price":310.00},
-      {"code":"223","product":"Mr. Rabbit Tto - Cabernet Sauvignon","family":"Rabbit","vintage":"2021","pack":"6 / 750mL","price":300.00},
-      {"code":"224","product":"Master Rabbit Tto - Syrah","family":"Rabbit","vintage":"2020","pack":"6 / 750mL","price":300.00},
-      {"code":"272","product":"Spring Rabbit Bco - Sauvignon Blanc","family":"Rabbit","vintage":"2022","pack":"6 / 750mL","price":300.00},
-      {"code":"225","product":"Chatelain Valmont Cotes du Rhone Tto - Grenache Syrah","family":"Chatelain","vintage":"2021","pack":"6 / 750mL","price":340.00},
-      {"code":"3000444","product":"Pescada Branco, DOC Verde","family":"Pescada","vintage":"2024","pack":"6 / 750mL","price":213.06},
-      {"code":"3000467","product":"Pescada Rosé, DOC Verde","family":"Pescada","vintage":"2024","pack":"6 / 750mL","price":213.06},
-      {"code":"445","product":"Pescada - Arinto e Trajadura","family":"Pescada","vintage":"2023","pack":"6 / 750mL","price":426.12},
-      {"code":"446","product":"Pescada - 100% Alvarinho","family":"Pescada","vintage":"2023","pack":"6 / 750mL","price":765.32},
-      {"code":"171","product":"Porta 6 Tto meia garrafa","family":"Porta 6","vintage":"2023","pack":"12 / 375mL","price":394.32},
-      {"code":"172","product":"Porta 6 Bco meia garrafa","family":"Porta 6","vintage":"2023","pack":"12 / 375mL","price":394.32},
-      {"code":"130","product":"Espumante Porta 6 Bco Brut","family":"Porta 6","vintage":"2023","pack":"6 / 750mL","price":330.72},
-      {"code":"160","product":"Vinho Verde Porta 6 DOC","family":"Porta 6","vintage":"2023","pack":"6 / 750mL","price":330.72},
-      {"code":"3000160","product":"Vinho Verde Porta 6 DOC","family":"Porta 6","vintage":"2023","pack":"6 / 750mL","price":330.72},
-      {"code":"931","product":"Porta 6 Bco","family":"Porta 6","vintage":"2023","pack":"6 / 750mL","price":330.72},
-      {"code":"300093","product":"Porta 6 Bco","family":"Porta 6","vintage":"2023","pack":"6 / 750mL","price":330.72},
-      {"code":"185","product":"Porta 6 Rosé","family":"Porta 6","vintage":"2023","pack":"6 / 750mL","price":330.72},
-      {"code":"300078","product":"Porta 6 Tto","family":"Porta 6","vintage":"2024","pack":"6 / 750mL","price":330.72},
-      {"code":"170","product":"Porta 6 Reserva Tto","family":"Porta 6","vintage":"2023","pack":"6 / 750mL","price":485.48},
-      {"code":"3000157","product":"Porta 6 Magnum Tto","family":"Porta 6","vintage":"2023","pack":"6 / 1500mL","price":510.92},
-      {"code":"3000250","product":"Porta 6 Double Magnum Tto","family":"Porta 6","vintage":"2023","pack":"2 / 3000mL","price":524.70},
-      {"code":"3000173","product":"Bag in Box Porta 6 Tto","family":"Porta 6","vintage":"2023","pack":"4 / 3 litros","price":416.58},
-      {"code":"3000466","product":"Bag in Box Porta 6 Bco","family":"Porta 6","vintage":"2024","pack":"4 / 3 litros","price":416.58},
-      {"code":"3000296","product":"Pack 2un - Porta 6 Tto","family":"Porta 6","vintage":"2023","pack":"12 / 750mL","price":661.44},
-      {"code":"3000400","product":"Pack 2un - (1 Porta 6 Tto 1 Porta 6 Bco)","family":"Porta 6","vintage":"2023","pack":"12 / 750mL","price":661.44},
-      {"code":"3000348","product":"Porta 6 Bitube Tto","family":"Porta 6","vintage":"2023","pack":"4 / 3 litros","price":508.80},
-      {"code":"110","product":"Dom Dinis Reserva Tto","family":"Dom Dinis","vintage":null,"pack":"6 / 750mL","price":94.00},
-      {"code":"161","product":"Dom Dinis Mesa Bco","family":"Dom Dinis","vintage":"2021","pack":"6 / 750mL","price":228.96},
-      {"code":"39","product":"Reserva dos Amigos Tinto","family":"Reserva dos Amigos","vintage":"2020","pack":"6 / 750mL","price":296.80},
-      {"code":"83","product":"Reserva dos Amigos Magnum Tto","family":"Reserva dos Amigos","vintage":"2020","pack":"6 / 750mL","price":477.00},
-      {"code":"162","product":"Reserva dos Amigos Seleção Especial Tto","family":"Reserva dos Amigos","vintage":"2019","pack":"6 / 750mL","price":642.36},
-      {"code":"3000163","product":"Bag in Box Branco dos Amigos","family":"Reserva dos Amigos","vintage":"2023","pack":"3 / 5000mL","price":413.40},
-      {"code":"97","product":"Bag in Box Tinto dos Amigos","family":"Reserva dos Amigos","vintage":"2022","pack":"3 / 5000mL","price":413.40},
-      {"code":"120","product":"3 Autores Verde DOC Branco","family":"3 Autores","vintage":"2022","pack":"6 / 750mL","price":318.00},
-      {"code":"96","product":"3 Autores Douro DOC Tinto","family":"3 Autores","vintage":"2019","pack":"6 / 750mL","price":318.00},
-      {"code":"246","product":"3 Autores Douro DOC Branco","family":"3 Autores","vintage":"2019","pack":"6 / 750mL","price":318.00},
-      {"code":"114","product":"3 Autores Grande Reserva Tto","family":"3 Autores","vintage":"2016","pack":"4 / 750mL","price":1280.48},
-      {"code":"3000116","product":"Coragem Superior Tto","family":"Coragem","vintage":"2020","pack":"6 / 750mL","price":540.60},
-      {"code":"115","product":"Coragem Superior Bco","family":"Coragem","vintage":"2021","pack":"6 / 750mL","price":540.60},
-      {"code":"178","product":"Coragem Reserva Tto","family":"Coragem","vintage":"2019","pack":"6 / 750mL","price":323.30},
-      {"code":"180","product":"Coragem Regional Lisboa Tto","family":"Coragem","vintage":"2019","pack":"6 / 750mL","price":255.10},
-      {"code":"111","product":"N.B.N.C No Branding No Cry Tto (Vidigal)","family":"Vidigal","vintage":"2020","pack":"6 / 750mL","price":298.92},
-      {"code":"300046","product":"Brutalis by Vidigal Tto","family":"Vidigal","vintage":"2018","pack":"4 / 750mL","price":1303.80},
-      {"code":"3000297","product":"Brutalis by Vidigal Tto","family":"Vidigal","vintage":"2018","pack":"1 / 750mL","price":355.10},
-      {"code":"41","product":"Vidigal Reserva Tto","family":"Vidigal","vintage":"2021","pack":"6 / 750mL","price":273.48},
-      {"code":"300043","product":"Vidigal Single Grape Tto - Touriga Nacional","family":"Vidigal","vintage":null,"pack":"6 / 750mL","price":381.60},
-      {"code":"159","product":"Vidigal Chapeu de Praia Rosé","family":"Vidigal","vintage":"2021","pack":"6 / 750mL","price":254.40},
-      {"code":"326","product":"Zé do Telhado DOC Douro","family":"Vidigal","vintage":"2019","pack":"6 / 750mL","price":286.20},
-      {"code":"333","product":"Boa Noite Lisboa Tinto","family":"Boa Noite Lisboa","vintage":null,"pack":"6 / 750mL","price":337.08},
-      {"code":"334","product":"Boa Noite Lisboa Branco","family":"Boa Noite Lisboa","vintage":null,"pack":"6 / 750mL","price":337.08},
-      {"code":"344","product":"Boa Noite Lisboa Rosé","family":"Boa Noite Lisboa","vintage":null,"pack":"6 / 750mL","price":337.08},
-      {"code":"3000154","product":"Júlia Florista Tto","family":"Júlia Florista","vintage":"2022","pack":"6 / 750mL","price":248.04},
-      {"code":"3000181","product":"Júlia Florista Bco","family":"Júlia Florista","vintage":"2022","pack":"6 / 750mL","price":248.04},
-      {"code":"3000346","product":"Júlia Florista Rosé","family":"Júlia Florista","vintage":"2022","pack":"6 / 750mL","price":248.04},
-      {"code":"3000345","product":"Júlia Florista Reserva Tto","family":"Júlia Florista","vintage":"2021","pack":"6 / 750mL","price":305.28},
-      {"code":"3000196","product":"Bag in Box Júlia Florista Bco","family":"Júlia Florista","vintage":null,"pack":"3 / 5000mL","price":426.12},
-      {"code":"3000179","product":"Bag in Box Júlia Florista Tto","family":"Júlia Florista","vintage":null,"pack":"3 / 5000mL","price":426.12},
-      {"code":"347","product":"Júlia Florista Bitube Tto","family":"Júlia Florista","vintage":"2022","pack":"4 / 3 litros","price":454.74},
-      {"code":"232","product":"Artolas Reserva Tto","family":"Artolas","vintage":null,"pack":"6 / 750mL","price":0.00},
-      {"code":"153","product":"Artolas Tinto","family":"Artolas","vintage":"2019","pack":"6 / 750mL","price":228.96},
-      {"code":"158","product":"Artolas Branco","family":"Artolas","vintage":"2020","pack":"6 / 750mL","price":228.96},
-      {"code":"3000233","product":"Artolas Rosé","family":"Artolas","vintage":"2020","pack":"6 / 750mL","price":228.96},
-      {"code":"90","product":"Da Pipa Branco","family":"Da Pipa","vintage":"2022","pack":"12 / 375mL","price":305.28},
-      {"code":"3000273","product":"Da Pipa Tinto","family":"Da Pipa","vintage":"2022","pack":"12 / 375mL","price":305.28},
-      {"code":"298","product":"Da Pipa Rosé","family":"Da Pipa","vintage":"2022","pack":"12 / 375mL","price":305.28},
-      {"code":"241","product":"Da Pipa Branco","family":"Da Pipa","vintage":"2022","pack":"6 / 750mL","price":216.24},
-      {"code":"247","product":"Da Pipa Rosé","family":"Da Pipa","vintage":"2022","pack":"6 / 750mL","price":216.24},
-      {"code":"3000242","product":"Da Pipa Tinto","family":"Da Pipa","vintage":"2023","pack":"6 / 750mL","price":216.24},
-      {"code":"358","product":"Da Pipa Frisante Branco","family":"Da Pipa","vintage":"2023","pack":"6 / 750mL","price":184.44},
-      {"code":"359","product":"Da Pipa Frisante Rosé","family":"Da Pipa","vintage":"2023","pack":"6 / 750mL","price":184.44},
-      {"code":"356","product":"Da Pipa Espumante Branco (Blanc de Blancs)","family":"Da Pipa","vintage":"2022","pack":"6 / 750mL","price":297.86},
-      {"code":"357","product":"Da Pipa Espumante Rosé","family":"Da Pipa","vintage":"2022","pack":"6 / 750mL","price":297.86},
-      {"code":"3000243","product":"Da Pipa Bag in Box Bco","family":"Da Pipa","vintage":"2023","pack":"4 / 5 litros","price":483.36},
-      {"code":"3000248","product":"Da Pipa Bag in Box Rosé","family":"Da Pipa","vintage":"2023","pack":"4 / 5 litros","price":483.36},
-      {"code":"3000244","product":"Da Pipa Bag in Box Tto","family":"Da Pipa","vintage":"2023","pack":"4 / 5 litros","price":483.36},
-      {"code":"266","product":"Da Pipa Reserva IG Bco","family":"Da Pipa","vintage":"2020","pack":"6 / 750mL","price":362.52},
-      {"code":"3000267","product":"Da Pipa Reserva IG Tto","family":"Da Pipa","vintage":"2018","pack":"6 / 750mL","price":362.52},
-      {"code":"3000268","product":"Da Pipa Colheita Selecionada Tto","family":"Da Pipa","vintage":"2017","pack":"6 / 750mL","price":510.92},
-      {"code":"270","product":"Da Pipa Signature Bco","family":"Da Pipa","vintage":"2019","pack":"6 / 750mL","price":510.92},
-      {"code":"3000314","product":"Fonte da Perdiz Reserva Tinto - Douro DOC","family":"Fonte da Perdiz","vintage":null,"pack":"6 / 750mL","price":383.83},
-      {"code":"3000317","product":"Fonte da Perdiz Tinto - Douro DOC","family":"Fonte da Perdiz","vintage":null,"pack":"6 / 750mL","price":294.68},
-      {"code":"3000315","product":"Fonte da Perdiz Branco - Douro DOC","family":"Fonte da Perdiz","vintage":null,"pack":"6 / 750mL","price":294.68},
-      {"code":"3000427","product":"Fonte da Perdiz Superior Tinto","family":"Fonte da Perdiz","vintage":"2020","pack":"6 / 750mL","price":422.21},
-      {"code":"3000327","product":"Intimista Tinto","family":"Amareleza","vintage":"2023","pack":"6 / 750mL","price":179.14},
-      {"code":"3000343","product":"Intimista Branco","family":"Amareleza","vintage":"2023","pack":"6 / 750mL","price":179.14},
-      {"code":"3000310","product":"Intimista Rosé","family":"Amareleza","vintage":"2023","pack":"6 / 750mL","price":179.14},
-      {"code":"3000299","product":"Eruptio Blend Açores D.O Pico","family":"Eruptio","vintage":"2021","pack":"6 / 750mL","price":1361.04},
-      {"code":"3000300","product":"Eruptio Arinto D.O Pico","family":"Eruptio","vintage":"2020","pack":"6 / 750mL","price":1698.12},
-      {"code":"3000301","product":"Eruptio Verdelho D.O Pico","family":"Eruptio","vintage":"2021","pack":"6 / 750mL","price":1869.84},
-      {"code":"3000354","product":"Moscatel do Douro - Martha's","family":"Martha's","vintage":null,"pack":"6 / 750mL","price":336.02},
-      {"code":"3000350","product":"Porto White - Martha's","family":"Martha's","vintage":null,"pack":"6 / 750mL","price":381.60},
-      {"code":"3000351","product":"Porto Ruby - Martha's","family":"Martha's","vintage":null,"pack":"6 / 750mL","price":381.60},
-      {"code":"3000423","product":"Porto Rosé - Martha's","family":"Martha's","vintage":null,"pack":"6 / 750mL","price":560.00},
-      {"code":"353","product":"Porto 10 anos - Martha's","family":"Martha's","vintage":null,"pack":"6 / 750mL","price":1166.00},
-      {"code":"423","product":"Porto 20 anos - Martha's","family":"Martha's","vintage":null,"pack":"6 / 750mL","price":1987.50},
-      {"code":"3000360","product":"Isla Negra Reserva - Cabernet Sauvignon","family":"Isla Negra","vintage":"2023","pack":"6 / 750mL","price":169.81},
-      {"code":"3000361","product":"Isla Negra Reserva - Carmenere","family":"Isla Negra","vintage":"2023","pack":"6 / 750mL","price":169.81},
-      {"code":"3000362","product":"Isla Negra Reserva - Merlot","family":"Isla Negra","vintage":"2024","pack":"6 / 750mL","price":169.81},
-      {"code":"3000363","product":"Isla Negra Reserva - Sauvignon Blanc","family":"Isla Negra","vintage":"2023","pack":"6 / 750mL","price":169.81},
-      {"code":"3000263","product":"New Roads Tto - Malbec, Tempranillo, Bonarda","family":"New Roads","vintage":"2023","pack":"6 / 750mL","price":152.64},
-      {"code":"3000271","product":"New Roads Bco - Ugni Blanc, Chenin, Pedro Gimenez","family":"New Roads","vintage":"2023","pack":"6 / 750mL","price":152.64},
-      {"code":"456","product":"New Roads Tto - Malbec 100%","family":"New Roads","vintage":"2023","pack":"6 / 750mL","price":183.38},
-      {"code":"382","product":"Viñas del Tango Rosé","family":"Viñas del Tango","vintage":"2024","pack":"6 / 750mL","price":209.88},
-      {"code":"381","product":"Viñas del Tango Varietal - Chardonnay","family":"Viñas del Tango","vintage":"2024","pack":"6 / 750mL","price":200.00},
-      {"code":"3000404","product":"Viñas del Tango Varietal - Torrontes","family":"Viñas del Tango","vintage":"2023","pack":"6 / 750mL","price":200.00},
-      {"code":"3000402","product":"Viñas del Tango Varietal - Cabernet Franc","family":"Viñas del Tango","vintage":"2020","pack":"6 / 750mL","price":200.00},
-      {"code":"403","product":"Viñas del Tango Varietal - Cabernet Sauvignon","family":"Viñas del Tango","vintage":"2022","pack":"6 / 750mL","price":200.00},
-      {"code":"3000403","product":"Viñas del Tango Varietal - Cabernet Sauvignon","family":"Viñas del Tango","vintage":"2022","pack":"6 / 750mL","price":200.00},
-      {"code":"383","product":"Viñas del Tango Varietal - Malbec","family":"Viñas del Tango","vintage":"2022","pack":"6 / 750mL","price":200.00},
-      {"code":"3000383","product":"Viñas del Tango Varietal - Malbec","family":"Viñas del Tango","vintage":"2024","pack":"6 / 750mL","price":200.00},
-      {"code":"385","product":"Viñas del Tango Gran - Malbec","family":"Viñas del Tango","vintage":"2023","pack":"6 / 750mL","price":233.20},
-      {"code":"3000385","product":"Viñas del Tango Selection - Malbec","family":"Viñas del Tango","vintage":"2023","pack":"6 / 750mL","price":240.00},
-      {"code":"3000387","product":"Viñas del Tango Selection - Cabernet Sauvignon","family":"Viñas del Tango","vintage":"2023","pack":"6 / 750mL","price":240.00},
-      {"code":"452","product":"Viñas del Tango Malbec Premium","family":"Viñas del Tango","vintage":"2023","pack":"6 / 750mL","price":289.38},
-      {"code":"3000452","product":"Viñas del Tango Malbec Premium","family":"Viñas del Tango","vintage":"2023","pack":"6 / 750mL","price":300.00},
-      {"code":"3000191","product":"Cava Bonaval Brut Rosé - Garnacha","family":"Cava Bonaval","vintage":null,"pack":"6 / 750mL","price":280.69},
-      {"code":"3000192","product":"Cava Bonaval Brut Branco - Macabeo","family":"Cava Bonaval","vintage":null,"pack":"6 / 750mL","price":280.69},
-      {"code":"3000468","product":"Cava Bonaval Branca Brut Sleeve","family":"Cava Bonaval","vintage":null,"pack":"6 / 750mL","price":null},
-      {"code":"3000251","product":"La Vache Espagnole Tto - Tempranillo, Monastrell","family":"La Vache","vintage":"2024","pack":"6 / 750mL","price":203.52},
-      {"code":"3000269","product":"La Vache Espagnole Bco - Macabeo","family":"La Vache","vintage":"2024","pack":"6 / 750mL","price":203.52},
-      {"code":"3000492","product":"Vinho Vidigal Rosé (6x750ml)","family":"Marques de Vitoria / Vidigal","vintage":null,"pack":"6 / 750mL","price":null},
-      {"code":"3000491","product":"Vinho Prado Molar Tinto (6x750ml)","family":"Marques de Vitoria","vintage":null,"pack":"6 / 750mL","price":null},
-      {"code":"3000490","product":"Vinho Marques de Vitoria Joven (6x750ml)","family":"Marques de Vitoria","vintage":null,"pack":"6 / 750mL","price":null},
-      {"code":"3000489","product":"Vinho Marques de Vitoria Rosé (6x750ml)","family":"Marques de Vitoria","vintage":null,"pack":"6 / 750mL","price":null},
-      {"code":"3000488","product":"Vinho Marques de Vitoria Blanco (6x750ml)","family":"Marques de Vitoria","vintage":null,"pack":"6 / 750mL","price":null},
-      {"code":"3000487","product":"Vinho Marques de Vitoria Crianza (6x750ml)","family":"Marques de Vitoria","vintage":null,"pack":"6 / 750mL","price":null},
-      {"code":"3000486","product":"Vinho Marques de Vitoria Reserva (6x750ml)","family":"Marques de Vitoria","vintage":null,"pack":"6 / 750mL","price":null},
-      {"code":"3000485","product":"Vinho Marques de Vitoria Gran Reserva (6x750ml)","family":"Marques de Vitoria","vintage":null,"pack":"6 / 750mL","price":null},
-      {"code":"3000476","product":"Vinho S.A Tto Stormhoek Pure Shiraz","family":"Stormhoek","vintage":"2025","pack":"6 / 750mL","price":272.80},
-      {"code":"3000475","product":"Vinho S.A Tto Stormhoek Cabernet/Merlot","family":"Stormhoek","vintage":"2025","pack":"6 / 750mL","price":272.80},
-      {"code":"3000474","product":"Vinho S.A Tto Stormhoek Syrah","family":"Stormhoek","vintage":"2025","pack":"6 / 750mL","price":272.80},
-      {"code":"3000473","product":"Vinho S.A Bco Stormhoek Sauvignon Blanc","family":"Stormhoek","vintage":"2025","pack":"6 / 750mL","price":272.80},
-      {"code":"3000472","product":"Vinho S.A Tto Stormhoek Pinotage","family":"Stormhoek","vintage":"2025","pack":"6 / 750mL","price":272.80},
-      {"code":"3000471","product":"Vinho S.A Tto Stormhoek Pinotage/Malbec","family":"Stormhoek","vintage":"2025","pack":"6 / 750mL","price":272.80},
-      {"code":"3000470","product":"Vinho S.A Bco Stormhoek Pinot Grigio","family":"Stormhoek","vintage":"2025","pack":"6 / 750mL","price":272.80},
-      {"code":"3000469","product":"Vinho S.A Bco Stormhoek Chard./Viognier","family":"Stormhoek","vintage":"2025","pack":"6 / 750mL","price":272.80}
+      /* Cole aqui o array completo de produtos (todos os objetos). 
+         Exemplo de item:
+         {"code":"3000211","product":"Gaggiarone ...","family":"Gaggiarone","vintage":"2021","pack":"6 / 750mL","price":820.44},
+         ... (todos os itens)
+      */
     ];
 
-    /*************************************************************************
-     * UI logic: render grid, search, filter, export JSON
-     *************************************************************************/
+    // === UTILITÁRIOS ===
     const mainGrid = document.getElementById('mainGrid');
     const rawData = document.getElementById('rawData');
     const searchInput = document.getElementById('search');
     const filterFamily = document.getElementById('filterFamily');
     const btnExport = document.getElementById('btnExport');
+    const loadedCountEl = document.getElementById('loadedCount');
+    const logArea = document.getElementById('logArea');
+    const expectedCountEl = document.getElementById('expectedCount');
 
-    // populate family filter
-    (function populateFamilies(){
-      const families = Array.from(new Set(PRODUCTS.map(p=>p.family || 'Outros'))).sort();
-      for(const f of families){
-        const opt = document.createElement('option');
-        opt.value = f;
-        opt.textContent = f;
-        filterFamily.appendChild(opt);
+    // Ajuste visual do número esperado (se você sabe que são 56, mantenha; senão altere)
+    const EXPECTED_COUNT = 56;
+    expectedCountEl.textContent = EXPECTED_COUNT;
+
+    function log(...args){
+      console.log(...args);
+      const line = args.map(a => (typeof a === 'object' ? JSON.stringify(a) : String(a))).join(' ');
+      if(logArea.textContent === '—') logArea.textContent = '';
+      logArea.textContent += line + '\\n';
+    }
+
+    function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+    function imageUrlFor(code){ return `images/${code}.jpg`; }
+
+    function handleImgError(img){
+      if(img.dataset.tried === 'jpg'){
+        if(!img.dataset.triedPng){
+          img.dataset.triedPng = '1';
+          img.src = img.src.replace(/\\.jpg$/i, '.png');
+        } else {
+          img.src = placeholderDataUrl();
+        }
+      } else {
+        img.dataset.tried = 'jpg';
+        // trigger onerror again (browser will call onerror if src fails)
+        img.src = img.src;
       }
-    })();
+    }
 
-    function imageUrlFor(code){
-      // Try jpg then png; browser will attempt to load; we set <img> src to jpg and onerror switch to png then placeholder
-      return `images/${code}.jpg`;
+    function placeholderDataUrl(){
+      return 'data:image/svg+xml;utf8,' + encodeURIComponent(
+        `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400"><rect width="100%" height="100%" fill="#f3f4f6"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#9ca3af" font-family="Arial" font-size="20">Imagem não disponível</text></svg>`
+      );
     }
 
     function createCard(item){
@@ -273,97 +122,45 @@
         <div>
           <div style="display:flex;justify-content:space-between;align-items:center">
             <strong>${escapeHtml(item.product)}</strong>
-            <span class="badge">${escapeHtml(item.code)}</span>
+            <span class="muted">${escapeHtml(item.code)}</span>
           </div>
-          <div class="meta muted small">
-            <div>${item.vintage ? item.vintage : 'Safra: —'}</div>
-            <div>${escapeHtml(item.pack)}</div>
-            <div>R$ ${item.price !== null ? Number(item.price).toFixed(2) : '—'}</div>
-          </div>
+          <div class="muted" style="margin-top:6px">${item.vintage || '—'} • ${escapeHtml(item.pack)} • R$ ${item.price !== null ? Number(item.price).toFixed(2) : '—'}</div>
         </div>
       `;
-      div.addEventListener('click', ()=> showDetails(item));
       return div;
     }
 
+    // === RENDERIZAÇÃO SEM LIMITES ===
     function render(list){
       mainGrid.innerHTML = '';
+      if(!Array.isArray(list)) list = [];
+      loadedCountEl.textContent = list.length;
+      log('Renderizando', list.length, 'itens');
       if(list.length === 0){
         mainGrid.innerHTML = '<div class="muted">Nenhum produto encontrado.</div>';
+        rawData.textContent = JSON.stringify(list, null, 2);
         return;
       }
+      // Renderiza todos os itens (sem paginação)
+      const frag = document.createDocumentFragment();
       for(const item of list){
-        mainGrid.appendChild(createCard(item));
+        frag.appendChild(createCard(item));
       }
+      mainGrid.appendChild(frag);
       rawData.textContent = JSON.stringify(list, null, 2);
     }
 
-    function showDetails(item){
-      const html = `
-        <div style="padding:12px">
-          <h3 style="margin:0 0 8px">${escapeHtml(item.product)} <small class="muted">(${escapeHtml(item.code)})</small></h3>
-          <div style="display:flex;gap:12px;align-items:flex-start">
-            <div style="width:260px;height:260px;background:#f3f4f6;border-radius:6px;overflow:hidden">
-              <img style="width:100%;height:100%;object-fit:cover" src="images/${item.code}.jpg" onerror="handleImgError(this)" alt="${escapeHtml(item.product)}" />
-            </div>
-            <div>
-              <table><tbody>
-                <tr><th>Código</th><td>${escapeHtml(item.code)}</td></tr>
-                <tr><th>Produto</th><td>${escapeHtml(item.product)}</td></tr>
-                <tr><th>Família</th><td>${escapeHtml(item.family || '—')}</td></tr>
-                <tr><th>Safra</th><td>${item.vintage || '—'}</td></tr>
-                <tr><th>Embalagem</th><td>${escapeHtml(item.pack)}</td></tr>
-                <tr><th>Preço caixa (s/ IPI)</th><td>${item.price !== null ? 'R$ ' + Number(item.price).toFixed(2) : '—'}</td></tr>
-              </tbody></table>
-              <div style="margin-top:10px"><button onclick="closeModal()">Fechar</button></div>
-            </div>
-          </div>
-        </div>
-      `;
-      showModal(html);
-    }
-
-    // simple modal
-    function showModal(innerHtml){
-      const overlay = document.createElement('div');
-      overlay.style.position='fixed';
-      overlay.style.left=0;overlay.style.top=0;overlay.style.right=0;overlay.style.bottom=0;
-      overlay.style.background='rgba(0,0,0,0.45)';overlay.style.display='flex';overlay.style.alignItems='center';overlay.style.justifyContent='center';
-      overlay.style.zIndex=9999;
-      const box = document.createElement('div');
-      box.style.width='min(1000px,96%)';box.style.maxHeight='90vh';box.style.overflow='auto';box.style.background='#fff';box.style.borderRadius='8px';box.style.padding='12px';
-      box.innerHTML = innerHtml;
-      overlay.appendChild(box);
-      overlay.addEventListener('click', (e)=>{ if(e.target===overlay) overlay.remove(); });
-      document.body.appendChild(overlay);
-      window.closeModal = ()=> overlay.remove();
-    }
-
-    function handleImgError(img){
-      if(img.dataset.tried === 'jpg'){
-        if(!img.dataset.triedPng){
-          img.dataset.triedPng = '1';
-          img.src = img.src.replace(/\.jpg$/i, '.png');
-        } else {
-          img.src = placeholderDataUrl();
-        }
-      } else {
-        img.dataset.tried = 'jpg';
-        img.src = img.src; // trigger onerror again
-        // if still fails, next onerror will try png
+    // === FILTROS E EXPORT ===
+    function populateFamilies(){
+      const families = Array.from(new Set(PRODUCTS.map(p=>p.family || 'Outros'))).sort();
+      for(const f of families){
+        const opt = document.createElement('option');
+        opt.value = f;
+        opt.textContent = f;
+        filterFamily.appendChild(opt);
       }
     }
 
-    function placeholderDataUrl(){
-      // small SVG placeholder
-      return 'data:image/svg+xml;utf8,' + encodeURIComponent(
-        `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400"><rect width="100%" height="100%" fill="#f3f4f6"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#9ca3af" font-family="Arial" font-size="20">Imagem não disponível</text></svg>`
-      );
-    }
-
-    function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-
-    // search & filter
     function applyFilters(){
       const q = searchInput.value.trim().toLowerCase();
       const fam = filterFamily.value;
@@ -383,28 +180,40 @@
     filterFamily.addEventListener('change', applyFilters);
 
     btnExport.addEventListener('click', ()=>{
-      // export current view JSON in a new window for copy/paste
-      const q = searchInput.value.trim().toLowerCase();
-      const fam = filterFamily.value;
-      let list = PRODUCTS.slice();
-      if(fam) list = list.filter(p => (p.family || '').toLowerCase() === fam.toLowerCase());
-      if(q){
-        list = list.filter(p => {
-          return (p.code && p.code.toLowerCase().includes(q)) ||
-                 (p.product && p.product.toLowerCase().includes(q)) ||
-                 (p.family && p.family.toLowerCase().includes(q));
-        });
-      }
       const w = window.open('', '_blank');
-      w.document.write('<pre>' + escapeHtml(JSON.stringify(list, null, 2)) + '</pre>');
+      w.document.write('<pre>' + escapeHtml(JSON.stringify(PRODUCTS, null, 2)) + '</pre>');
       w.document.title = 'Export JSON';
     });
 
-    // initial render
-    render(PRODUCTS);
+    // === INICIALIZAÇÃO E VERIFICAÇÃO ===
+    (function init(){
+      try{
+        log('Inicializando catálogo...');
+        // Basic sanity checks
+        if(!Array.isArray(PRODUCTS)){
+          throw new Error('VARIÁVEL PRODUCTS não é um array. Verifique se você colou o array completo.');
+        }
+        log('PRODUCTS length =', PRODUCTS.length);
+        // Atualiza contador esperado visualmente (se quiser ajustar)
+        loadedCountEl.textContent = 0;
+        populateFamilies();
+        render(PRODUCTS);
+        // Se houver discrepância, logue aviso
+        if(PRODUCTS.length !== EXPECTED_COUNT){
+          log('Aviso: número de itens carregados (' + PRODUCTS.length + ') difere do esperado (' + EXPECTED_COUNT + ').');
+        } else {
+          log('Contagem conferida: OK.');
+        }
+      } catch(err){
+        log('Erro na inicialização:', err.message || err);
+        mainGrid.innerHTML = '<div class="muted">Erro ao inicializar catálogo. Veja o console para detalhes.</div>';
+      }
+    })();
 
-    // expose PRODUCTS for console debugging
+    // Expor para depuração
     window.PRODUCTS = PRODUCTS;
+    window.logArea = logArea;
+    window.handleImgError = handleImgError;
   </script>
 </body>
 </html>
