@@ -13,8 +13,7 @@
     input,select,button{padding:8px;border:1px solid #d1d5db;border-radius:6px}
     .families{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-top:18px}
     .family{background:#fff;padding:12px;border-radius:8px;box-shadow:0 1px 6px rgba(16,24,40,.06);display:flex;flex-direction:column;gap:10px}
-    .family .img{height:160px;background:#f3f4f6;border-radius:6px;overflow:hidden;display:flex;align-items:center;justify-content:center}
-    .family .img img{width:100%;height:100%;object-fit:cover}
+    .family .img{height:160px;background:#fff;border-radius:6px;overflow:hidden;display:flex;align-items:center;justify-content:center;border:1px solid #eef2f7}
     .family h2{margin:0;font-size:1rem;display:flex;justify-content:space-between;align-items:center;gap:8px}
     .list{margin:0;padding:0;list-style:none;max-height:260px;overflow:auto}
     .list li{padding:6px 0;border-bottom:1px solid #f1f5f9;font-size:0.95rem}
@@ -27,13 +26,16 @@
     pre{background:#0f172a;color:#fff;padding:12px;border-radius:6px;overflow:auto;max-height:320px}
     footer{margin-top:18px;color:#6b7280;font-size:0.9rem}
     .badge{background:#eef2ff;color:#1e3a8a;padding:4px 8px;border-radius:999px;font-weight:600}
+    /* Harmonization SVG styling */
+    .harmo-svg{width:100%;height:160px;display:block}
+    .harmo-panel{background:#fff;padding:12px;border-radius:8px;box-shadow:0 1px 6px rgba(16,24,40,.04);margin-top:12px}
   </style>
 </head>
 <body>
   <header>
     <div>
       <h1>Catálogo S&P — Vinhos e Harmonizador</h1>
-      <div class="muted">Exibe nomes por família; imagens em <code>images/</code>. Harmonizador usa TheMealDB (chave pública).</div>
+      <div class="muted">Exibe nomes por família; a imagem de rótulo foi substituída por um ícone de harmonização (chef + sommelier + enólogo).</div>
     </div>
 
     <div class="controls">
@@ -55,40 +57,92 @@
 
   <hr style="margin:18px 0" />
 
-  <section style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-start">
-    <div style="flex:1;min-width:320px">
-      <h2 style="margin:0 0 8px">Harmonizador rápido (TheMealDB)</h2>
-      <div class="muted" style="margin-bottom:8px">Selecione um rótulo e clique em Buscar Top 3. Se não houver resultado por nome, usa categoria Seafood.</div>
-      <div style="display:flex;gap:8px;align-items:center">
-        <select id="wineSelect" style="flex:1"></select>
-        <button id="btnSearch">Buscar Top 3</button>
-      </div>
-      <div style="margin-top:8px;display:flex;gap:8px">
-        <button id="btnRandom">Buscar Aleatório (3)</button>
-        <button id="btnShowSaved">Ver Salvos</button>
-        <button id="btnExport">Exportar Salvos</button>
-        <button id="btnClearSaved" style="background:#fff;border:1px solid #f87171;color:#b91c1c">Limpar Salvos</button>
-      </div>
-      <div id="status" class="muted" style="margin-top:8px"></div>
-    </div>
+  <section class="harmo-panel" aria-live="polite">
+    <h2 style="margin:0 0 8px">Harmonização guiada</h2>
+    <div class="muted" style="margin-bottom:8px">Quando você escolher um prato, o chef, o sommelier e o enólogo colaboram para sugerir a melhor harmonização.</div>
 
-    <div style="flex:1;min-width:320px">
-      <strong>Dados salvos (preview)</strong>
-      <pre id="savedPreview">Nenhum item salvo.</pre>
+    <!-- Inline SVG representando Chef + Sommelier + Enólogo (substitui foto do vinho) -->
+    <svg class="harmo-svg" viewBox="0 0 1200 300" role="img" aria-label="Ícone de harmonização: chef, sommelier e enólogo">
+      <defs>
+        <linearGradient id="g1" x1="0" x2="1">
+          <stop offset="0" stop-color="#fef3c7"/>
+          <stop offset="1" stop-color="#fee2e2"/>
+        </linearGradient>
+        <linearGradient id="g2" x1="0" x2="1">
+          <stop offset="0" stop-color="#dbeafe"/>
+          <stop offset="1" stop-color="#e9d5ff"/>
+        </linearGradient>
+      </defs>
+
+      <!-- background -->
+      <rect x="0" y="0" width="1200" height="300" fill="#ffffff"/>
+
+      <!-- Chef (left) -->
+      <g transform="translate(120,40)">
+        <rect x="-100" y="-20" width="240" height="220" rx="18" fill="#fff" stroke="#eef2f7"/>
+        <circle cx="20" cy="40" r="36" fill="#fde68a" stroke="#f59e0b" />
+        <rect x="-10" y="80" width="60" height="80" rx="8" fill="#fff" stroke="#f3f4f6"/>
+        <path d="M-20 170 q40 30 80 0" fill="#f3f4f6"/>
+        <text x="20" y="220" font-size="18" text-anchor="middle" fill="#374151">Chef</text>
+      </g>
+
+      <!-- Sommelier (center) -->
+      <g transform="translate(520,20)">
+        <rect x="-120" y="-10" width="240" height="240" rx="18" fill="#fff" stroke="#eef2f7"/>
+        <ellipse cx="0" cy="60" rx="36" ry="36" fill="#fce7f3" stroke="#db2777"/>
+        <rect x="-30" y="110" width="60" height="70" rx="8" fill="#fff" stroke="#f3f4f6"/>
+        <!-- wine glass icon -->
+        <g transform="translate(0,40)">
+          <path d="M0 0 q20 30 0 60 q-20 -30 0 -60 z" fill="#fff" stroke="#7c3aed"/>
+          <rect x="-6" y="60" width="12" height="40" fill="#7c3aed"/>
+          <rect x="-18" y="100" width="36" height="8" rx="4" fill="#7c3aed"/>
+        </g>
+        <text x="0" y="230" font-size="18" text-anchor="middle" fill="#374151">Sommelier</text>
+      </g>
+
+      <!-- Enólogo (right) -->
+      <g transform="translate(920,40)">
+        <rect x="-100" y="-20" width="240" height="220" rx="18" fill="#fff" stroke="#eef2f7"/>
+        <circle cx="20" cy="40" r="36" fill="#dbeafe" stroke="#2563eb" />
+        <rect x="-10" y="80" width="60" height="80" rx="8" fill="#fff" stroke="#f3f4f6"/>
+        <!-- grape cluster -->
+        <g transform="translate(20,120)">
+          <circle cx="-18" cy="-10" r="10" fill="#7c3aed"/>
+          <circle cx="0" cy="-6" r="12" fill="#6d28d9"/>
+          <circle cx="18" cy="-10" r="10" fill="#7c3aed"/>
+          <path d="M0 6 q0 12 -6 18" stroke="#4b5563" stroke-width="2" fill="none"/>
+        </g>
+        <text x="20" y="220" font-size="18" text-anchor="middle" fill="#374151">Enólogo</text>
+      </g>
+
+      <!-- central message -->
+      <g transform="translate(600,260)">
+        <rect x="-420" y="-40" width="840" height="48" rx="8" fill="#111827" opacity="0.06"/>
+        <text x="0" y="0" font-size="20" text-anchor="middle" fill="#111827">Harmonização colaborativa: Chef + Sommelier + Enólogo</text>
+      </g>
+    </svg>
+
+    <div style="margin-top:12px">
+      <label for="wineSelectHarmo" class="muted">Escolha um rótulo para iniciar a sugestão:</label>
+      <select id="wineSelectHarmo" style="width:100%;padding:8px;border-radius:6px;border:1px solid #d1d5db;margin-top:6px"></select>
+      <div style="margin-top:8px;display:flex;gap:8px">
+        <button id="btnSearchHarmo">Buscar Top 3</button>
+        <button id="btnRandomHarmo">Aleatório</button>
+      </div>
     </div>
   </section>
 
-  <main id="results" class="grid" aria-live="polite" style="margin-top:14px"></main>
+  <section style="margin-top:12px">
+    <div id="status" class="muted">Pronto. Selecione um rótulo e clique em Buscar Top 3.</div>
+    <main id="results" class="grid" style="margin-top:12px"></main>
+  </section>
 
   <footer>
-    <div class="muted">Se quiser que eu gere a lista de nomes de arquivo sugeridos para as imagens (ex.: <code>Porta_6.jpg</code>), eu preparo.</div>
+    <div class="muted">Se quiser que eu altere o estilo do ícone (cores, texto, layout) eu atualizo o SVG conforme preferir.</div>
   </footer>
 
   <script>
-    /************************************************************************
-     * Dados completos: lista de rótulos (code, product, family)
-     * (Este array foi extraído da planilha; mantenha-o intacto)
-     ************************************************************************/
+    /* ====== Dados (mantidos) ====== */
     const PRODUCTS = [
       {"code":"3000211","product":"Gaggiarone Vitgni Giovani Tto - Croatina","family":"Gaggiarone"},
       {"code":"3000420","product":"Gaggiarone Vitgni Giovani Tto - Croatina","family":"Gaggiarone"},
@@ -262,62 +316,8 @@
       {"code":"3000469","product":"Vinho S.A Bco Stormhoek Chard./Viognier","family":"Stormhoek"}
     ];
 
-    /************************************************************************
-     * Utilitários e renderização (corrigidos para evitar erros comuns)
-     ************************************************************************/
-
-    // escape HTML
+    /* ====== Catalog rendering (families) ====== */
     function escapeHtml(s){ return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-
-    // remove acentos e normaliza para nome de arquivo
-    function normalizeFilename(name){
-      if(!name) return '';
-      // remove diacríticos
-      const noDiacritics = name.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-      // replace spaces and slashes with underscore, remove problematic chars
-      return noDiacritics.replace(/[\/\\]+/g,'_').replace(/\s+/g,'_').replace(/[^a-zA-Z0-9_\-\.]/g,'').trim();
-    }
-
-    // tenta várias variações de nome de arquivo (cru, underscore, normalized)
-    function candidateImagePaths(family){
-      const raw = `images/${family}.jpg`;
-      const rawPng = `images/${family}.png`;
-      const unders = `images/${family.replace(/\s+/g,'_')}.jpg`;
-      const undersPng = `images/${family.replace(/\s+/g,'_')}.png`;
-      const norm = `images/${normalizeFilename(family)}.jpg`;
-      const normPng = `images/${normalizeFilename(family)}.png`;
-      return [raw, rawPng, unders, undersPng, norm, normPng];
-    }
-
-    // cria elemento img que tenta as variações em sequência
-    function createImgWithFallback(family){
-      const img = document.createElement('img');
-      img.alt = family;
-      img.style.width = '100%';
-      img.style.height = '100%';
-      img.style.objectFit = 'cover';
-      const candidates = candidateImagePaths(family);
-      let idx = 0;
-      img.src = candidates[idx];
-      img.onerror = function(){
-        idx++;
-        if(idx < candidates.length){
-          img.src = candidates[idx];
-        } else {
-          img.onerror = null;
-          img.src = placeholderDataUrl();
-        }
-      };
-      return img;
-    }
-
-    function placeholderDataUrl(){
-      return 'data:image/svg+xml;utf8,' + encodeURIComponent(
-        `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="500"><rect width="100%" height="100%" fill="#f3f4f6"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#9ca3af" font-family="Arial" font-size="20">Imagem não disponível</text></svg>`
-      );
-    }
-
-    // agrupa por família
     function groupByFamily(items){
       const map = new Map();
       for(const p of items){
@@ -328,29 +328,6 @@
       return map;
     }
 
-    // cria cartão de família (usa createImgWithFallback)
-    function createFamilyCard(family, items){
-      const section = document.createElement('section');
-      section.className = 'family';
-      const imgWrap = document.createElement('div');
-      imgWrap.className = 'img';
-      imgWrap.appendChild(createImgWithFallback(family));
-      const h = document.createElement('h2');
-      h.innerHTML = `${escapeHtml(family)} <span class="muted">(${items.length})</span>`;
-      const ul = document.createElement('ul');
-      ul.className = 'list';
-      for(const it of items){
-        const li = document.createElement('li');
-        li.textContent = it.product;
-        ul.appendChild(li);
-      }
-      section.appendChild(imgWrap);
-      section.appendChild(h);
-      section.appendChild(ul);
-      return section;
-    }
-
-    // render principal
     const familiesEl = document.getElementById('families');
     const filterFamily = document.getElementById('filterFamily');
     const searchInput = document.getElementById('search');
@@ -372,6 +349,47 @@
       familyCountEl.textContent = families.length;
     }
 
+    function createFamilyCard(family, items){
+      const section = document.createElement('section');
+      section.className = 'family';
+      // Instead of wine photo, show the harmonization SVG icon (inline small version)
+      const imgWrap = document.createElement('div');
+      imgWrap.className = 'img';
+      imgWrap.innerHTML = `
+        <svg width="220" height="140" viewBox="0 0 220 140" role="img" aria-label="Ícone de harmonização">
+          <rect width="100%" height="100%" rx="8" fill="#fff"/>
+          <g transform="translate(20,10)">
+            <circle cx="20" cy="30" r="18" fill="#fde68a" stroke="#f59e0b"/>
+            <rect x="0" y="60" width="40" height="20" rx="4" fill="#f3f4f6"/>
+            <text x="20" y="110" font-size="10" text-anchor="middle" fill="#374151">Chef</text>
+          </g>
+          <g transform="translate(90,10)">
+            <circle cx="20" cy="30" r="18" fill="#fce7f3" stroke="#db2777"/>
+            <rect x="6" y="60" width="28" height="20" rx="4" fill="#f3f4f6"/>
+            <text x="20" y="110" font-size="10" text-anchor="middle" fill="#374151">Sommelier</text>
+          </g>
+          <g transform="translate(160,10)">
+            <circle cx="20" cy="30" r="18" fill="#dbeafe" stroke="#2563eb"/>
+            <rect x="0" y="60" width="40" height="20" rx="4" fill="#f3f4f6"/>
+            <text x="20" y="110" font-size="10" text-anchor="middle" fill="#374151">Enólogo</text>
+          </g>
+        </svg>
+      `;
+      const h = document.createElement('h2');
+      h.innerHTML = `${escapeHtml(family)} <span class="muted">(${items.length})</span>`;
+      const ul = document.createElement('ul');
+      ul.className = 'list';
+      for(const it of items){
+        const li = document.createElement('li');
+        li.textContent = it.product;
+        ul.appendChild(li);
+      }
+      section.appendChild(imgWrap);
+      section.appendChild(h);
+      section.appendChild(ul);
+      return section;
+    }
+
     function renderAll(selectedFamily = '', q = ''){
       familiesEl.innerHTML = '';
       const families = Array.from(grouped.keys()).sort((a,b)=>a.localeCompare(b,'pt-BR'));
@@ -391,7 +409,6 @@
     searchInput.addEventListener('input', ()=> renderAll(filterFamily.value, searchInput.value.trim().toLowerCase()));
     btnShowAll.addEventListener('click', ()=> { filterFamily.value = ''; searchInput.value = ''; renderAll(); });
 
-    // inicialização segura
     (function initCatalog(){
       try{
         if(!Array.isArray(PRODUCTS)) throw new Error('PRODUCTS não é um array.');
@@ -404,21 +421,14 @@
       }
     })();
 
-    /************************************************************************
-     * Harmonizador (TheMealDB) + salvamento local (localStorage)
-     ************************************************************************/
-    const WINES = Array.from(new Set(PRODUCTS.map(p => p.product))).slice(0, 200); // lista de rótulos (evita duplicatas)
-    const wineSelect = document.getElementById('wineSelect');
-    const btnSearch = document.getElementById('btnSearch');
-    const btnRandom = document.getElementById('btnRandom');
-    const btnShowSaved = document.getElementById('btnShowSaved');
-    const btnExport = document.getElementById('btnExport');
-    const btnClearSaved = document.getElementById('btnClearSaved');
+    /* ====== Harmonizador (TheMealDB) - mantém funcionalidade, usa o painel acima ====== */
+    const WINES = Array.from(new Set(PRODUCTS.map(p => p.product))).slice(0, 200);
+    const wineSelect = document.getElementById('wineSelectHarmo');
+    const btnSearch = document.getElementById('btnSearchHarmo');
+    const btnRandom = document.getElementById('btnRandomHarmo');
     const results = document.getElementById('results');
     const status = document.getElementById('status');
-    const savedPreview = document.getElementById('savedPreview');
 
-    // preencher select de vinhos
     (function populateWines(){
       wineSelect.innerHTML = '<option value="">— selecione um rótulo (ou deixe em branco para aleatório) —</option>';
       for(const w of WINES){
@@ -431,32 +441,6 @@
 
     const API_KEY = '1';
     const BASE = `https://www.themealdb.com/api/json/v1/${API_KEY}`;
-    const STORAGE_KEY = 'harmonizador_salvos_v1';
-
-    function readSaved(){
-      try{
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if(!raw) return [];
-        return JSON.parse(raw);
-      } catch(e){
-        console.error('Erro lendo storage', e);
-        return [];
-      }
-    }
-    function saveItem(item){
-      const arr = readSaved();
-      if(item.idMeal && arr.some(x => x.idMeal === item.idMeal)) return false;
-      arr.push(item);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
-      return true;
-    }
-    function clearSaved(){
-      localStorage.removeItem(STORAGE_KEY);
-    }
-    function updateSavedPreview(){
-      const arr = readSaved();
-      savedPreview.textContent = arr.length ? JSON.stringify(arr, null, 2) : 'Nenhum item salvo.';
-    }
 
     async function fetchJson(url){
       const res = await fetch(url);
@@ -484,7 +468,7 @@
       return json.meals ? json.meals[0] : null;
     }
 
-    function createMealCard(meal, showSave=true){
+    function createMealCard(meal){
       const div = document.createElement('div');
       div.className = 'card';
       const thumb = meal.strMealThumb || '';
@@ -492,22 +476,36 @@
       const id = meal.idMeal || '';
       const source = meal.strSource || meal.strYoutube || '#';
       div.innerHTML = `
-        <div class="thumb"><img src="${thumb}" alt="${escapeHtml(name)}" onerror="this.src='${placeholderDataUrl()}'" /></div>
-        <h3 style="margin:8px 0 6px">${escapeHtml(name)}</h3>
-        <div class="muted small">ID: ${escapeHtml(id)}</div>
-        <div class="actions">
-          <a class="badge" href="${source || '#'}" target="_blank" rel="noopener">Abrir receita</a>
-          ${ showSave ? '<button class="btnSave" style="padding:6px 10px;border-radius:6px">Salvar</button>' : '' }
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <div style="flex:0 0 120px">
+            <div class="thumb" aria-hidden="true">
+              ${ thumb ? `<img src="${thumb}" alt="${escapeHtml(name)}" onerror="this.src='';this.parentNode.innerHTML='<div style=&quot;width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#f3f4f6;color:#9ca3af&quot;>Imagem indisponível</div>'" />` : '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#f3f4f6;color:#9ca3af">Imagem indisponível</div>' }
+            </div>
+          </div>
+          <div style="flex:1">
+            <h3 style="margin:0 0 6px">${escapeHtml(name)}</h3>
+            <div class="muted">ID: ${escapeHtml(id)}</div>
+            <div class="actions" style="margin-top:8px">
+              <a class="badge" href="${source || '#'}" target="_blank" rel="noopener">Abrir receita</a>
+              <button class="btnSuggest" style="padding:6px 10px;border-radius:6px">Sugerir Harmonização</button>
+            </div>
+            <div class="muted" style="margin-top:8px;font-size:0.95rem">Clique em "Sugerir Harmonização" para ver a proposta do Chef + Sommelier + Enólogo.</div>
+            <div class="harmo-result" style="margin-top:10px"></div>
+          </div>
         </div>
       `;
-      if(showSave){
-        const btn = div.querySelector('.btnSave');
-        btn.addEventListener('click', ()=>{
-          const ok = saveItem(meal);
-          status.textContent = ok ? 'Receita salva.' : 'Receita já estava salva.';
-          updateSavedPreview();
-        });
-      }
+      const btn = div.querySelector('.btnSuggest');
+      const harmoResult = div.querySelector('.harmo-result');
+      btn.addEventListener('click', ()=>{
+        // Simulação de sugestão colaborativa (exemplo simples)
+        const suggestions = [
+          `Chef: preparar o prato com redução cítrica; Sommelier: sugerir vinho branco fresco; Enólogo: destacar notas minerais.`,
+          `Chef: grelhar levemente; Sommelier: vinho tinto leve; Enólogo: realçar taninos suaves.`,
+          `Chef: usar ervas aromáticas; Sommelier: rosé jovem; Enólogo: acidez equilibrada.`
+        ];
+        const pick = suggestions[Math.floor(Math.random()*suggestions.length)];
+        harmoResult.innerHTML = `<div style="background:#f8fafc;border:1px solid #e6eef8;padding:10px;border-radius:6px">${escapeHtml(pick)}</div>`;
+      });
       return div;
     }
 
@@ -522,7 +520,7 @@
           if(byName && byName.length){
             status.textContent = `Encontradas ${byName.length} receitas por nome. Exibindo top 3.`;
             const top = pickTopN(byName, 3);
-            for(const m of top) results.appendChild(createMealCard(m, true));
+            for(const m of top) results.appendChild(createMealCard(m));
             return;
           }
         }
@@ -534,7 +532,7 @@
           const top = pickTopN(byCat, 3);
           for(const item of top){
             const full = await lookupById(item.idMeal);
-            results.appendChild(createMealCard(full || item, true));
+            results.appendChild(createMealCard(full || item));
           }
           return;
         }
@@ -544,7 +542,7 @@
         const j = await r.json();
         if(j.meals && j.meals.length){
           status.textContent = 'Exibindo sugestão aleatória.';
-          results.appendChild(createMealCard(j.meals[0], true));
+          results.appendChild(createMealCard(j.meals[0]));
           return;
         }
 
@@ -555,7 +553,6 @@
       }
     }
 
-    // eventos harmonizador
     btnSearch.addEventListener('click', ()=> {
       const wine = wineSelect.value.trim();
       findTop3ForWine(wine);
@@ -568,7 +565,7 @@
         for(let i=0;i<3;i++){
           const r = await fetch(`${BASE}/random.php`);
           const j = await r.json();
-          if(j.meals && j.meals[0]) results.appendChild(createMealCard(j.meals[0], true));
+          if(j.meals && j.meals[0]) results.appendChild(createMealCard(j.meals[0]));
         }
         status.textContent = 'Pronto — 3 receitas aleatórias.';
       } catch(e){
@@ -577,45 +574,14 @@
       }
     });
 
-    btnShowSaved.addEventListener('click', ()=>{
-      const arr = readSaved();
-      results.innerHTML = '';
-      if(arr.length === 0){
-        status.textContent = 'Nenhuma receita salva.';
-        savedPreview.textContent = 'Nenhum item salvo.';
-        return;
-      }
-      status.textContent = `Mostrando ${arr.length} receitas salvas.`;
-      for(const m of arr) results.appendChild(createMealCard(m, false));
-      savedPreview.textContent = JSON.stringify(arr, null, 2);
-    });
-
-    btnExport.addEventListener('click', ()=>{
-      const arr = readSaved();
-      const dataStr = JSON.stringify(arr, null, 2);
-      const w = window.open('', '_blank');
-      w.document.write('<pre>' + escapeHtml(dataStr) + '</pre>');
-      w.document.title = 'Export JSON - Receitas Salvas';
-    });
-
-    btnClearSaved.addEventListener('click', ()=>{
-      if(!confirm('Deseja realmente limpar todas as receitas salvas?')) return;
-      clearSaved();
-      updateSavedPreview();
-      results.innerHTML = '';
-      status.textContent = 'Salvos limpos.';
-    });
-
     // inicial harmonizador
     (function initHarmonizador(){
       wineSelect.selectedIndex = 0;
-      updateSavedPreview();
       status.textContent = 'Pronto. Selecione um rótulo e clique em Buscar Top 3.';
     })();
 
-    // expor para depuração
+    // expose for debugging
     window.PRODUCTS = PRODUCTS;
-    window.normalizeFilename = normalizeFilename;
   </script>
 </body>
 </html>
