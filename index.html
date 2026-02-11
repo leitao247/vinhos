@@ -1,4 +1,478 @@
 <!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S&P Expert Console v20.0 (Data Sanitized)</title>
+    <style>
+        /* DESIGN SYSTEM: "THE CELLAR" */
+        :root {
+            --primary: #5D1823;
+            --secondary: #1F252E;
+            --gold: #C0A062;
+            --paper: #FFFFFF;
+            --text: #333;
+            --gray: #E0E0E0;
+        }
+
+        body { font-family: 'Georgia', serif; background-color: #F4F4F4; color: var(--text); margin: 0; padding: 20px; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        
+        header { text-align: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px solid var(--gold); }
+        h1 { font-family: 'Helvetica Neue', sans-serif; letter-spacing: 3px; font-weight: 300; text-transform: uppercase; color: var(--primary); margin:0; }
+        .subtitle { font-family: sans-serif; font-size: 0.8rem; color: #666; margin-top: 5px; text-transform: uppercase; letter-spacing: 1px; }
+
+        .tabs { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .tab-btn { background: transparent; border: 1px solid var(--secondary); color: var(--secondary); padding: 10px 20px; cursor: pointer; font-family: sans-serif; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; }
+        .tab-btn.active { background: var(--secondary); color: #fff; }
+
+        .control-panel { background: #fff; padding: 30px; border-top: 4px solid var(--primary); box-shadow: 0 5px 15px rgba(0,0,0,0.05); display: none; }
+        .control-panel.active { display: block; animation: fadeIn 0.5s; }
+        @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+
+        select, button.action-btn { width: 100%; padding: 15px; font-size: 1rem; margin-bottom: 15px; border: 1px solid #ccc; }
+        button.action-btn { background-color: var(--primary); color: #fff; border: none; text-transform: uppercase; font-weight: bold; letter-spacing: 1px; cursor: pointer; transition: 0.3s; }
+        button.action-btn:hover { background-color: #3e0b12; }
+
+        .budget-group { display: flex; gap: 10px; }
+        .budget-btn { flex: 1; padding: 15px; background: #fff; border: 1px solid #ccc; cursor: pointer; font-weight: bold; color: var(--secondary); transition: 0.2s; }
+        .budget-btn:hover { background: var(--secondary); color: #fff; }
+
+        .result-card { background: #fff; margin-top: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); display: flex; position: relative; flex-wrap: wrap; }
+        .visual-side { width: 35%; background: var(--secondary); display: flex; align-items: center; justify-content: center; padding: 20px; color: #fff; flex-direction: column; text-align: center; }
+        .visual-img { width: 100%; height: 200px; object-fit: cover; margin-bottom: 15px; filter: brightness(0.9); border: 2px solid rgba(255,255,255,0.2); }
+        .technical-side { width: 65%; padding: 30px; background-color: var(--paper); border-left: 1px solid var(--gray); box-sizing: border-box; }
+        
+        .role-badge { font-family: sans-serif; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; color: #999; margin-bottom: 5px; display: block; }
+        .wine-title { font-size: 1.6rem; color: var(--primary); margin: 0 0 5px 0; line-height: 1.1; font-weight: bold; }
+        .wine-meta { font-family: sans-serif; font-size: 0.85rem; color: #555; margin-bottom: 20px; }
+        
+        .enologist-box { background: #f9f9f9; border-left: 4px solid var(--gold); padding: 15px; margin-top: 20px; }
+        .quote { font-style: italic; color: #444; line-height: 1.6; font-size: 1rem; margin: 10px 0; }
+        .chem-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 15px; padding-top: 10px; border-top: 1px solid #eee; }
+        .chem-item { font-family: sans-serif; font-size: 0.75rem; color: #777; text-align: center; }
+        .chem-item span { display: block; font-weight: bold; color: var(--primary); font-size: 0.9rem; margin-top: 2px; }
+
+        .kit-list { list-style: none; padding: 0; margin: 0; }
+        .kit-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #ccc; font-size: 0.9rem; }
+        .kit-item strong { color: var(--primary); }
+
+        .loader { display: none; margin: 20px auto; border: 4px solid #f3f3f3; border-top: 4px solid var(--gold); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        @media (max-width: 700px) { .result-card { flex-direction: column; } .visual-side, .technical-side { width: 100%; } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>S&P Expert Console</h1>
+        <div class="subtitle">v20.0 Data Sanitized (Zero Duplication)</div>
+    </header>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="app.switchTab('food')">Live Food Pairing</button>
+        <button class="tab-btn" onclick="app.switchTab('wine')">Wine Bridging</button>
+        <button class="tab-btn" onclick="app.switchTab('budget')">Smart Cellar</button>
+    </div>
+
+    <div id="panel-food" class="control-panel active">
+        <h2 style="margin-top:0; color:#555; font-size:1.2rem;">Live Food Engine</h2>
+        <p>Harmonização em tempo real com pratos da internet.</p>
+        <button class="action-btn" onclick="expert.runFoodAnalysis()">Buscar Prato & Harmonizar</button>
+        <div id="loader-food" class="loader"></div>
+        <div id="result-food"></div>
+    </div>
+
+    <div id="panel-wine" class="control-panel">
+        <h2 style="margin-top:0; color:#555; font-size:1.2rem;">Wine Bridging Protocol</h2>
+        <p>Selecione um vinho para calcular a sequência.</p>
+        <select id="wineSelector"><option value="">Carregando estoque completo...</option></select>
+        <button class="action-btn" onclick="expert.runBridgingAnalysis()">Calcular Sequência</button>
+        <div id="result-wine"></div>
+    </div>
+
+    <div id="panel-budget" class="control-panel">
+        <h2 style="margin-top:0; color:#555; font-size:1.2rem;">Adega Inteligente</h2>
+        <div class="budget-group">
+            <button class="budget-btn" onclick="expert.runBudgetAnalysis(200)">Kit R$ 200</button>
+            <button class="budget-btn" onclick="expert.runBudgetAnalysis(400)">Kit R$ 400</button>
+            <button class="budget-btn" onclick="expert.runBudgetAnalysis(600)">Kit R$ 600</button>
+        </div>
+        <div id="result-budget"></div>
+    </div>
+</div>
+
+<script>
+/**
+ * --- INVENTÁRIO COMPLETO (S&P IMPORTADORA) v20.0 ---
+ * LISTA LIMPA: Duplicatas removidas. Tags padronizadas.
+ */
+const INVENTORY = [
+    // --- ESPUMANTES (Nível 1) ---
+    { id: '130', name: "Espumante Porta 6 Brut", level: 1, type: 'Espumante', price: 55.12, chem: {acid:'Alta', body:'Leve', sugar:'Seco'}, tags: ['fried', 'starter', 'sushi'] },
+    { id: '191', name: "Cava Bonaval Rosé", level: 1, type: 'Espumante', price: 46.78, chem: {acid:'Vibrante', body:'Médio', sugar:'Brut'}, tags: ['tapas', 'salmon', 'starter'] },
+    { id: '192', name: "Cava Bonaval Brut Branco", level: 1, type: 'Espumante', price: 46.78, chem: {acid:'Alta', body:'Leve', sugar:'Brut'}, tags: ['fried', 'oyster'] },
+    { id: '356', name: "Da Pipa Espumante Bairrada", level: 1, type: 'Espumante', price: 49.64, chem: {acid:'Cremosa', body:'Médio', sugar:'Seco'}, tags: ['pork_light', 'seafood'] },
+    { id: '1000364', name: "Espumante La Baronne", level: 1, type: 'Espumante', price: 45.28, chem: {acid:'Média', body:'Leve', sugar:'Demi'}, tags: ['dessert_light', 'fruit'] },
+
+    // --- BRANCOS LEVES / VERDES (Nível 1) ---
+    { id: '446', name: "Pescada Alvarinho", level: 1, type: 'Branco', price: 127.55, chem: {acid:'Muito Alta', body:'Médio', sugar:'Seco'}, tags: ['ceviche', 'seafood', 'fish'] },
+    { id: '160', name: "Porta 6 Vinho Verde", level: 1, type: 'Branco', price: 55.12, chem: {acid:'Alta', body:'Leve', sugar:'Seco'}, tags: ['salad', 'sushi'] },
+    { id: '444', name: "Pescada Verde Branco", level: 1, type: 'Branco', price: 35.51, chem: {acid:'Vibrante', body:'Leve', sugar:'Seco'}, tags: ['snack', 'fish_fry'] },
+    { id: '3000386', name: "Gigantones Verde", level: 1, type: 'Branco', price: 35.51, chem: {acid:'Alta', body:'Leve', sugar:'Seco'}, tags: ['shellfish', 'starter'] },
+    { id: '120', name: "3 Autores Verde DOC", level: 1, type: 'Branco', price: 53.00, chem: {acid:'Alta', body:'Leve', sugar:'Seco'}, tags: ['salad', 'shellfish'] },
+    { id: '3000363', name: "Isla Negra Sauvignon Blanc", level: 1, type: 'Branco', price: 28.30, chem: {acid:'Alta', body:'Leve', sugar:'Seco'}, tags: ['salad', 'fish'] },
+    { id: '3000473', name: "Stormhoek Sauv. Blanc", level: 1, type: 'Branco', price: 31.82, chem: {acid:'Alta', body:'Leve', sugar:'Seco'}, tags: ['salad', 'fish'] },
+    { id: '3000484', name: "Barão do Hospital Verde", level: 1, type: 'Branco', price: 105.00, chem: {acid:'Alta', body:'Estruturado', sugar:'Seco'}, tags: ['seafood_premium', 'fish'] },
+    { id: '3000299', name: "Eruptio (Açores)", level: 1, type: 'Branco', price: 226.84, chem: {acid:'Extrema', body:'Mineral', sugar:'Seco'}, tags: ['oyster', 'seafood_premium'] },
+
+    // --- BRANCOS AROMÁTICOS & ROSÉS (Nível 2) ---
+    { id: '209', name: "Ca Montebello Pinot Grigio", level: 2, type: 'Branco', price: 80.00, chem: {acid:'Média', body:'Médio', sugar:'Seco'}, tags: ['chicken', 'pasta_white'] },
+    { id: '245', name: "Pink Rabbit Rosé", level: 2, type: 'Rosé', price: 51.66, chem: {acid:'Média', body:'Leve', sugar:'Seco'}, tags: ['chicken', 'salad'] },
+    { id: '159', name: "Vidigal Chapéu de Praia", level: 2, type: 'Rosé', price: 42.40, chem: {acid:'Alta', body:'Leve', sugar:'Seco'}, tags: ['beach', 'snack'] },
+    { id: '3000269', name: "La Vache Espagnole Branco", level: 2, type: 'Branco', price: 33.92, chem: {acid:'Média', body:'Leve', sugar:'Seco'}, tags: ['tapas', 'fish'] },
+    { id: '3000271', name: "New Roads Branco", level: 2, type: 'Branco', price: 25.44, chem: {acid:'Média', body:'Leve', sugar:'Seco'}, tags: ['daily', 'chicken'] },
+    { id: '931', name: "Porta 6 Branco Lisboa", level: 2, type: 'Branco', price: 55.12, chem: {acid:'Equilibrada', body:'Médio', sugar:'Seco'}, tags: ['pasta', 'fish_grilled'] },
+    { id: '272', name: "Spring Rabbit Sauv. Blanc", level: 2, type: 'Branco', price: 53.25, chem: {acid:'Alta', body:'Leve', sugar:'Seco'}, tags: ['salad', 'goat_cheese'] },
+    { id: '185', name: "Porta 6 Rosé", level: 2, type: 'Rosé', price: 55.12, chem: {acid:'Média', body:'Leve', sugar:'Seco'}, tags: ['shrimp', 'snack'] },
+    { id: '374', name: "Paso de Los Andes Branco", level: 2, type: 'Branco', price: 33.50, chem: {acid:'Média', body:'Leve', sugar:'Suave'}, tags: ['asian', 'fruit'] },
+    { id: '382', name: "Viñas del Tango Rosé", level: 2, type: 'Rosé', price: 34.98, chem: {acid:'Média', body:'Médio', sugar:'Seco'}, tags: ['snack', 'chicken'] },
+    { id: '3000332', name: "Flor de Lisboa Branco", level: 2, type: 'Branco', price: 34.62, chem: {acid:'Média', body:'Leve', sugar:'Seco'}, tags: ['fish', 'salad'] },
+    { id: '241', name: "Da Pipa Branco", level: 2, type: 'Branco', price: 36.04, chem: {acid:'Média', body:'Fresco', sugar:'Seco'}, tags: ['fish', 'rice'] },
+    { id: '405', name: "Torre Romanica Bianco", level: 2, type: 'Branco', price: 35.51, chem: {acid:'Média', body:'Leve', sugar:'Seco'}, tags: ['fish', 'salad'] },
+    { id: '422', name: "Torre Romanica Rosato", level: 2, type: 'Rosé', price: 35.51, chem: {acid:'Vibrante', body:'Leve', sugar:'Seco'}, tags: ['starter', 'snack'] },
+    { id: '215', name: "Mandorlo Bianco", level: 2, type: 'Branco', price: 84.62, chem: {acid:'Alta', body:'Aromático', sugar:'Seco'}, tags: ['asian', 'fish'] },
+    { id: '449', name: "Cabriz Branco", level: 2, type: 'Branco', price: 78.08, chem: {acid:'Média', body:'Médio', sugar:'Seco'}, tags: ['fish', 'pasta'] },
+
+    // --- NÍVEL 3: PONTE (Corpo Médio/Untuoso) ---
+    { id: '220', name: "Charming Rabbit Chardonnay", level: 3, type: 'Branco', price: 60.00, chem: {acid:'Baixa', body:'Untuoso', sugar:'Seco'}, tags: ['cream', 'pork'] },
+    { id: '414', name: "Lugana DOC Turbiana", level: 3, type: 'Branco', price: 134.62, chem: {acid:'Média', body:'Estruturado', sugar:'Seco'}, tags: ['risotto', 'fish_fat'] },
+    { id: '411', name: "Le Mure Garda Chardonnay", level: 3, type: 'Branco', price: 84.62, chem: {acid:'Baixa', body:'Gordo', sugar:'Seco'}, tags: ['cheese_soft', 'pasta_cream'] },
+    { id: '208', name: "Ca Montebello Pinot Nero", level: 3, type: 'Tinto', price: 80.00, chem: {acid:'Alta', body:'Leve', sugar:'Seco', tanin:'Baixo'}, tags: ['mushroom', 'tuna'] },
+    { id: '378', name: "Paso de Los Andes Pinot Noir", level: 3, type: 'Tinto', price: 47.70, chem: {acid:'Média-Alta', body:'Leve', sugar:'Seco', tanin:'Baixo'}, tags: ['pizza', 'salmon'] },
+    { id: '3000222', name: "Mrs. Rabbit Pinot Noir", level: 3, type: 'Tinto', price: 60.00, chem: {acid:'Elegante', body:'Leve', sugar:'Seco', tanin:'Sedoso'}, tags: ['duck', 'cheese_soft'] },
+    { id: '415', name: "Meridiano Garda Chardonnay", level: 3, type: 'Branco', price: 134.62, chem: {acid:'Média', body:'Madeira', sugar:'Seco'}, tags: ['codfish', 'veal'] },
+    { id: '115', name: "Coragem Superior Branco", level: 3, type: 'Branco', price: 90.10, chem: {acid:'Média', body:'Gordo', sugar:'Seco'}, tags: ['fish_fat', 'pork'] },
+
+    // --- NÍVEL 4: TINTOS MÉDIOS ---
+    { id: '412', name: "Carpino Garda Merlot", level: 4, type: 'Tinto', price: 235.32, chem: {acid:'Média', body:'Médio', sugar:'Seco', tanin:'Médio'}, tags: ['pasta_red', 'beef_light'] },
+    { id: '170', name: "Porta 6 Reserva", level: 4, type: 'Tinto', price: 80.91, chem: {acid:'Média', body:'Médio+', sugar:'Seco', tanin:'Macio'}, tags: ['meat', 'stew'] },
+    { id: '360', name: "Isla Negra Cabernet", level: 4, type: 'Tinto', price: 28.30, chem: {acid:'Média', body:'Médio', sugar:'Seco', tanin:'Médio'}, tags: ['daily', 'burger'] },
+    { id: '3000251', name: "La Vache Espagnole Tinto", level: 4, type: 'Tinto', price: 33.92, chem: {acid:'Baixa', body:'Médio', sugar:'Seco', tanin:'Rústico'}, tags: ['tapas', 'chorizo'] },
+    { id: '436', name: "Cabriz Colheita Selecionada", level: 4, type: 'Tinto', price: 59.71, chem: {acid:'Gastronômica', body:'Médio', sugar:'Seco', tanin:'Polido'}, tags: ['codfish', 'roast'] },
+    { id: '225', name: "Chatelain Valmont Rhone", level: 4, type: 'Tinto', price: 60.35, chem: {acid:'Média', body:'Especiado', sugar:'Seco', tanin:'Médio'}, tags: ['lamb_light', 'sausage'] },
+    { id: '3000336', name: "Flor d'Penalva Dão", level: 4, type: 'Tinto', price: 44.59, chem: {acid:'Alta', body:'Médio', sugar:'Seco', tanin:'Fino'}, tags: ['roast_chicken', 'rice'] },
+    { id: '290', name: "Neroperso Rosso Veneto", level: 4, type: 'Tinto', price: 131.44, chem: {acid:'Média', body:'Encorpado', sugar:'Seco'}, tags: ['pasta', 'beef'] },
+    { id: '3000291', name: "Liburna Nero D'Avola", level: 4, type: 'Tinto', price: 42.42, chem: {acid:'Média', body:'Médio', sugar:'Seco'}, tags: ['pasta', 'pizza'] },
+    { id: '3000288', name: "Borgo del Filari Montepulciano", level: 4, type: 'Tinto', price: 53.05, chem: {acid:'Média', body:'Médio', sugar:'Seco'}, tags: ['meat', 'cheese'] },
+    { id: '3000388', name: "Torre Romanica Rosso", level: 4, type: 'Tinto', price: 35.51, chem: {acid:'Média', body:'Médio', sugar:'Seco'}, tags: ['daily', 'pasta'] },
+    { id: '3000406', name: "Torre Romanica Sangiovese", level: 4, type: 'Tinto', price: 48.76, chem: {acid:'Alta', body:'Médio', sugar:'Seco'}, tags: ['pasta_red', 'meat'] },
+    { id: '408', name: "Cornalino Rosso", level: 4, type: 'Tinto', price: 98.93, chem: {acid:'Média', body:'Médio', sugar:'Seco'}, tags: ['meat', 'cheese'] },
+    { id: '300078', name: "Porta 6 Tinto", level: 4, type: 'Tinto', price: 55.12, chem: {acid:'Média', body:'Macio', sugar:'Seco'}, tags: ['burger', 'pizza'] },
+    { id: '3000173', name: "Bag in Box Porta 6 Tinto (3L)", level: 4, type: 'Tinto', price: 104.14, chem: {acid:'Média', body:'Médio', sugar:'Seco'}, tags: ['party', 'daily'] },
+    { id: '94', name: "Dom Dinis Tinto", level: 4, type: 'Tinto', price: 38.16, chem: {acid:'Média', body:'Simples', sugar:'Seco'}, tags: ['daily', 'meal'] },
+    { id: '39', name: "Reserva dos Amigos Tinto", level: 4, type: 'Tinto', price: 49.46, chem: {acid:'Média', body:'Médio', sugar:'Seco'}, tags: ['meat', 'rice'] },
+    { id: '111', name: "NBNC (No Branding)", level: 4, type: 'Tinto', price: 49.82, chem: {acid:'Média', body:'Jovem', sugar:'Seco'}, tags: ['pizza', 'pasta'] },
+    { id: '41', name: "Vidigal Reserva", level: 4, type: 'Tinto', price: 45.58, chem: {acid:'Média', body:'Médio', sugar:'Seco'}, tags: ['meat', 'daily'] },
+    { id: '333', name: "Boa Noite Lisboa Tinto", level: 4, type: 'Tinto', price: 56.18, chem: {acid:'Média', body:'Redondo', sugar:'Seco'}, tags: ['burger', 'tapas'] },
+    { id: '3000154', name: "Júlia Florista Tinto", level: 4, type: 'Tinto', price: 41.34, chem: {acid:'Baixa', body:'Leve', sugar:'Seco'}, tags: ['daily', 'snack'] },
+    { id: '153', name: "Artolas Tinto", level: 4, type: 'Tinto', price: 38.16, chem: {acid:'Média', body:'Simples', sugar:'Seco'}, tags: ['meal', 'daily'] },
+    { id: '1000432', name: "C de Cabriz", level: 4, type: 'Tinto', price: 42.59, chem: {acid:'Alta', body:'Jovem', sugar:'Seco'}, tags: ['daily', 'pizza'] },
+    { id: '369', name: "Paso de Los Andes Cabernet", level: 4, type: 'Tinto', price: 31.14, chem: {acid:'Média', body:'Médio', sugar:'Seco'}, tags: ['meat', 'pasta'] },
+    { id: '3000263', name: "New Roads Tinto", level: 4, type: 'Tinto', price: 25.44, chem: {acid:'Média', body:'Jovem', sugar:'Seco'}, tags: ['daily', 'pizza'] },
+    { id: '3000475', name: "Stormhoek Cab/Merlot", level: 4, type: 'Tinto', price: 31.82, chem: {acid:'Média', body:'Médio', sugar:'Seco'}, tags: ['burger', 'daily'] },
+
+    // NÍVEL 5: TINTOS ESTRUTURADOS
+    { id: '355', name: "La Fogliata Primitivo", level: 5, type: 'Tinto', price: 59.18, chem: {acid:'Baixa', body:'Médio', sugar:'Residual', tanin:'Doce'}, tags: ['pizza', 'cheese_hard'] },
+    { id: '3000211', name: "Gaggiarone Croatina", level: 5, type: 'Tinto', price: 136.74, chem: {acid:'Média', body:'Encorpado', sugar:'Seco', tanin:'Alto'}, tags: ['beef', 'game'] },
+    { id: '448', name: "Cabriz Touriga Nacional", level: 5, type: 'Tinto', price: 110.94, chem: {acid:'Alta', body:'Estruturado', sugar:'Seco', tanin:'Firme'}, tags: ['beef', 'steak'] },
+    { id: '456', name: "New Roads Malbec", level: 5, type: 'Tinto', price: 30.56, chem: {acid:'Média', body:'Encorpado', sugar:'Seco', tanin:'Redondo'}, tags: ['bbq', 'beef'] },
+    { id: '223', name: "Mr. Rabbit Cabernet", level: 5, type: 'Tinto', price: 50.00, chem: {acid:'Média', body:'Médio-Alto', sugar:'Seco', tanin:'Firme'}, tags: ['steak', 'lamb'] },
+    { id: '300046', name: "Brutalis by Vidigal", level: 5, type: 'Tinto', price: 325.95, chem: {acid:'Equilibrada', body:'Muito Encorpado', sugar:'Seco', tanin:'Potente'}, tags: ['premium_beef', 'game'] },
+    { id: '114', name: "3 Autores Grande Reserva", level: 5, type: 'Tinto', price: 320.12, chem: {acid:'Alta', body:'Complexo', sugar:'Seco', tanin:'Elegante'}, tags: ['special_dinner', 'lamb'] },
+    { id: '452', name: "Viñas del Tango Premium", level: 5, type: 'Tinto', price: 48.23, chem: {acid:'Média', body:'Encorpado', sugar:'Seco', tanin:'Aveludado'}, tags: ['bbq', 'pork_ribs'] },
+    { id: '3000389', name: "Torre Romanica Primitivo", level: 5, type: 'Tinto', price: 68.01, chem: {acid:'Baixa', body:'Encorpado', sugar:'Residual'}, tags: ['bbq', 'cheese'] },
+    { id: '397', name: "Torre Romanica Premium", level: 5, type: 'Tinto', price: 79.50, chem: {acid:'Média', body:'Estruturado', sugar:'Seco'}, tags: ['steak', 'game'] },
+    { id: '216', name: "Ribó Garda Cabernet", level: 5, type: 'Tinto', price: 144.16, chem: {acid:'Média', body:'Estruturado', sugar:'Seco'}, tags: ['steak', 'roast'] },
+    { id: '407', name: "I Ciottoli Garda", level: 5, type: 'Tinto', price: 90.98, chem: {acid:'Média', body:'Encorpado', sugar:'Seco'}, tags: ['bbq', 'stew'] },
+    { id: '3000221', name: "Dirty Rabbit Petit Verdot", level: 5, type: 'Tinto', price: 60.00, chem: {acid:'Alta', body:'Denso', sugar:'Seco'}, tags: ['game', 'stew'] },
+    { id: '224', name: "Master Rabbit Syrah", level: 5, type: 'Tinto', price: 50.00, chem: {acid:'Baixa', body:'Especiado', sugar:'Seco'}, tags: ['bbq', 'pork'] },
+    { id: '162', name: "Reserva dos Amigos Especial", level: 5, type: 'Tinto', price: 107.06, chem: {acid:'Média', body:'Encorpado', sugar:'Seco'}, tags: ['roast', 'game'] },
+    { id: '3000116', name: "Coragem Superior Tinto", level: 5, type: 'Tinto', price: 90.10, chem: {acid:'Alta', body:'Estruturado', sugar:'Seco'}, tags: ['steak', 'cheese_hard'] },
+    { id: '3000268', name: "Da Pipa Signature Baga", level: 5, type: 'Tinto', price: 85.15, chem: {acid:'Alta', body:'Tânico', sugar:'Seco'}, tags: ['pork', 'fatty_meat'] },
+    { id: '3000314', name: "Fonte da Perdiz Reserva", level: 5, type: 'Tinto', price: 63.97, chem: {acid:'Média', body:'Encorpado', sugar:'Seco'}, tags: ['roast', 'cheese'] },
+    { id: '330', name: "Herdade do Gamito Especial", level: 5, type: 'Tinto', price: 92.29, chem: {acid:'Média', body:'Potente', sugar:'Seco'}, tags: ['game', 'lamb'] },
+    { id: '1000399', name: "Gaião Reserva", level: 5, type: 'Tinto', price: 112.81, chem: {acid:'Média', body:'Estruturado', sugar:'Seco'}, tags: ['steak', 'stew'] },
+    { id: '3000440', name: "Cabriz Reserva", level: 5, type: 'Tinto', price: 106.63, chem: {acid:'Alta', body:'Encorpado', sugar:'Seco'}, tags: ['roast', 'cheese_hard'] },
+    { id: '383', name: "Viñas del Tango Malbec", level: 5, type: 'Tinto', price: 33.33, chem: {acid:'Média', body:'Encorpado', sugar:'Seco'}, tags: ['bbq', 'steak'] },
+    { id: '3000472', name: "Stormhoek Pinotage", level: 5, type: 'Tinto', price: 31.82, chem: {acid:'Média', body:'Defumado', sugar:'Seco'}, tags: ['bbq', 'ribs'] },
+
+    // NÍVEL 6: FORTIFICADOS (ID 350 Duplicado foi removido)
+    { id: '350', name: "Porto Ruby Martha's", level: 6, type: 'Porto', price: 63.60, chem: {acid:'Baixa', body:'Licoroso', sugar:'Doce', tanin:'Baixo'}, tags: ['dessert', 'chocolate', 'cheese_blue'] }, // Tags consolidadas
+    { id: '353', name: "Porto 10 Anos Martha's", level: 6, type: 'Porto', price: 194.33, chem: {acid:'Média', body:'Licoroso', sugar:'Doce', tanin:'Evoluído'}, tags: ['dessert', 'nuts'] },
+    { id: '413', name: "Le Cime Passito", level: 6, type: 'Sobremesa', price: 212.00, chem: {acid:'Alta', body:'Denso', sugar:'Muito Doce', tanin:'Zero'}, tags: ['dessert_fruit', 'foie_gras'] },
+    { id: '3000354', name: "Moscatel do Douro", level: 6, type: 'Porto', price: 56.00, chem: {acid:'Média', body:'Licoroso', sugar:'Doce', tanin:'Zero'}, tags: ['dessert_citrus', 'cake'] },
+    { id: '352', name: "Porto White Martha's", level: 6, type: 'Porto', price: 63.60, chem: {acid:'Baixa', body:'Doce', sugar:'Doce'}, tags: ['aperitif', 'nuts'] },
+    { id: '3000351', name: "Porto Tawny Martha's", level: 6, type: 'Porto', price: 63.60, chem: {acid:'Baixa', body:'Evoluído', sugar:'Doce'}, tags: ['nuts', 'creme_brulee'] },
+    { id: '423', name: "Porto 20 Anos Martha's", level: 6, type: 'Porto', price: 374.31, chem: {acid:'Alta', body:'Complexo', sugar:'Doce', tanin:'Aveludado'}, tags: ['cigar', 'meditation'] }
+];
+
+const app = {
+    init: function() {
+        // Validação de integridade no boot
+        const ids = new Set();
+        const names = new Set();
+        
+        INVENTORY.forEach(w => {
+            if(ids.has(w.id)) console.error(`ID Duplicado: ${w.id}`);
+            ids.add(w.id);
+            if(names.has(w.name)) console.warn(`Nome Duplicado: ${w.name}`);
+            names.add(w.name);
+        });
+
+        const sel = document.getElementById('wineSelector');
+        // Ordena por Nível -> Nome
+        INVENTORY.sort((a,b) => a.level - b.level || a.name.localeCompare(b.name));
+        
+        // Selector com OptGroups (UX Improvement)
+        for(let i=1; i<=6; i++) {
+            const group = document.createElement('optgroup');
+            group.label = `Nível ${i}`;
+            const winesInLevel = INVENTORY.filter(w => w.level === i);
+            winesInLevel.forEach(w => {
+                if (w.price >= 20) { 
+                    let opt = document.createElement('option');
+                    opt.value = w.id;
+                    opt.text = w.name;
+                    group.appendChild(opt);
+                }
+            });
+            if(winesInLevel.length > 0) sel.appendChild(group);
+        }
+    },
+
+    fmt: (v) => v.toLocaleString('pt-BR', {style:'currency', currency:'BRL'}),
+
+    shuffle: function(array) {
+        let currentIndex = array.length, randomIndex;
+        while (currentIndex != 0) {
+            randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex--;
+            [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+        }
+        return array;
+    },
+
+    switchTab: function(tabName) {
+        document.querySelectorAll('.control-panel').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('panel-' + tabName).classList.add('active');
+        event.target.classList.add('active');
+    }
+};
+
+const expert = {
+    // --- 1. LIVE FOOD PAIRING ---
+    runFoodAnalysis: async function() {
+        const loader = document.getElementById('loader-food');
+        const area = document.getElementById('result-food');
+        area.innerHTML = '';
+        loader.style.display = 'block';
+
+        try {
+            const cats = ['Beef', 'Seafood', 'Dessert', 'Lamb', 'Pasta', 'Pork'];
+            const cat = cats[Math.floor(Math.random() * cats.length)];
+            const res = await fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?c=${cat}`);
+            const data = await res.json();
+            
+            if (!data.meals || data.meals.length === 0) throw new Error("Sem pratos.");
+            const dish = data.meals[Math.floor(Math.random() * data.meals.length)];
+
+            // Logic
+            let targetTags = [];
+            let fallbackLevel = 4;
+            
+            if(cat === 'Beef' || cat === 'Lamb') { targetTags = ['beef', 'steak', 'bbq']; fallbackLevel = 5; }
+            else if(cat === 'Seafood') { targetTags = ['seafood', 'fish', 'ceviche']; fallbackLevel = 1; }
+            else if(cat === 'Dessert') { targetTags = ['dessert', 'chocolate', 'cake']; fallbackLevel = 6; }
+            else if(cat === 'Pasta') { targetTags = ['pasta', 'pasta_red']; fallbackLevel = 4; }
+            else if(cat === 'Pork') { targetTags = ['pork', 'ribs', 'roast']; fallbackLevel = 4; } 
+
+            const dishName = dish.strMeal.toLowerCase();
+            if(dishName.includes('chocolate')) { 
+                targetTags = ['chocolate', 'dessert']; 
+                fallbackLevel = 6; 
+            } else if(dishName.includes('cream')) { 
+                targetTags.push('cream'); 
+                fallbackLevel = 3; 
+            }
+            
+            let candidates = INVENTORY.filter(w => w.tags.some(t => targetTags.includes(t)));
+            if(candidates.length === 0) candidates = INVENTORY.filter(w => w.level === fallbackLevel);
+            
+            // Fallback Blindado
+            if(candidates.length === 0) candidates = INVENTORY.filter(w => w.price >= 20 && w.price < 200);
+            
+            const wine = app.shuffle(candidates)[0];
+            if(!wine) throw new Error("Inventário indisponível.");
+
+            let valid = `Harmonização por estrutura. O corpo ${wine.chem.body} suporta a densidade do prato.`;
+            if(wine.level === 1) valid = `Acidez ${wine.chem.acid} corta gordura e limpa o palato.`;
+            if(wine.level === 5) valid = `Taninos presentes ajudam a amaciar a proteína da carne.`;
+
+            area.innerHTML = `
+                <div class="result-card">
+                    <div class="visual-side">
+                        <img src="${dish.strMealThumb}" class="visual-img">
+                        <span style="font-size:0.8rem; letter-spacing:2px;">PRATO: ${cat.toUpperCase()}</span>
+                        <strong style="font-size:1.4rem;">${dish.strMeal}</strong>
+                    </div>
+                    <div class="technical-side">
+                        <span class="role-badge">SUGESTÃO DO SOMMELIER</span>
+                        <h3 class="wine-title">${wine.name}</h3>
+                        <div class="wine-meta">${wine.type.toUpperCase()} • ${app.fmt(wine.price)}</div>
+                        <div class="enologist-box">
+                            <span class="role-badge" style="color:var(--primary); background:none; padding:0;">PARECER DO ENÓLOGO</span>
+                            <p class="quote">"${valid}"</p>
+                            <div class="chem-grid">
+                                <div class="chem-item">ACIDEZ<span>${wine.chem.acid}</span></div>
+                                <div class="chem-item">CORPO<span>${wine.chem.body}</span></div>
+                                <div class="chem-item">AÇÚCAR<span>${wine.chem.sugar}</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        } catch(e) { console.error(e); area.innerHTML = "<p style='text-align:center; color:red'>Erro de conexão com API.</p>"; } 
+        finally { loader.style.display = 'none'; }
+    },
+
+    // --- 2. BRIDGING ---
+    runBridgingAnalysis: function() {
+        try {
+            const id = document.getElementById('wineSelector').value;
+            const area = document.getElementById('result-wine');
+            
+            if(!id) return alert("Selecione um vinho.");
+            const current = INVENTORY.find(w => w.id === id);
+            if(!current) return alert("Vinho não encontrado no estoque.");
+
+            let targetLevel = current.level + 1;
+            let explanation = "Evolução de corpo.";
+
+            if(current.level === 6) { targetLevel = 1; explanation = "Reset Palatino: Necessário acidez para limpar o açúcar."; }
+            else if(current.level === 5) { targetLevel = 6; explanation = "Finalização: Doçura após taninos potentes."; }
+
+            let candidates = INVENTORY.filter(w => w.level === targetLevel);
+            while(candidates.length === 0 && targetLevel <= 6) { targetLevel++; candidates = INVENTORY.filter(w => w.level === targetLevel); }
+            if(candidates.length === 0) { targetLevel = 1; candidates = INVENTORY.filter(w => w.level === 1); }
+
+            candidates.sort((a,b) => b.price - a.price);
+            const next = candidates[0];
+
+            area.innerHTML = `
+                <div class="result-card">
+                    <div class="visual-side" style="background:var(--primary)">
+                        <span style="font-size:3rem;">&rarr;</span>
+                        <span style="font-size:0.8rem; letter-spacing:2px; margin-top:10px;">SEQUÊNCIA LÓGICA</span>
+                    </div>
+                    <div class="technical-side">
+                        <div style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding-bottom:10px;">
+                            <div><span class="role-badge">ATUAL (Lv ${current.level})</span><strong>${current.name}</strong></div>
+                            <div style="text-align:right;"><span class="role-badge">PRÓXIMO (Lv ${next.level})</span><strong style="color:var(--primary)">${next.name}</strong></div>
+                        </div>
+                        <div class="enologist-box">
+                            <p class="quote">"${explanation}"</p>
+                            <div class="chem-grid">
+                                <div class="chem-item">DE<span>${current.chem.body}</span></div>
+                                <div class="chem-item">PARA<span>${next.chem.body}</span></div>
+                                <div class="chem-item">INVESTIMENTO<span>${app.fmt(next.price)}</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            area.style.display = 'block';
+        } catch (e) {
+            console.error(e);
+            alert("Erro inesperado. Recarregue a página.");
+        }
+    },
+
+    // --- 3. BUDGET ---
+    runBudgetAnalysis: function(limit) {
+        try {
+            let cart = [];
+            let currentTotal = 0;
+            
+            // CORREÇÃO UX: Verifica nome também para evitar duplicatas visuais
+            const addUnique = (wine) => {
+                if (wine && 
+                    !cart.some(w => w.id === wine.id || w.name === wine.name) && 
+                    (currentTotal + wine.price <= limit)) {
+                    cart.push(wine);
+                    currentTotal += wine.price;
+                    return true;
+                }
+                return false;
+            };
+
+            let starters = INVENTORY.filter(w => w.level <= 2 && w.price < limit * 0.4);
+            if(starters.length === 0) starters = INVENTORY.filter(w => w.level <= 2);
+            if(starters.length === 0) starters = INVENTORY.filter(w => w.price < limit * 0.5);
+            
+            const starter = app.shuffle(starters)[0];
+            if(starter) addUnique(starter);
+
+            const mains = app.shuffle(INVENTORY.filter(w => w.level >= 4 && w.level <= 5 && (currentTotal + w.price) < limit));
+            if(mains.length > 0) addUnique(mains[0]);
+
+            const remaining = limit - currentTotal;
+            const fillers = INVENTORY.filter(w => w.price <= remaining).sort((a,b) => b.price - a.price);
+            
+            for(let w of fillers) { 
+                if (cart.length >= 5) break; 
+                addUnique(w); 
+            }
+
+            const area = document.getElementById('result-budget');
+            if(cart.length === 0) { area.innerHTML = "<p>Orçamento insuficiente.</p>"; return; }
+
+            let listHtml = cart.map(w => `<li class="kit-item"><strong>${w.name}</strong> <span>${app.fmt(w.price)}</span></li>`).join('');
+            
+            area.innerHTML = `
+                <div class="result-card">
+                    <div class="visual-side" style="background:var(--gold);">
+                        <span style="font-size:2.5rem;">${cart.length}</span>
+                        <span style="font-size:0.8rem; letter-spacing:2px;">GARRAFAS</span>
+                        <strong style="font-size:1.5rem; margin-top:10px;">${app.fmt(currentTotal)}</strong>
+                    </div>
+                    <div class="technical-side">
+                        <span class="role-badge">KIT SELECIONADO</span>
+                        <ul class="kit-list">${listHtml}</ul>
+                        <div class="enologist-box">
+                            <span class="role-badge" style="color:var(--primary); background:none; padding:0;">VALIDAÇÃO</span>
+                            <p class="quote">"Seleção equilibrada cobrindo desde entradas até pratos principais."</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            area.style.display = 'block';
+            area.scrollIntoView({behavior: "smooth"});
+        } catch (e) {
+            console.error(e);
+            alert("Erro no cálculo do orçamento.");
+        }
+    }
+};
+
+app.init();
+</script>
+
+</body>
+</html><!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
@@ -443,3 +917,4 @@
     </script>
 </body>
 </html>
+
