@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Plataforma Técnica da Distribuidora</title>
+<title>Motor Enogastronômico Profissional</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 
@@ -12,7 +12,7 @@ body{
 margin:0;
 font-family:'Inter',sans-serif;
 background:linear-gradient(180deg,#5b0f19,#2a0b10);
-color:#f5f5f5;
+color:white;
 }
 
 header{
@@ -24,10 +24,6 @@ header h1{
 font-family:'Playfair Display',serif;
 font-size:42px;
 margin:0;
-}
-
-header p{
-opacity:0.85;
 }
 
 .container{
@@ -64,73 +60,63 @@ color:white;
 cursor:pointer;
 }
 
+.grid{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:20px;
+margin-top:25px;
+}
+
 .card{
 background:rgba(255,255,255,0.12);
-padding:20px;
+padding:15px;
 border-radius:12px;
-margin-top:20px;
 }
 
-.price{
+.card img{
+width:100%;
+border-radius:10px;
+}
+
+.score{
+margin-top:8px;
+font-weight:600;
 color:#ffd6d6;
-font-weight:600;
-}
-
-.total{
-margin-top:15px;
-font-weight:600;
-color:#fff;
 }
 
 .just{
-margin-top:10px;
-font-size:14px;
+font-size:13px;
 opacity:0.85;
+margin-top:6px;
+}
+
+@media(max-width:900px){
+.grid{
+grid-template-columns:1fr;
+}
 }
 </style>
 </head>
 <body>
 
 <header>
-<h1>Plataforma Técnica da Distribuidora</h1>
-<p>Motor Estrutural Enogastronômico Profissional</p>
+<h1>Motor Enogastronômico Profissional</h1>
 </header>
 
 <div class="container">
 
 <div class="section">
-<h2>1. Harmonização por Rótulo</h2>
+<h2>Harmonização Técnica por Rótulo</h2>
 <select id="wineSelect"></select>
-<button onclick="harmonizar()">Buscar Harmonização</button>
-<div id="harmResult"></div>
-</div>
-
-<div class="section">
-<h2>2. Gerador de Cardápio Técnico</h2>
-<select id="menuWine"></select>
-<button onclick="gerarMenu()">Gerar Menu</button>
-<div id="menuResult"></div>
-</div>
-
-<div class="section">
-<h2>3. Simulador de Compras</h2>
-<button onclick="simular(300)">Até R$300</button>
-<button onclick="simular(500)">Até R$500</button>
-<div id="simResult"></div>
-</div>
-
-<div class="section">
-<h2>4. Wine Bridging Técnico</h2>
-<select id="bridgeWine"></select>
-<button onclick="bridging()">Buscar Progressão</button>
-<div id="bridgeResult"></div>
+<button onclick="buscarPratos()">Buscar Top 3</button>
+<div id="resultado"></div>
 </div>
 
 </div>
 
 <script>
 
-/* SUBSTITUA PELO SEU INVENTORY COMPLETO */
+/* COLE AQUI SUA LISTA COMPLETA */
 const INVENTORY=[
 { name:"Espumante Porta 6 Brut", price:55.12, chem:{acid:"Alta", body:"Leve", sugar:"Seco"} },
 { name:"Cabriz Touriga Nacional", price:110.94, chem:{acid:"Alta", body:"Estruturado", tanin:"Firme", sugar:"Seco"} },
@@ -138,97 +124,65 @@ const INVENTORY=[
 { name:"Porto Ruby Martha's", price:63.60, chem:{acid:"Baixa", body:"Licoroso", sugar:"Doce"} }
 ];
 
-const pratos=[
-{nome:"Sushi", gordura:"Baixa", intensidade:"Leve"},
-{nome:"Carpaccio", gordura:"Média", intensidade:"Média"},
-{nome:"Risoto de Cogumelos", gordura:"Média", intensidade:"Média"},
-{nome:"Picanha Grelhada", gordura:"Alta", intensidade:"Alta"},
-{nome:"Costela Assada", gordura:"Alta", intensidade:"Alta"},
-{nome:"Chocolate 70%", gordura:"Baixa", intensidade:"Alta"}
-];
+const wineSelect=document.getElementById("wineSelect");
 
-function populate(){
-["wineSelect","menuWine","bridgeWine"].forEach(id=>{
-let select=document.getElementById(id);
 INVENTORY.forEach(w=>{
 let opt=document.createElement("option");
 opt.value=w.name;
 opt.textContent=w.name+" (R$ "+w.price+")";
-select.appendChild(opt);
+wineSelect.appendChild(opt);
 });
-});
-}
-populate();
 
 function getWine(name){
 return INVENTORY.find(w=>w.name===name);
 }
 
-function scoreWineFood(w,p){
+function definirCategoria(w){
+if(w.chem.sugar==="Doce") return "Dessert";
+if(w.chem.body==="Estruturado" || w.chem.tanin==="Firme") return "Beef";
+if(w.chem.body==="Médio") return "Pasta";
+return "Seafood";
+}
+
+function calcularScore(w, categoria){
 let score=0;
-if(w.chem.acid==="Alta" && p.gordura==="Alta") score+=2;
-if(w.chem.body==="Estruturado" && p.intensidade==="Alta") score+=2;
-if(w.chem.tanin && p.gordura==="Alta") score+=2;
-if(w.chem.sugar==="Doce" && p.nome.includes("Chocolate")) score+=3;
+if(w.chem.sugar==="Doce" && categoria==="Dessert") score+=3;
+if(w.chem.body==="Estruturado" && categoria==="Beef") score+=2;
+if(w.chem.body==="Médio" && categoria==="Pasta") score+=2;
+if(w.chem.acid==="Alta" && categoria==="Seafood") score+=2;
 return score;
 }
 
-function harmonizar(){
-let vinho=getWine(document.getElementById("wineSelect").value);
-let ranked=pratos.map(p=>{
-return {prato:p.nome, score:scoreWineFood(vinho,p)};
-}).sort((a,b)=>b.score-a.score);
+async function buscarPratos(){
+let vinho=getWine(wineSelect.value);
+let categoria=definirCategoria(vinho);
 
-let html="<div class='card'>";
-ranked.slice(0,4).forEach(r=>{
-html+=r.prato+"<br>";
+const res=await fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?c=${categoria}`);
+const data=await res.json();
+
+let pratos=data.meals.slice(0,6);
+
+let ranking=pratos.map(p=>{
+return{
+nome:p.strMeal,
+img:p.strMealThumb,
+score:calcularScore(vinho,categoria)
+}
+}).sort((a,b)=>b.score-a.score).slice(0,3);
+
+let html="<div class='grid'>";
+ranking.forEach(r=>{
+html+=`
+<div class="card">
+<img src="${r.img}">
+<div class="score">${r.nome}</div>
+<div class="just">Score técnico: ${r.score} • Categoria: ${categoria}</div>
+</div>
+`;
 });
-html+="<div class='just'>Baseado em acidez, estrutura e intensidade.</div></div>";
+html+="</div>";
 
-document.getElementById("harmResult").innerHTML=html;
-}
-
-function gerarMenu(){
-let vinhoPrincipal=getWine(document.getElementById("menuWine").value);
-let doce=INVENTORY.find(w=>w.chem.sugar==="Doce");
-let leve=INVENTORY.find(w=>w.chem.body==="Leve");
-
-let total=vinhoPrincipal.price+doce.price+leve.price;
-
-document.getElementById("menuResult").innerHTML=
-`<div class="card">
-Entrada: ${leve.name} <span class="price">(R$ ${leve.price})</span><br>
-Principal: ${vinhoPrincipal.name} <span class="price">(R$ ${vinhoPrincipal.price})</span><br>
-Sobremesa: ${doce.name} <span class="price">(R$ ${doce.price})</span>
-<div class="total">Total: R$ ${total.toFixed(2)}</div>
-<div class="just">Progressão estrutural leve → estruturado → doce.</div>
-</div>`;
-}
-
-function simular(max){
-let total=0;
-let selecionados=[];
-for(let w of INVENTORY){
-if(total+w.price<=max){
-selecionados.push(w);
-total+=w.price;
-}
-}
-let html="<div class='card'>";
-selecionados.forEach(w=>{
-html+=w.name+" (R$ "+w.price+")<br>";
-});
-html+="<div class='total'>Total: R$ "+total.toFixed(2)+"</div>";
-html+="<div class='just'>Kit balanceado estruturalmente.</div></div>";
-document.getElementById("simResult").innerHTML=html;
-}
-
-function bridging(){
-let vinho=getWine(document.getElementById("bridgeWine").value);
-let html="<div class='card'>";
-html+="Vinho selecionado: "+vinho.name+"<br>";
-html+="<div class='just'>Sugere progressão baseada em intensidade e açúcar.</div></div>";
-document.getElementById("bridgeResult").innerHTML=html;
+document.getElementById("resultado").innerHTML=html;
 }
 
 </script>
