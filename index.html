@@ -3,41 +3,51 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Harmonizador Rápido — Buscar Pratos (TheMealDB)</title>
+  <title>Harmonizador — Buscar Pratos e Salvar (TheMealDB)</title>
   <style>
     body{font-family:system-ui,Segoe UI,Roboto,Arial;max-width:980px;margin:28px auto;padding:18px;background:#f6f7fb;color:#111}
     header{display:flex;align-items:center;justify-content:space-between}
     h1{margin:0;font-size:1.2rem}
-    .controls{display:flex;gap:8px;align-items:center;margin-top:12px}
+    .controls{display:flex;gap:8px;align-items:center;margin-top:12px;flex-wrap:wrap}
     select,input,button{padding:8px;border:1px solid #d1d5db;border-radius:6px}
     .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-top:18px}
     .card{background:#fff;padding:12px;border-radius:8px;box-shadow:0 1px 6px rgba(16,24,40,.06)}
     .thumb{height:160px;background:#f3f4f6;border-radius:6px;overflow:hidden;display:flex;align-items:center;justify-content:center}
     .thumb img{width:100%;height:100%;object-fit:cover}
     .muted{color:#6b7280;font-size:0.9rem}
-    a.button-like{display:inline-block;padding:6px 10px;border-radius:6px;background:#2563eb;color:#fff;text-decoration:none}
+    .actions{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+    pre{background:#0f172a;color:#fff;padding:12px;border-radius:6px;overflow:auto;max-height:320px}
+    .small{font-size:0.9rem}
   </style>
 </head>
 <body>
   <header>
     <div>
-      <h1>Harmonizador Rápido</h1>
-      <div class="muted">Busca pratos na web usando TheMealDB (API pública, chave de teste '1').</div>
+      <h1>Harmonizador — Buscar Pratos e Salvar</h1>
+      <div class="muted small">Usa TheMealDB (chave pública '1'). Salva receitas selecionadas no armazenamento local do navegador.</div>
     </div>
   </header>
 
   <div class="controls">
     <select id="wineSelect" style="min-width:360px"></select>
     <button id="btnSearch">Buscar Top 3</button>
-    <button id="btnRandom">Buscar Aleatório</button>
+    <button id="btnRandom">Buscar Aleatório (3)</button>
+    <button id="btnShowSaved">Ver Salvos</button>
+    <button id="btnExport">Exportar Salvos (JSON)</button>
+    <button id="btnClearSaved" style="background:#fff;border:1px solid #f87171;color:#b91c1c">Limpar Salvos</button>
   </div>
 
   <div id="status" class="muted" style="margin-top:10px"></div>
 
   <main id="results" class="grid" aria-live="polite" style="margin-top:14px"></main>
 
+  <section style="margin-top:18px">
+    <strong>Dados salvos (preview)</strong>
+    <pre id="savedPreview">Nenhum item salvo.</pre>
+  </section>
+
   <script>
-    // Lista de vinhos (apenas nomes). Substitua/adicione conforme quiser.
+    // Lista de rótulos (exemplo). Substitua/adicione conforme quiser.
     const WINES = [
       "Porta 6 Reserva",
       "Porta 6 Tinto",
@@ -51,17 +61,21 @@
       "Reserva dos Amigos"
     ];
 
-    // TheMealDB base + test key
     const API_KEY = '1';
     const BASE = `https://www.themealdb.com/api/json/v1/${API_KEY}`;
+    const STORAGE_KEY = 'harmonizador_salvos_v1';
 
     const wineSelect = document.getElementById('wineSelect');
     const btnSearch = document.getElementById('btnSearch');
     const btnRandom = document.getElementById('btnRandom');
+    const btnShowSaved = document.getElementById('btnShowSaved');
+    const btnExport = document.getElementById('btnExport');
+    const btnClearSaved = document.getElementById('btnClearSaved');
     const results = document.getElementById('results');
     const status = document.getElementById('status');
+    const savedPreview = document.getElementById('savedPreview');
 
-    // Preencher select
+    // preencher select
     (function populate(){
       const optAll = document.createElement('option');
       optAll.value = '';
@@ -75,78 +89,200 @@
       }
     })();
 
-    // Helpers
-    function setStatus(text){ status.textContent = text || ''; }
-    function clearResults(){ results.innerHTML = ''; }
+    // storage helpers
+    function readSaved(){
+      try{
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if(!raw) return [];
+        return JSON.parse(raw);
+      } catch(e){
+        console.error('Erro lendo storage', e);
+        return [];
+      }
+    }
+    function saveItem(item){
+      const arr = readSaved();
+      // evitar duplicatas por idMeal
+      if(item.idMeal && arr.some(x => x.idMeal === item.idMeal)) return false;
+      arr.push(item);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+      return true;
+    }
+    function clearSaved(){
+      localStorage.removeItem(STORAGE_KEY);
+    }
 
-    function createCard(meal){
+    function updateSavedPreview(){
+      const arr = readSaved();
+      if(arr.length === 0){
+        savedPreview.textContent = 'Nenhum item salvo.';
+      } else {
+        savedPreview.textContent = JSON.stringify(arr, null, 2);
+      }
+    }
+
+    // API helpers
+    async function fetchJson(url){
+      const res = await fetch(url);
+      if(!res.ok) throw new Error('Erro na requisição');
+      return res.json();
+    }
+
+    async function searchByName(q){
+      const url = `${BASE}/search.php?s=${encodeURIComponent(q)}`;
+      status.textContent = 'Buscando por nome: ' + q + ' ...';
+      const json = await fetchJson(url);
+      return json.meals; // array ou null
+    }
+
+    async function filterByCategory(cat){
+      const url = `${BASE}/filter.php?c=${encodeURIComponent(cat)}`;
+      status.textContent = 'Fallback: buscando por categoria: ' + cat + ' ...';
+      const json = await fetchJson(url);
+      return json.meals; // array com idMeal, strMeal, strMealThumb
+    }
+
+    async function lookupById(id){
+      const url = `${BASE}/lookup.php?i=${encodeURIComponent(id)}`;
+      const json = await fetchJson(url);
+      return json.meals ? json.meals[0] : null;
+    }
+
+    function createCard(meal, showSave=true){
       const div = document.createElement('div');
       div.className = 'card';
-      const thumb = meal.strMealThumb ? meal.strMealThumb : '';
+      const thumb = meal.strMealThumb || '';
       const name = meal.strMeal || '—';
       const id = meal.idMeal || '';
       const source = meal.strSource || meal.strYoutube || '#';
       div.innerHTML = `
-        <div class="thumb"><img src="${thumb}" alt="${escapeHtml(name)}" onerror="this.src='data:image/svg+xml;utf8,${encodeURIComponent('<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; width=&quot;600&quot; height=&quot;400&quot;><rect width=&quot;100%&quot; height=&quot;100%&quot; fill=&quot;#f3f4f6&quot;/><text x=&quot;50%&quot; y=&quot;50%&quot; dominant-baseline=&quot;middle&quot; text-anchor=&quot;middle&quot; fill=&quot;#9ca3af&quot; font-family=&quot;Arial&quot; font-size=&quot;18&quot;>Imagem não disponível</text></svg>')}"/></div>
+        <div class="thumb"><img src="${thumb}" alt="${escapeHtml(name)}" onerror="this.src='data:image/svg+xml;utf8,${encodeURIComponent('<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; width=&quot;600&quot; height=&quot;400&quot;><rect width=&quot;100%&quot; height=&quot;100%&quot; fill=&quot;#f3f4f6&quot;/><text x=&quot;50%&quot; y=&quot;50%&quot; dominant-baseline=&quot;middle&quot; text-anchor=&quot;middle&quot; fill=&quot;#9ca3af&quot; font-family=&quot;Arial&quot; font-size=&quot;18&quot;>Imagem não disponível</text></svg>')}'/></div>
         <h3 style="margin:8px 0 6px">${escapeHtml(name)}</h3>
         <div class="muted small">ID: ${escapeHtml(id)}</div>
-        <div style="margin-top:8px"><a class="button-like" href="${source || '#'}" target="_blank" rel="noopener">Abrir receita</a></div>
+        <div class="actions">
+          <a class="button-like" href="${source || '#'}" target="_blank" rel="noopener" style="background:#10b981;color:#fff;padding:6px 10px;border-radius:6px;text-decoration:none">Abrir receita</a>
+          ${ showSave ? '<button class="btnSave" style="padding:6px 10px;border-radius:6px">Salvar</button>' : '' }
+        </div>
       `;
+      if(showSave){
+        const btn = div.querySelector('.btnSave');
+        btn.addEventListener('click', ()=>{
+          const ok = saveItem(meal);
+          if(ok){
+            status.textContent = 'Receita salva.';
+            updateSavedPreview();
+          } else {
+            status.textContent = 'Receita já estava salva.';
+          }
+        });
+      }
       return div;
     }
 
     function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
-    // Busca por nome (search.php?s=)
-    async function searchByName(q){
-      const url = `${BASE}/search.php?s=${encodeURIComponent(q)}`;
-      setStatus('Buscando por nome: ' + q + ' ...');
-      const res = await fetch(url);
-      if(!res.ok) throw new Error('Erro na API');
-      const json = await res.json();
-      return json.meals; // array ou null
-    }
+    function pickTopN(arr, n=3){ if(!Array.isArray(arr)) return []; return arr.slice(0,n); }
 
-    // Fallback: buscar por categoria (filter.php?c=Seafood)
-    async function filterByCategory(cat){
-      const url = `${BASE}/filter.php?c=${encodeURIComponent(cat)}`;
-      setStatus('Fallback: buscando por categoria: ' + cat + ' ...');
-      const res = await fetch(url);
-      if(!res.ok) throw new Error('Erro na API');
-      const json = await res.json();
-      return json.meals; // array com id, name, thumb
-    }
-
-    // Lookup full meal by id (lookup.php?i=)
-    async function lookupById(id){
-      const url = `${BASE}/lookup.php?i=${encodeURIComponent(id)}`;
-      const res = await fetch(url);
-      if(!res.ok) throw new Error('Erro na API');
-      const json = await res.json();
-      return json.meals ? json.meals[0] : null;
-    }
-
-    // Seleciona top N (simples: primeiros N resultados)
-    function pickTopN(arr, n=3){
-      if(!Array.isArray(arr)) return [];
-      return arr.slice(0, n);
-    }
-
-    // Fluxo principal: tenta search by name -> se null, fallback category Seafood
     async function findTop3ForWine(wineName){
-      clearResults();
+      results.innerHTML = '';
       try{
-        setStatus('Iniciando busca...');
-        // 1) tentar buscar por nome do vinho
+        status.textContent = 'Iniciando busca...';
         if(wineName){
           const byName = await searchByName(wineName);
           if(byName && byName.length){
-            setStatus(`Encontradas ${byName.length} receitas por nome. Exibindo top 3.`);
+            status.textContent = `Encontradas ${byName.length} receitas por nome. Exibindo top 3.`;
             const top = pickTopN(byName, 3);
-            for(const m of top){
-              results.appendChild(createCard(m));
-            }
+            for(const m of top) results.appendChild(createCard(m, true));
             return;
           }
         }
 
+        // fallback por categoria
+        const cat = 'Seafood';
+        const byCat = await filterByCategory(cat);
+        if(byCat && byCat.length){
+          status.textContent = `Nenhuma receita por nome. Usando categoria "${cat}". Exibindo top 3.`;
+          const top = pickTopN(byCat, 3);
+          for(const item of top){
+            const full = await lookupById(item.idMeal);
+            results.appendChild(createCard(full || item, true));
+          }
+          return;
+        }
+
+        // fallback aleatório
+        status.textContent = 'Nenhum resultado por nome ou categoria; buscando aleatório...';
+        const r = await fetch(`${BASE}/random.php`);
+        const j = await r.json();
+        if(j.meals && j.meals.length){
+          status.textContent = 'Exibindo sugestão aleatória.';
+          results.appendChild(createCard(j.meals[0], true));
+          return;
+        }
+
+        status.textContent = 'Nenhum prato encontrado.';
+      } catch(err){
+        console.error(err);
+        status.textContent = 'Erro ao buscar: ' + (err.message || err);
+      }
+    }
+
+    // eventos
+    btnSearch.addEventListener('click', ()=> {
+      const wine = wineSelect.value.trim();
+      findTop3ForWine(wine);
+    });
+
+    btnRandom.addEventListener('click', async ()=>{
+      results.innerHTML = '';
+      status.textContent = 'Buscando 3 receitas aleatórias...';
+      try{
+        for(let i=0;i<3;i++){
+          const r = await fetch(`${BASE}/random.php`);
+          const j = await r.json();
+          if(j.meals && j.meals[0]) results.appendChild(createCard(j.meals[0], true));
+        }
+        status.textContent = 'Pronto — 3 receitas aleatórias.';
+      } catch(e){
+        console.error(e);
+        status.textContent = 'Erro ao buscar aleatórias.';
+      }
+    });
+
+    btnShowSaved.addEventListener('click', ()=>{
+      const arr = readSaved();
+      results.innerHTML = '';
+      if(arr.length === 0){
+        status.textContent = 'Nenhuma receita salva.';
+        savedPreview.textContent = 'Nenhum item salvo.';
+        return;
+      }
+      status.textContent = `Mostrando ${arr.length} receitas salvas.`;
+      for(const m of arr) results.appendChild(createCard(m, false));
+      savedPreview.textContent = JSON.stringify(arr, null, 2);
+    });
+
+    btnExport.addEventListener('click', ()=>{
+      const arr = readSaved();
+      const dataStr = JSON.stringify(arr, null, 2);
+      // abrir nova janela com JSON para copiar/colar (download direto não solicitado)
+      const w = window.open('', '_blank');
+      w.document.write('<pre>' + escapeHtml(dataStr) + '</pre>');
+      w.document.title = 'Export JSON - Receitas Salvas';
+    });
+
+    btnClearSaved.addEventListener('click', ()=>{
+      if(!confirm('Deseja realmente limpar todas as receitas salvas?')) return;
+      clearSaved();
+      updateSavedPreview();
+      results.innerHTML = '';
+      status.textContent = 'Salvos limpos.';
+    });
+
+    // inicial
+    wineSelect.selectedIndex = 0;
+    updateSavedPreview();
+    status.textContent = 'Pronto. Selecione um rótulo e clique em Buscar Top 3.';
+  </script>
+</body>
+</html>
