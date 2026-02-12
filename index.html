@@ -538,7 +538,7 @@
 
           <div class="lista" id="listaAssinatura">
             <div class="status">
-              Aqui surgirá a lista de vinhos sugeridos para o seu “Wine Club” Uvva.
+              Clique em “Gerar combo de assinatura” para ver 3 rótulos sugeridos no card abaixo.
             </div>
           </div>
 
@@ -551,7 +551,7 @@
               <div class="assinatura-total-label">Total por mês</div>
               <div class="assinatura-total-valor" id="assinaturaTotalValor"></div>
             </div>
-            <div class="assinatura-lista-titulo">Vinhos incluídos:</div>
+            <div class="assinatura-lista-titulo">Vinhos incluídos (3 rótulos):</div>
             <div class="lista" id="assinaturaMiniLista" style="max-height:110px;"></div>
             <div class="assinatura-codigos" id="assinaturaCodigos"></div>
           </div>
@@ -748,7 +748,7 @@
       }
 
       let sugeridos = sugerirVinhosWineBringing(base);
-      sugeridos = sugeridos.slice(0, 3); // máximo 3 cards
+      sugeridos = sugeridos.slice(0, 3);
 
       listaWineBringing.innerHTML = '';
       const topo = document.createElement('div');
@@ -891,7 +891,7 @@
         return;
       }
 
-      const combinam = sugerirVinhosWineBringing(base);
+      const combinam = sugerirVinhosWineBringing(base).slice(0, 2); // base + 2 = 3 vinhos
       const combo = [base, ...combinam];
 
       if (!combo.length) {
@@ -901,11 +901,8 @@
       }
 
       let total = 0;
-      listaAssinatura.innerHTML = '';
-      combo.forEach(v => {
-        total += v.preco;
-        listaAssinatura.appendChild(criarItemVinho(v));
-      });
+      listaAssinatura.innerHTML = '<div class="status">Combo gerado com 3 rótulos para a assinatura mensal.</div>';
+      combo.forEach(v => { total += v.preco; });
 
       assinaturaTotalValor.textContent = 'R$ ' + total.toFixed(2) + ' / mês';
 
