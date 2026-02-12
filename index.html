@@ -212,9 +212,9 @@
     }
 
     .vinho-item {
-      display: grid;
-      grid-template-columns: auto 1fr;
-      gap: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
       padding: 6px 7px;
       border-radius: 8px;
       position: relative;
@@ -241,21 +241,7 @@
       border-color: #a855f7;
     }
 
-    .vinho-thumb {
-      width: 40px;
-      height: 62px;
-      border-radius: 6px;
-      background: radial-gradient(circle at top, #1f2937, #020617);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 11px;
-      color: #e5e7eb;
-      text-align: center;
-      padding: 3px;
-    }
-
-    .vinho-thumb img { display: none; }
+    .vinho-thumb { display: none; }
 
     .vinho-info {
       font-size: 12px;
@@ -382,18 +368,13 @@
       margin-top: 4px;
     }
 
-    /* Wine Bringing: cards maiores e só 3 itens */
+    /* Wine Bringing: só texto, 3 itens */
     #listaWineBringing {
       max-height: none;
     }
     #listaWineBringing .vinho-item {
-      grid-template-columns: 60px 1fr;
       padding: 10px 10px;
       margin-bottom: 4px;
-    }
-    #listaWineBringing .vinho-thumb {
-      width: 52px;
-      height: 80px;
     }
     #listaWineBringing .vinho-info .vinho-nome {
       font-size: 14px;
@@ -627,259 +608,4 @@
     const listaAssinatura = document.getElementById('listaAssinatura');
     const assinaturaCard = document.getElementById('assinaturaCard');
     const assinaturaTotalValor = document.getElementById('assinaturaTotalValor');
-    const assinaturaMiniLista = document.getElementById('assinaturaMiniLista');
-    const assinaturaCodigos = document.getElementById('assinaturaCodigos');
-
-    function initCombos() {
-      selectVinho.innerHTML = '<option value="">Selecione um vinho...</option>';
-      selectAssinaturaBase.innerHTML = '<option value="">Selecione um vinho...</option>';
-
-      vinhosCatalogo.forEach(v => {
-        const o1 = document.createElement('option');
-        o1.value = v.cod;
-        o1.textContent = v.nome;
-        selectVinho.appendChild(o1);
-
-        const o2 = document.createElement('option');
-        o2.value = v.cod;
-        o2.textContent = v.nome;
-        selectAssinaturaBase.appendChild(o2);
-      });
-
-      const regSet = new Set();
-      const uvaSet = new Set();
-      vinhosCatalogo.forEach(v => {
-        if (v.regiao) regSet.add(v.regiao);
-        (v.uvas || []).forEach(u => uvaSet.add(u));
-      });
-
-      Array.from(regSet).sort().forEach(r => {
-        const opt = document.createElement('option');
-        opt.value = r;
-        opt.textContent = r;
-        selectRegiao.appendChild(opt);
-      });
-
-      Array.from(uvaSet).sort().forEach(u => {
-        const opt = document.createElement('option');
-        opt.value = u;
-        opt.textContent = u;
-        selectUva.appendChild(opt);
-      });
-    }
-
-    initCombos();
-
-    function criarItemVinho(v) {
-      const item = document.createElement('div');
-      item.className = 'vinho-item';
-
-      const thumb = document.createElement('div');
-      thumb.className = 'vinho-thumb';
-      thumb.textContent = 'Rótulo';
-
-      const info = document.createElement('div');
-      info.className = 'vinho-info';
-      info.innerHTML = `
-        <div class="vinho-nome">${v.nome}</div>
-        <div class="vinho-meta">${v.regiao}</div>
-        <div class="vinho-meta">Uvas: ${(v.uvas || []).join(', ')}</div>
-        <div class="vinho-preco">R$ ${v.preco.toFixed(2)}</div>
-      `;
-
-      item.appendChild(thumb);
-      item.appendChild(info);
-      return item;
-    }
-
-    function sugerirVinhosWineBringing(base) {
-      return vinhosCatalogo
-        .filter(v =>
-          v.cod !== base.cod &&
-          (v.regiao === base.regiao ||
-           (v.uvas || []).some(u => (base.uvas || []).includes(u)) ||
-           v.estilo === base.estilo)
-        )
-        .sort((a, b) => a.preco - b.preco);
-    }
-
-    document.getElementById('btnVinhoSugestoes').addEventListener('click', () => {
-      const cod = selectVinho.value;
-      if (!cod) {
-        listaWineBringing.innerHTML = '<div class="status">Selecione um vinho primeiro.</div>';
-        return;
-      }
-
-      const base = vinhosCatalogo.find(v => v.cod === cod);
-      if (!base) {
-        listaWineBringing.innerHTML = '<div class="status">Vinho não encontrado.</div>';
-        return;
-      }
-
-      let sugeridos = sugerirVinhosWineBringing(base);
-      sugeridos = sugeridos.slice(0, 3);
-
-      listaWineBringing.innerHTML = '';
-      const topo = document.createElement('div');
-      topo.className = 'status';
-      topo.innerHTML =
-        'Vinho selecionado: <strong>' + base.nome + '</strong> (' + base.cod +
-        ')<br><span class="pill-mini">Sugestões calculadas por região, uva e estilo – não aleatórias.</span>';
-      listaWineBringing.appendChild(topo);
-
-      if (!sugeridos.length) {
-        listaWineBringing.innerHTML += '<div class="status">Nenhum outro vinho compatível encontrado.</div>';
-        return;
-      }
-
-      sugeridos.forEach(v => listaWineBringing.appendChild(criarItemVinho(v)));
-    });
-
-    document.getElementById('btnBuscarReceitas').addEventListener('click', () => {
-      const tipoPrato = selectTipoPrato.value;
-      if (!tipoPrato) {
-        alert('Escolha carne, peixe ou vegano.');
-        return;
-      }
-
-      let categoriaApi = 'Beef';
-      if (tipoPrato === 'peixe') categoriaApi = 'Seafood';
-      if (tipoPrato === 'vegano') categoriaApi = 'Vegetarian';
-
-      statusReceitas.textContent = 'Buscando prato ' + categoriaApi + '...';
-      boxPrato.innerHTML = '<div class="status">Carregando prato...</div>';
-      listaVinhosReceita.innerHTML = '<div class="status">Analisando harmonização com nossos vinhos...</div>';
-
-      fetch('https://www.themealdb.com/api/json/v1/1/filter.php?c=' + encodeURIComponent(categoriaApi))
-        .then(r => r.json())
-        .then(dados => {
-          const lista = dados.meals || [];
-          if (!lista.length) {
-            boxPrato.innerHTML = '<div class="status">Nenhum prato encontrado.</div>';
-            statusReceitas.textContent = 'Nenhum prato encontrado para esta categoria.';
-            return null;
-          }
-          const escolhido = lista[Math.floor(Math.random() * lista.length)];
-          return fetch('https://www.themealdb.com/api/json/v1/1/lookup.php?i=' + escolhido.idMeal);
-        })
-        .then(r => r ? r.json() : null)
-        .then(det => {
-          if (!det) return;
-          const meal = (det.meals || [])[0];
-          mostrarPrato(meal);
-          sugerirVinhosParaTipoPrato(tipoPrato);
-          statusReceitas.textContent = 'Prato carregado e harmonização sugerida.';
-        })
-        .catch(() => {
-          boxPrato.innerHTML = '<div class="status">Erro ao buscar receita externa.</div>';
-          listaVinhosReceita.innerHTML = '<div class="status">Não foi possível sugerir vinhos para a receita.</div>';
-          statusReceitas.textContent = 'Erro ao consultar TheMealDB.';
-        });
-    });
-
-    function mostrarPrato(meal) {
-      boxPrato.innerHTML = '';
-      if (!meal) {
-        boxPrato.innerHTML = '<div class="status">Nenhum prato encontrado.</div>';
-        return;
-      }
-
-      const nome = document.createElement('div');
-      nome.className = 'nome-prato';
-      nome.textContent = meal.strMeal;
-
-      const leg = document.createElement('div');
-      leg.className = 'prato-meta';
-      leg.textContent = (meal.strArea || '') + (meal.strCategory ? ' · ' + meal.strCategory : '');
-
-      boxPrato.appendChild(nome);
-      boxPrato.appendChild(leg);
-    }
-
-    function sugerirVinhosParaTipoPrato(tipoPrato) {
-      let estilosPreferidos = [];
-      if (tipoPrato === 'carne') estilosPreferidos = ['tinto_estruturado', 'tinto_medio'];
-      else if (tipoPrato === 'peixe') estilosPreferidos = ['branco_fresco', 'branco_estruturado'];
-      else if (tipoPrato === 'vegano') estilosPreferidos = ['branco_fresco', 'tinto_medio'];
-
-      const candidatos = vinhosCatalogo
-        .filter(v => estilosPreferidos.includes(v.estilo))
-        .sort((a, b) => a.preco - b.preco);
-
-      listaVinhosReceita.innerHTML = '';
-
-      if (!candidatos.length) {
-        listaVinhosReceita.innerHTML = '<div class="status">Nenhum vinho compatível cadastrado.</div>';
-        return;
-      }
-
-      const topo = document.createElement('div');
-      topo.className = 'status';
-      topo.textContent = 'Vinhos sugeridos para este tipo de prato (ordenados do menor preço para o maior).';
-      listaVinhosReceita.appendChild(topo);
-
-      candidatos.forEach(v => listaVinhosReceita.appendChild(criarItemVinho(v)));
-    }
-
-    document.getElementById('btnFiltrar').addEventListener('click', () => {
-      const reg = selectRegiao.value;
-      const uva = selectUva.value;
-
-      const lista = vinhosCatalogo
-        .filter(v => {
-          const okReg = reg ? v.regiao === reg : true;
-          const okUva = uva ? (v.uvas || []).includes(uva) : true;
-          return okReg && okUva;
-        })
-        .sort((a, b) => a.preco - b.preco);
-
-      listaFiltro.innerHTML = '';
-      if (!lista.length) {
-        listaFiltro.innerHTML = '<div class="status">Nenhum vinho encontrado com esses filtros.</div>';
-        return;
-      }
-
-      lista.forEach(v => listaFiltro.appendChild(criarItemVinho(v)));
-    });
-
-    document.getElementById('btnGerarAssinatura').addEventListener('click', () => {
-      const codBase = selectAssinaturaBase.value;
-      if (!codBase) {
-        alert('Escolha um vinho-base para montar a assinatura.');
-        return;
-      }
-
-      const base = vinhosCatalogo.find(v => v.cod === codBase);
-      if (!base) {
-        alert('Vinho-base não encontrado.');
-        return;
-      }
-
-      const combinam = sugerirVinhosWineBringing(base).slice(0, 2); // base + 2 = 3
-      const combo = [base, ...combinam];
-
-      if (!combo.length) {
-        listaAssinatura.innerHTML = '<div class="status">Nenhum vinho para montar assinatura.</div>';
-        assinaturaCard.style.display = 'none';
-        return;
-      }
-
-      let total = 0;
-      listaAssinatura.innerHTML = '<div class="status">Combo gerado com 3 rótulos para a assinatura mensal.</div>';
-      combo.forEach(v => { total += v.preco; });
-
-      assinaturaTotalValor.textContent = 'R$ ' + total.toFixed(2) + ' / mês';
-
-      assinaturaMiniLista.innerHTML = '';
-      combo.forEach(v => assinaturaMiniLista.appendChild(criarItemVinho(v)));
-
-      const codigos = combo
-        .map(v => v.cod.toString().padStart(6, '0'))
-        .join(', ');
-      assinaturaCodigos.textContent = 'Códigos dos rótulos: ' + codigos;
-
-      assinaturaCard.style.display = 'block';
-    });
-  </script>
-</body>
-</html>
+    const assinaturaMiniLista = docu
