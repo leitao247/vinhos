@@ -396,6 +396,23 @@
       color: #9ca3af;
       margin-top: 4px;
     }
+
+    /* Wine Bringing: cards maiores e só 3 itens */
+    #listaWineBringing {
+      max-height: none;
+    }
+    #listaWineBringing .vinho-item {
+      grid-template-columns: 60px 1fr;
+      padding: 10px 10px;
+      margin-bottom: 4px;
+    }
+    #listaWineBringing .vinho-thumb {
+      width: 52px;
+      height: 80px;
+    }
+    #listaWineBringing .vinho-info .vinho-nome {
+      font-size: 14px;
+    }
   </style>
 </head>
 <body>
@@ -730,7 +747,8 @@
         return;
       }
 
-      const sugeridos = sugerirVinhosWineBringing(base);
+      let sugeridos = sugerirVinhosWineBringing(base);
+      sugeridos = sugeridos.slice(0, 3); // máximo 3 cards
 
       listaWineBringing.innerHTML = '';
       const topo = document.createElement('div');
