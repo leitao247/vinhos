@@ -3,49 +3,200 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Harmonizador Visual — Foto do Prato + Sugestões (corrigido)</title>
+  <title>Harmonizador Visual — Foto do Prato + Sugestões</title>
   <style>
-    :root{
-      --bg:#f6f7fb; --card:#fff; --muted:#6b7280; --accent:#2563eb; --radius:12px;
+    :root {
+      --bg: #f6f7fb;
+      --card: #fff;
+      --muted: #6b7280;
+      --accent: #2563eb;
+      --radius: 12px;
       font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
     }
-    *{box-sizing:border-box}
-    body{margin:0;background:var(--bg);color:#0f172a;display:flex;justify-content:center;padding:28px}
-    .wrap{width:100%;max-width:980px}
-    header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
-    h1{margin:0;font-size:1.15rem}
-    .subtitle{color:var(--muted);font-size:0.95rem}
-    .controls{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px;align-items:center}
-    select,input,button{padding:10px 12px;border-radius:10px;border:1px solid rgba(15,23,42,0.06);background:var(--card);font-size:0.95rem}
-    .select{min-width:320px}
-    .input{min-width:260px}
-    .btn-primary{background:var(--accent);color:#fff;border:0;cursor:pointer;padding:10px 14px;border-radius:10px}
-    .btn-ghost{background:#fff;border:1px solid rgba(15,23,42,0.06);color:var(--accent);cursor:pointer;padding:10px 14px;border-radius:10px}
-    .layout{display:grid;grid-template-columns:1fr 320px;gap:18px;align-items:start}
-    .card{background:var(--card);padding:16px;border-radius:12px;box-shadow:0 6px 20px rgba(2,6,23,0.06)}
-    .dish-figure{height:420px;border-radius:10px;overflow:hidden;background:linear-gradient(180deg,#f3f4f6,#eef2ff);display:flex;align-items:center;justify-content:center;border:1px solid rgba(15,23,42,0.04)}
-    .dish-figure img{width:100%;height:100%;object-fit:cover;display:block}
-    .dish-meta{display:flex;flex-direction:column;gap:6px;margin-top:10px}
-    .dish-title{font-weight:600}
-    .dish-source{color:var(--muted);font-size:0.92rem}
-    .harmo-note{margin-top:6px;padding:10px;border-radius:8px;background:linear-gradient(180deg,#fff,#fbfdff);border:1px solid rgba(15,23,42,0.04);font-size:0.95rem}
-    .wine-list{display:flex;flex-direction:column;gap:10px;margin-top:12px}
-    .wine-item{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px;border-radius:10px;background:linear-gradient(180deg,#fff,#fbfdff);border:1px solid rgba(15,23,42,0.04)}
-    .wine-left{display:flex;flex-direction:column;gap:4px}
-    .wine-name{font-weight:600}
-    .wine-price{color:var(--muted);font-size:0.92rem}
-    .small{font-size:0.9rem;color:var(--muted)}
-    .map-row{display:flex;gap:8px;align-items:center;margin-top:8px}
-    .spinner {
-      position:fixed; inset:0; display:flex;align-items:center;justify-content:center;
-      background:rgba(255,255,255,0.6); z-index:999; visibility:hidden;
+
+    * { box-sizing: border-box }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: #0f172a;
+      display: flex;
+      justify-content: center;
+      padding: 28px;
     }
-    .spinner.show{visibility:visible}
-    .spinner .dot{width:14px;height:14px;margin:6px;border-radius:50%;background:var(--accent);animation:spin 0.9s infinite linear}
-    .spinner .dot:nth-child(2){animation-delay:0.12s}
-    .spinner .dot:nth-child(3){animation-delay:0.24s}
-    @keyframes spin{0%{transform:translateY(0)}50%{transform:translateY(-8px)}100%{transform:translateY(0)}}
-    @media (max-width:980px){ .layout{grid-template-columns:1fr} .dish-figure{height:320px} .controls{gap:8px} }
+
+    .wrap { width: 100%; max-width: 980px }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+
+    h1 { margin: 0; font-size: 1.15rem }
+
+    .subtitle { color: var(--muted); font-size: 0.95rem }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+      align-items: center;
+    }
+
+    select, input, button {
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(15, 23, 42, 0.06);
+      background: var(--card);
+      font-size: 0.95rem;
+    }
+
+    .select { min-width: 320px }
+    .input { min-width: 260px }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      border: 0;
+      cursor: pointer;
+      padding: 10px 14px;
+      border-radius: 10px;
+    }
+
+    .btn-ghost {
+      background: #fff;
+      border: 1px solid rgba(15, 23, 42, 0.06);
+      color: var(--accent);
+      cursor: pointer;
+      padding: 10px 14px;
+      border-radius: 10px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .card {
+      background: var(--card);
+      padding: 16px;
+      border-radius: var(--radius);
+      box-shadow: 0 6px 20px rgba(2, 6, 23, 0.06);
+    }
+
+    .dish-figure {
+      height: 420px;
+      border-radius: 10px;
+      overflow: hidden;
+      background: linear-gradient(180deg, #f3f4f6, #eef2ff);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(15, 23, 42, 0.04);
+    }
+
+    .dish-figure img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .dish-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .dish-title { font-weight: 600 }
+    .dish-source { color: var(--muted); font-size: 0.92rem }
+
+    .harmo-note {
+      margin-top: 6px;
+      padding: 10px;
+      border-radius: 8px;
+      background: linear-gradient(180deg, #fff, #fbfdff);
+      border: 1px solid rgba(15, 23, 42, 0.04);
+      font-size: 0.95rem;
+    }
+
+    .wine-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .wine-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 10px;
+      border-radius: 10px;
+      background: linear-gradient(180deg, #fff, #fbfdff);
+      border: 1px solid rgba(15, 23, 42, 0.04);
+    }
+
+    .wine-left {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .wine-name { font-weight: 600 }
+    .wine-price { color: var(--muted); font-size: 0.92rem }
+    .small { font-size: 0.9rem; color: var(--muted) }
+
+    .map-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-top: 8px;
+    }
+
+    .spinner {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.6);
+      z-index: 999;
+      visibility: hidden;
+    }
+
+    .spinner.show { visibility: visible }
+
+    .spinner .dot {
+      width: 14px;
+      height: 14px;
+      margin: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: spin 0.9s infinite linear;
+    }
+
+    .spinner .dot:nth-child(2) { animation-delay: 0.12s }
+    .spinner .dot:nth-child(3) { animation-delay: 0.24s }
+
+    @keyframes spin {
+      0%   { transform: translateY(0) }
+      50%  { transform: translateY(-8px) }
+      100% { transform: translateY(0) }
+    }
+
+    @media (max-width: 980px) {
+      .layout { grid-template-columns: 1fr }
+      .dish-figure { height: 320px }
+      .controls { gap: 8px }
+    }
   </style>
 </head>
 <body>
@@ -67,7 +218,9 @@
 
     <div class="layout">
       <main class="card" role="main">
-        <div id="status" class="small" style="margin-bottom:8px">Pronto. Selecione um rótulo ou digite um termo e clique Buscar prato.</div>
+        <div id="status" class="small" style="margin-bottom:8px">
+          Pronto. Selecione um rótulo ou digite um termo e clique Buscar prato.
+        </div>
 
         <figure class="dish-figure" id="dishContainer" aria-live="polite">
           <div style="text-align:center;color:#9aa4b2;padding:18px">
@@ -116,26 +269,27 @@
   </div>
 
   <script>
-    // ---------- Dados (mantidos) ----------
+    // ========== Dados ==========
+
     const WINES = [
-      { name: "Porta 6 Reserva", price: 80.91 },
-      { name: "Porta 6 Tinto", price: 33.07 },
-      { name: "Porta 6 Branco", price: 33.07 },
+      { name: "Porta 6 Reserva",    price: 80.91  },
+      { name: "Porta 6 Tinto",      price: 33.07  },
+      { name: "Porta 6 Branco",     price: 33.07  },
       { name: "Brutalis by Vidigal", price: 217.30 },
       { name: "Júlia Florista Tinto", price: 41.34 },
-      { name: "Da Pipa Tinto", price: 36.54 },
-      { name: "Vidigal Reserva", price: 45.58 },
-      { name: "Coragem Reserva", price: 53.10 },
-      { name: "3 Autores Douro", price: 53.10 },
-      { name: "Reserva dos Amigos", price: 49.36 }
+      { name: "Da Pipa Tinto",      price: 36.54  },
+      { name: "Vidigal Reserva",    price: 45.58  },
+      { name: "Coragem Reserva",    price: 53.10  },
+      { name: "3 Autores Douro",    price: 53.10  },
+      { name: "Reserva dos Amigos", price: 49.36  }
     ];
 
     const DEFAULT_MAPPINGS = {
-      "Porta 6 Reserva": "seafood",
+      "Porta 6 Reserva":    "seafood",
       "Brutalis by Vidigal": "beef",
       "Júlia Florista Tinto": "pork",
-      "Da Pipa Tinto": "stew",
-      "Vidigal Reserva": "grilled salmon"
+      "Da Pipa Tinto":      "stew",
+      "Vidigal Reserva":    "grilled salmon"
     };
 
     const DEFAULT_SUGGESTIONS = [
@@ -144,374 +298,501 @@
       "Brutalis by Vidigal"
     ];
 
+    // ========== Classificação de vinhos (padrões centralizados) ==========
+
+    const WINE_PATTERNS = {
+      red:   /tinto|reserva|malbec|cab|syrah|merlot|douro|port/i,
+      white: /branco|verde|sauvignon|chardonnay|pinot|grigio/i,
+      rose:  /ros[eé]/i
+    };
+
+    const SEAFOOD_PATTERN = /seafood|prawn|shrimp|salmon|fish|sardine|calamari/i;
+
+    function classifyWine(name) {
+      if (!name) return null;
+      for (const [type, pattern] of Object.entries(WINE_PATTERNS)) {
+        if (pattern.test(name)) return type;
+      }
+      return null;
+    }
+
+    // ========== API ==========
+
     const API_KEY = '1';
     const BASE = `https://www.themealdb.com/api/json/v1/${API_KEY}`;
 
-    // ---------- Elementos ----------
-    const wineSelect = document.getElementById('wineSelect');
-    const termInput = document.getElementById('termInput');
-    const btnFind = document.getElementById('btnFind');
-    const btnRandom = document.getElementById('btnRandom');
-    const dishContainer = document.getElementById('dishContainer');
-    const dishTitle = document.getElementById('dishTitle');
-    const dishSource = document.getElementById('dishSource');
-    const wineSuggestions = document.getElementById('wineSuggestions');
-    const status = document.getElementById('status');
-    const harmoNote = document.getElementById('harmoNote');
-    const spinner = document.getElementById('spinner');
+    async function fetchJson(url) {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('Erro na requisição: ' + res.status);
+      return res.json();
+    }
 
-    const mapWine = document.getElementById('mapWine');
-    const mapTerm = document.getElementById('mapTerm');
-    const btnMapSave = document.getElementById('btnMapSave');
-    const btnMapRemove = document.getElementById('btnMapRemove');
-    const defaultPreview = document.getElementById('defaultPreview');
+    async function searchMealsByName(q) {
+      const data = await fetchJson(`${BASE}/search.php?s=${encodeURIComponent(q)}`);
+      return data.meals || null;
+    }
+
+    async function filterByIngredient(i) {
+      const data = await fetchJson(`${BASE}/filter.php?i=${encodeURIComponent(i)}`);
+      return data.meals || null;
+    }
+
+    async function filterByCategory(cat) {
+      const data = await fetchJson(`${BASE}/filter.php?c=${encodeURIComponent(cat)}`);
+      return data.meals || null;
+    }
+
+    async function lookupById(id) {
+      const data = await fetchJson(`${BASE}/lookup.php?i=${encodeURIComponent(id)}`);
+      return data.meals ? data.meals[0] : null;
+    }
+
+    async function fetchRandomMeal() {
+      const data = await fetchJson(`${BASE}/random.php`);
+      return data.meals ? data.meals[0] : null;
+    }
+
+    // ========== Elementos do DOM ==========
+
+    const els = {
+      wineSelect:      document.getElementById('wineSelect'),
+      termInput:       document.getElementById('termInput'),
+      btnFind:         document.getElementById('btnFind'),
+      btnRandom:       document.getElementById('btnRandom'),
+      dishContainer:   document.getElementById('dishContainer'),
+      dishTitle:       document.getElementById('dishTitle'),
+      dishSource:      document.getElementById('dishSource'),
+      wineSuggestions:  document.getElementById('wineSuggestions'),
+      status:          document.getElementById('status'),
+      harmoNote:       document.getElementById('harmoNote'),
+      spinner:         document.getElementById('spinner'),
+      mapWine:         document.getElementById('mapWine'),
+      mapTerm:         document.getElementById('mapTerm'),
+      btnMapSave:      document.getElementById('btnMapSave'),
+      btnMapRemove:    document.getElementById('btnMapRemove'),
+      defaultPreview:  document.getElementById('defaultPreview')
+    };
+
+    // ========== Estado ==========
+
+    let recentShownIds = [];
+    const RECENT_HISTORY_LIMIT = 10;
+
+    // ========== Storage ==========
 
     const KEY_MAP = 'harmo_map_v1';
     const KEY_SUG = 'harmo_suggestions_v1';
 
-    // ---------- Estado ----------
-    let recentShownIds = [];
-    const RECENT_HISTORY_LIMIT = 10; // janela maior para reduzir repetições
+    function readMap() {
+      try {
+        const raw = localStorage.getItem(KEY_MAP);
+        return raw ? JSON.parse(raw) : { ...DEFAULT_MAPPINGS };
+      } catch {
+        return { ...DEFAULT_MAPPINGS };
+      }
+    }
 
-    // ---------- Storage helpers ----------
-    function readMap(){ try{ const r = localStorage.getItem(KEY_MAP); return r ? JSON.parse(r) : {...DEFAULT_MAPPINGS}; } catch(e){ return {...DEFAULT_MAPPINGS}; } }
-    function saveMap(m){ localStorage.setItem(KEY_MAP, JSON.stringify(m)); }
-    function removeMapKey(k){ const m = readMap(); if(m[k]){ delete m[k]; saveMap(m); } }
+    function saveMap(m) {
+      localStorage.setItem(KEY_MAP, JSON.stringify(m));
+    }
 
-    function readDefaultSuggestions(){ try{ const r = localStorage.getItem(KEY_SUG); return r ? JSON.parse(r) : DEFAULT_SUGGESTIONS.slice(); } catch(e){ return DEFAULT_SUGGESTIONS.slice(); } }
-    function saveDefaultSuggestions(arr){ localStorage.setItem(KEY_SUG, JSON.stringify(arr)); }
+    function removeMapKey(key) {
+      const m = readMap();
+      if (m[key]) {
+        delete m[key];
+        saveMap(m);
+      }
+    }
 
-    // ---------- UI helpers ----------
-    function formatPriceBR(value){
+    function readDefaultSuggestions() {
+      try {
+        const raw = localStorage.getItem(KEY_SUG);
+        return raw ? JSON.parse(raw) : DEFAULT_SUGGESTIONS.slice();
+      } catch {
+        return DEFAULT_SUGGESTIONS.slice();
+      }
+    }
+
+    // ========== Helpers de UI ==========
+
+    function formatPriceBR(value) {
       if (value === null || value === undefined || Number.isNaN(Number(value))) return '';
       return Number(value).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
     }
-    function escapeHtml(s){ return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
-    function populateWineSelect(){
-      wineSelect.innerHTML = '<option value="">— selecione um rótulo —</option>';
-      for(const w of WINES){
-        const o = document.createElement('option');
-        o.value = w.name;
-        o.textContent = `${w.name} — ${formatPriceBR(w.price)}`;
-        wineSelect.appendChild(o);
+    function escapeHtml(s) {
+      const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+      return String(s || '').replace(/[&<>"']/g, c => map[c]);
+    }
+
+    function setStatus(txt) {
+      els.status.textContent = txt || '';
+    }
+
+    const EMPTY_DISH_HTML = `
+      <div style="text-align:center;color:#9aa4b2;padding:18px">
+        <div style="font-weight:600;margin-bottom:6px">Nenhuma imagem carregada</div>
+        <div class="small">Busque um prato para ver a foto aqui</div>
+      </div>`;
+
+    function clearDish() {
+      els.dishContainer.innerHTML = EMPTY_DISH_HTML;
+      els.dishTitle.textContent = '';
+      els.dishSource.textContent = '';
+      els.wineSuggestions.innerHTML = '';
+      els.harmoNote.style.display = 'none';
+      els.harmoNote.textContent = '';
+    }
+
+    // ========== Popula selects ==========
+
+    function populateSelect(selectEl, options, placeholder) {
+      selectEl.innerHTML = `<option value="">${placeholder}</option>`;
+      for (const w of options) {
+        const opt = document.createElement('option');
+        opt.value = w.name;
+        opt.textContent = w.label || w.name;
+        selectEl.appendChild(opt);
       }
     }
 
-    function populateMapWine(){
-      mapWine.innerHTML = '<option value="">— selecione vinho —</option>';
-      for(const w of WINES){
-        const o = document.createElement('option');
-        o.value = w.name;
-        o.textContent = w.name;
-        mapWine.appendChild(o);
-      }
+    function populateWineSelect() {
+      populateSelect(
+        els.wineSelect,
+        WINES.map(w => ({ name: w.name, label: `${w.name} — ${formatPriceBR(w.price)}` })),
+        '— selecione um rótulo —'
+      );
     }
 
-    function renderDefaultPreview(){
+    function populateMapWine() {
+      populateSelect(
+        els.mapWine,
+        WINES,
+        '— selecione vinho —'
+      );
+    }
+
+    function renderDefaultPreview() {
       const arr = readDefaultSuggestions();
       const withPrices = arr.map(n => {
         const obj = WINES.find(w => w.name === n);
         return obj ? `${obj.name} — ${formatPriceBR(obj.price)}` : n;
       });
-      defaultPreview.textContent = withPrices.join(' • ');
+      els.defaultPreview.textContent = withPrices.join(' • ');
     }
 
-    function setStatus(txt){ status.textContent = txt || ''; }
-    function clearDish(){
-      dishContainer.innerHTML = `<div style="text-align:center;color:#9aa4b2;padding:18px">
-        <div style="font-weight:600;margin-bottom:6px">Nenhuma imagem carregada</div>
-        <div class="small">Busque um prato para ver a foto aqui</div>
-      </div>`;
-      dishTitle.textContent = '';
-      dishSource.textContent = '';
-      wineSuggestions.innerHTML = '';
-      harmoNote.style.display = 'none';
-      harmoNote.textContent = '';
+    // ========== Spinner ==========
+
+    function showSpinner() {
+      els.spinner.classList.add('show');
+      els.spinner.setAttribute('aria-hidden', 'false');
     }
 
-    // ---------- TheMealDB helpers ----------
-    async function fetchJson(url){
-      const res = await fetch(url);
-      if(!res.ok) throw new Error('Erro na requisição: ' + res.status);
-      return res.json();
-    }
-    async function searchMealsByName(q){
-      const url = `${BASE}/search.php?s=${encodeURIComponent(q)}`;
-      return (await fetchJson(url)).meals || null;
-    }
-    async function filterByIngredient(i){
-      const url = `${BASE}/filter.php?i=${encodeURIComponent(i)}`;
-      return (await fetchJson(url)).meals || null;
-    }
-    async function filterByCategory(cat){
-      const url = `${BASE}/filter.php?c=${encodeURIComponent(cat)}`;
-      return (await fetchJson(url)).meals || null;
-    }
-    async function lookupById(id){
-      const url = `${BASE}/lookup.php?i=${encodeURIComponent(id)}`;
-      const json = await fetchJson(url);
-      return json.meals ? json.meals[0] : null;
-    }
-    async function fetchRandomMeal(){
-      const url = `${BASE}/random.php`;
-      const json = await fetchJson(url);
-      return json.meals ? json.meals[0] : null;
+    function hideSpinner() {
+      els.spinner.classList.remove('show');
+      els.spinner.setAttribute('aria-hidden', 'true');
     }
 
-    // ---------- Enriquecer itens (lookup quando necessário) ----------
-    async function enrichMeals(items){
-      if(!Array.isArray(items)) return [];
-      const out = [];
-      for(const m of items){
-        if(!m) continue;
-        if(m.strMeal && m.strMealThumb && m.idMeal){
-          out.push(m);
-        } else if(m.idMeal){
-          try{
-            const full = await lookupById(m.idMeal);
-            if(full) out.push(full);
-          } catch(e){
-            // ignore individual lookup errors
-          }
-        }
+    async function withSpinner(fn) {
+      try {
+        showSpinner();
+        return await fn();
+      } finally {
+        hideSpinner();
       }
-      return out;
     }
 
-    // ---------- Escolha evitando repetições ----------
-    function pickDifferentMealFromArray(meals){
-      if(!Array.isArray(meals) || meals.length === 0) return null;
-      const candidates = meals.filter(m => m && (m.idMeal || m.strMeal));
-      const notRecent = candidates.filter(m => !recentShownIds.includes(m.idMeal));
-      const pool = notRecent.length ? notRecent : candidates;
+    // ========== Enriquecer itens (lookup em paralelo) ==========
+
+    async function enrichMeals(items) {
+      if (!Array.isArray(items)) return [];
+
+      const promises = items
+        .filter(Boolean)
+        .map(m => {
+          if (m.strMeal && m.strMealThumb && m.idMeal) {
+            return Promise.resolve(m);
+          }
+          if (m.idMeal) {
+            return lookupById(m.idMeal).catch(() => null);
+          }
+          return Promise.resolve(null);
+        });
+
+      const results = await Promise.all(promises);
+      return results.filter(Boolean);
+    }
+
+    // ========== Escolha evitando repetições ==========
+
+    function pickDifferentMeal(meals) {
+      if (!Array.isArray(meals) || meals.length === 0) return null;
+      const valid = meals.filter(m => m && (m.idMeal || m.strMeal));
+      const notRecent = valid.filter(m => !recentShownIds.includes(m.idMeal));
+      const pool = notRecent.length > 0 ? notRecent : valid;
       return pool[Math.floor(Math.random() * pool.length)];
     }
 
-    function addToRecent(id){
-      if(!id) return;
+    function addToRecent(id) {
+      if (!id) return;
       recentShownIds.unshift(id);
-      recentShownIds = Array.from(new Set(recentShownIds)).slice(0, RECENT_HISTORY_LIMIT);
+      recentShownIds = [...new Set(recentShownIds)].slice(0, RECENT_HISTORY_LIMIT);
     }
 
-    // ---------- Wrapper seguro para chamadas (mostra spinner) ----------
-    async function safeCallWithSpinner(fn){
-      try{
-        spinner.classList.add('show');
-        spinner.setAttribute('aria-hidden','false');
-        return await fn();
-      } finally {
-        spinner.classList.remove('show');
-        spinner.setAttribute('aria-hidden','true');
+    // ========== Derivar termo do vinho ==========
+
+    function deriveTermFromWine(wineName) {
+      if (!wineName) return '';
+      const type = classifyWine(wineName);
+      if (type === 'red')   return 'beef';
+      if (type === 'white') return 'salmon';
+      if (type === 'rose')  return 'prawns';
+      const parts = wineName.split(/\s+/).filter(Boolean);
+      return parts[parts.length - 1] || wineName;
+    }
+
+    // ========== Sugestões de harmonização ==========
+
+    const TIPS = {
+      chef: {
+        red:     "Grelhar ou assar; temperos robustos.",
+        white:   "Preparar com cítricos e ervas; manter leve.",
+        seafood: "Grelhar com limão e ervas; manter o prato leve.",
+        default: "Preparar com atenção ao equilíbrio de sabores."
+      },
+      sommelier: {
+        red:     "Vinho tinto médio a encorpado.",
+        white:   "Branco fresco com boa acidez.",
+        seafood: "Branco ou rosé fresco para mariscos.",
+        default: "Escolha vinho que complemente intensidade do prato."
+      },
+      enologist: {
+        red:     "Realçar taninos e notas de madeira.",
+        white:   "Preservar frescor e mineralidade.",
+        default: "Buscar equilíbrio entre acidez e corpo."
+      }
+    };
+
+    function getTip(role, wineName, term) {
+      const wineType = classifyWine(wineName);
+      const isSeafood = term && SEAFOOD_PATTERN.test(term);
+      const tips = TIPS[role];
+
+      if (wineType && tips[wineType]) return tips[wineType];
+      if (isSeafood && tips.seafood) return tips.seafood;
+      return tips.default;
+    }
+
+    // ========== Sugestões de vinhos com preços ==========
+
+    function buildSuggestions(wineName) {
+      const defaults = readDefaultSuggestions();
+      if (!wineName) return defaults.slice(0, 3);
+
+      const wineType = classifyWine(wineName);
+      const matched = wineType
+        ? defaults.filter(w => classifyWine(w) === wineType)
+        : [];
+
+      const result = [];
+      for (const w of matched) {
+        if (result.length >= 3) break;
+        if (!result.includes(w)) result.push(w);
+      }
+      for (const w of defaults) {
+        if (result.length >= 3) break;
+        if (!result.includes(w)) result.push(w);
+      }
+      return result.slice(0, 3);
+    }
+
+    function renderSuggestions(list) {
+      els.wineSuggestions.innerHTML = '';
+      if (!list || list.length === 0) {
+        els.wineSuggestions.innerHTML = '<div class="small">Nenhuma sugestão disponível.</div>';
+        return;
+      }
+      for (const name of list) {
+        const wineObj = WINES.find(w => w.name === name);
+        const priceText = wineObj ? formatPriceBR(wineObj.price) : '';
+        const div = document.createElement('div');
+        div.className = 'wine-item';
+        div.innerHTML = `
+          <div class="wine-left">
+            <div class="wine-name">${escapeHtml(name)}</div>
+            <div class="wine-price">${escapeHtml(priceText)}</div>
+          </div>
+          <div class="wine-meta small">Sugestão</div>`;
+        els.wineSuggestions.appendChild(div);
       }
     }
 
-    // ---------- Derivar termo do vinho (fallback) ----------
-    function deriveTermFromWine(wineName){
-      if(!wineName) return '';
-      const lower = wineName.toLowerCase();
-      // mapeamentos simples por palavras-chave
-      if(/reserva|douro|tinto|port/i.test(lower)) return 'beef';
-      if(/branco|verde|sauvignon|chardonnay|pinot/i.test(lower)) return 'salmon';
-      if(/ros|rose/i.test(lower)) return 'prawns';
-      // fallback: última palavra significativa
-      const parts = wineName.split(/\s+/).filter(Boolean);
-      return parts.slice(-1)[0] || wineName;
+    // ========== Render do prato ==========
+
+    function displayMeal(meal, wineName, term) {
+      const thumb = (meal && meal.strMealThumb) || '';
+      const title = (meal && meal.strMeal) || '';
+      const source = (meal && (meal.strSource || meal.strYoutube)) || '';
+
+      if (thumb) {
+        els.dishContainer.innerHTML = `<img src="${escapeHtml(thumb)}" alt="${escapeHtml(title)}" />`;
+      } else {
+        els.dishContainer.innerHTML = '<div style="padding:12px;text-align:center">Imagem não disponível</div>';
+      }
+
+      els.dishTitle.textContent = title ? `Prato: ${title}` : '';
+      els.dishSource.textContent = source ? `Fonte: ${source}` : '';
+
+      els.harmoNote.style.display = 'block';
+      els.harmoNote.innerHTML = [
+        `<strong>Chef:</strong> ${escapeHtml(getTip('chef', wineName, term))}`,
+        `<strong>Sommelier:</strong> ${escapeHtml(getTip('sommelier', wineName, term))}`,
+        `<strong>Enólogo:</strong> ${escapeHtml(getTip('enologist', wineName, term))}`
+      ].join('<br/>');
+
+      renderSuggestions(buildSuggestions(wineName));
     }
 
-    // ---------- Lógica principal: usa mapeamento e busca coerente ----------
-    async function showDishFor(wineName, explicitTerm){
-      try{
-        setStatus('Buscando prato coerente com o vinho...');
-        clearDish();
+    // ========== Lógica principal ==========
 
-        const map = readMap();
-        let term = (explicitTerm || '').trim();
-        if(!term && wineName) term = map[wineName] || deriveTermFromWine(wineName);
+    async function showDishFor(wineName, explicitTerm) {
+      setStatus('Buscando prato coerente com o vinho...');
+      clearDish();
 
-        // ordem de tentativas:
-        // 1) search by name (search.php?s=term)
-        // 2) filter by ingredient (filter.php?i=term)
-        // 3) category fallback (Seafood)
-        // 4) random fallback
-        // Em cada pool, enriquecemos e escolhemos um prato que não seja recente.
+      const map = readMap();
+      let term = (explicitTerm || '').trim();
+      if (!term && wineName) {
+        term = map[wineName] || deriveTermFromWine(wineName);
+      }
 
-        // helper para tentar um pool
-        async function tryPool(items){
-          const full = await enrichMeals(items);
-          const chosen = pickDifferentMealFromArray(full);
-          if(chosen){
-            addToRecent(chosen.idMeal);
-            displayMeal(chosen, wineName, term);
-            return true;
+      try {
+        await withSpinner(async () => {
+          // Tenta pool e exibe se encontrar
+          async function tryPool(items) {
+            const enriched = await enrichMeals(items);
+            const chosen = pickDifferentMeal(enriched);
+            if (chosen) {
+              addToRecent(chosen.idMeal);
+              displayMeal(chosen, wineName, term);
+              return true;
+            }
+            return false;
           }
-          return false;
-        }
 
-        // 1) search by name
-        if(term){
-          const byName = await safeCallWithSpinner(() => searchMealsByName(term));
-          if(byName && await tryPool(byName)) { setStatus('Prato encontrado por nome.'); return; }
+          // 1) Busca por nome
+          if (term) {
+            const byName = await searchMealsByName(term);
+            if (byName && await tryPool(byName)) {
+              setStatus('Prato encontrado por nome.');
+              return;
+            }
 
-          // 2) filter by ingredient
-          const byIngredient = await safeCallWithSpinner(() => filterByIngredient(term));
-          if(byIngredient && await tryPool(byIngredient)) { setStatus('Prato encontrado por ingrediente.'); return; }
-        }
+            // 2) Filtro por ingrediente
+            const byIngredient = await filterByIngredient(term);
+            if (byIngredient && await tryPool(byIngredient)) {
+              setStatus('Prato encontrado por ingrediente.');
+              return;
+            }
+          }
 
-        // 3) category fallback
-        const byCategory = await safeCallWithSpinner(() => filterByCategory('Seafood'));
-        if(byCategory && await tryPool(byCategory)) { setStatus('Prato encontrado por categoria.'); return; }
+          // 3) Fallback por categoria
+          const byCategory = await filterByCategory('Seafood');
+          if (byCategory && await tryPool(byCategory)) {
+            setStatus('Prato encontrado por categoria.');
+            return;
+          }
 
-        // 4) tentar alguns randoms
-        const randoms = [];
-        for(let i=0;i<6;i++){
-          const r = await safeCallWithSpinner(() => fetchRandomMeal());
-          if(r) randoms.push(r);
-        }
-        if(randoms.length && await tryPool(randoms)) { setStatus('Prato aleatório encontrado.'); return; }
+          // 4) Fallback aleatório
+          const randomPromises = Array.from({ length: 6 }, () =>
+            fetchRandomMeal().catch(() => null)
+          );
+          const randoms = (await Promise.all(randomPromises)).filter(Boolean);
+          if (randoms.length && await tryPool(randoms)) {
+            setStatus('Prato aleatório encontrado.');
+            return;
+          }
 
-        setStatus('Nenhum prato encontrado.');
-      } catch(err){
+          setStatus('Nenhum prato encontrado.');
+        });
+      } catch (err) {
         console.error(err);
         setStatus('Erro ao buscar prato. Verifique sua conexão.');
       }
     }
 
-    // ---------- Render do prato e harmonização (mantendo preços) ----------
-    function displayMeal(meal, wineName, term){
-      const thumb = meal && meal.strMealThumb ? meal.strMealThumb : '';
-      const title = meal && meal.strMeal ? meal.strMeal : '';
-      const source = meal && (meal.strSource || meal.strYoutube) ? (meal.strSource || meal.strYoutube) : '';
-      if(thumb) dishContainer.innerHTML = `<img src="${escapeHtml(thumb)}" alt="${escapeHtml(title)}" />`;
-      else dishContainer.innerHTML = `<div style="padding:12px;text-align:center">Imagem não disponível</div>`;
-      dishTitle.textContent = title ? `Prato: ${title}` : '';
-      dishSource.textContent = source ? `Fonte: ${source}` : '';
+    // ========== Eventos ==========
 
-      const chef = suggestChef(wineName, term);
-      const sommelier = suggestSommelier(wineName, term);
-      const enologist = suggestEnologist(wineName, term);
-      harmoNote.style.display = 'block';
-      harmoNote.innerHTML = `<strong>Chef:</strong> ${escapeHtml(chef)}<br/><strong>Sommelier:</strong> ${escapeHtml(sommelier)}<br/><strong>Enólogo:</strong> ${escapeHtml(enologist)}`;
-
-      const suggestions = buildSuggestions(wineName);
-      renderSuggestionsWithPrices(suggestions);
-    }
-
-    function suggestChef(wineName, term){
-      const lowerWine = (wineName || '').toLowerCase();
-      if(/tinto|reserva|malbec|cab|syrah|merlot/i.test(lowerWine)) return "Grelhar ou assar; temperos robustos.";
-      if(/branco|sauvignon|chardonnay|verde|pinot|grigio/i.test(lowerWine)) return "Preparar com cítricos e ervas; manter leve.";
-      if(term && /seafood|prawn|shrimp|salmon|fish|sardine|calamari/i.test(term.toLowerCase())) return "Grelhar com limão e ervas; manter o prato leve.";
-      return "Preparar com atenção ao equilíbrio de sabores.";
-    }
-    function suggestSommelier(wineName, term){
-      const lowerWine = (wineName || '').toLowerCase();
-      if(/tinto|reserva|malbec|cab|syrah|merlot/i.test(lowerWine)) return "Vinho tinto médio a encorpado.";
-      if(/branco|sauvignon|chardonnay|verde|pinot|grigio/i.test(lowerWine)) return "Branco fresco com boa acidez.";
-      if(term && /seafood|prawn|shrimp|salmon|fish|sardine|calamari/i.test(term.toLowerCase())) return "Branco ou rosé fresco para mariscos.";
-      return "Escolha vinho que complemente intensidade do prato.";
-    }
-    function suggestEnologist(wineName, term){
-      const lowerWine = (wineName || '').toLowerCase();
-      if(/tinto|reserva|malbec|cab|syrah|merlot/i.test(lowerWine)) return "Realçar taninos e notas de madeira.";
-      if(/branco|sauvignon|chardonnay|verde|pinot|grigio/i.test(lowerWine)) return "Preservar frescor e mineralidade.";
-      return "Buscar equilíbrio entre acidez e corpo.";
-    }
-
-    // ---------- Sugestões com preços ----------
-    function buildSuggestions(wineName){
-      const defaults = readDefaultSuggestions();
-      if(!wineName) return defaults.slice(0,3);
-      const lower = wineName.toLowerCase();
-      const reds = defaults.filter(w => /tinto|reserva|malbec|cab|syrah|merlot/i.test(w));
-      const whites = defaults.filter(w => /branco|sauvignon|chardonnay|verde|pinot|grigio/i.test(w));
-      const ros = defaults.filter(w => /ros|rose/i.test(w));
-      let out = [];
-      if(/tinto|reserva|cab|malbec|syrah|merlot/i.test(lower)) out = reds;
-      else if(/branco|verde|sauvignon|chardonnay|pinot|grigio/i.test(lower)) out = whites;
-      else if(/ros|rose/i.test(lower)) out = ros;
-      if(out.length === 0) out = defaults;
-      const res = [];
-      for(const w of out){ if(res.length >= 3) break; if(!res.includes(w)) res.push(w); }
-      for(const d of defaults){ if(res.length >= 3) break; if(!res.includes(d)) res.push(d); }
-      return res.slice(0,3);
-    }
-
-    function renderSuggestionsWithPrices(list){
-      wineSuggestions.innerHTML = '';
-      if(!list || list.length === 0){
-        wineSuggestions.innerHTML = '<div class="small">Nenhuma sugestão disponível.</div>';
+    els.btnFind.addEventListener('click', () => {
+      const wine = (els.wineSelect.value || '').trim();
+      const term = (els.termInput.value || '').trim();
+      if (!wine && !term) {
+        alert('Selecione um vinho ou digite um termo de prato.');
         return;
       }
-      for(const name of list){
-        const wineObj = WINES.find(w => w.name === name) || null;
-        const priceText = wineObj ? formatPriceBR(wineObj.price) : '';
-        const div = document.createElement('div');
-        div.className = 'wine-item';
-        div.innerHTML = `<div class="wine-left"><div class="wine-name">${escapeHtml(name)}</div><div class="wine-price">${escapeHtml(priceText)}</div></div><div class="wine-meta small">Sugestão</div>`;
-        wineSuggestions.appendChild(div);
-      }
-    }
-
-    // ---------- Eventos ----------
-    btnFind.addEventListener('click', ()=> {
-      const wine = (wineSelect.value || '').trim();
-      const term = (termInput.value || '').trim();
-      if(!wine && !term){ alert('Selecione um vinho ou digite um termo de prato.'); return; }
       showDishFor(wine, term);
     });
 
-    btnRandom.addEventListener('click', async ()=>{
+    els.btnRandom.addEventListener('click', async () => {
       setStatus('Buscando prato aleatório...');
-      try{
-        const meal = await safeCallWithSpinner(() => fetchRandomMeal());
-        if(meal){
-          // evitar repetição imediata
-          let attempts = 0;
-          while(recentShownIds.includes(meal.idMeal) && attempts < 8){
-            const next = await safeCallWithSpinner(() => fetchRandomMeal());
-            if(!next) break;
-            meal.idMeal = next.idMeal; meal.strMeal = next.strMeal; meal.strMealThumb = next.strMealThumb; meal.strSource = next.strSource;
-            attempts++;
+      try {
+        let meal = null;
+        const MAX_ATTEMPTS = 8;
+
+        await withSpinner(async () => {
+          for (let i = 0; i < MAX_ATTEMPTS; i++) {
+            const candidate = await fetchRandomMeal();
+            if (!candidate) break;
+            meal = candidate;
+            if (!recentShownIds.includes(meal.idMeal)) break;
           }
-          if(meal.idMeal) addToRecent(meal.idMeal);
+        });
+
+        if (meal) {
+          addToRecent(meal.idMeal);
           displayMeal(meal, '');
           setStatus('Prato aleatório carregado.');
         } else {
           setStatus('Nenhum prato aleatório encontrado.');
         }
-      } catch(e){
+      } catch (e) {
         console.error(e);
         setStatus('Erro ao buscar aleatório.');
       }
     });
 
-    btnMapSave.addEventListener('click', ()=>{
-      const wine = (mapWine.value || '').trim();
-      const term = (mapTerm.value || '').trim();
-      if(!wine || !term){ alert('Selecione um vinho e informe o termo.'); return; }
-      const m = readMap(); m[wine] = term; saveMap(m); setStatus('Associação salva.'); mapTerm.value = '';
+    els.btnMapSave.addEventListener('click', () => {
+      const wine = (els.mapWine.value || '').trim();
+      const term = (els.mapTerm.value || '').trim();
+      if (!wine || !term) {
+        alert('Selecione um vinho e informe o termo.');
+        return;
+      }
+      const m = readMap();
+      m[wine] = term;
+      saveMap(m);
+      setStatus('Associação salva.');
+      els.mapTerm.value = '';
       renderDefaultPreview();
     });
 
-    btnMapRemove.addEventListener('click', ()=>{
-      const wine = (mapWine.value || '').trim();
-      if(!wine){ alert('Selecione um vinho para remover.'); return; }
-      removeMapKey(wine); setStatus('Associação removida.');
+    els.btnMapRemove.addEventListener('click', () => {
+      const wine = (els.mapWine.value || '').trim();
+      if (!wine) {
+        alert('Selecione um vinho para remover.');
+        return;
+      }
+      removeMapKey(wine);
+      setStatus('Associação removida.');
       renderDefaultPreview();
     });
 
-    // ---------- Init ----------
-    (function init(){
-      populateWineSelect();
-      populateMapWine();
-      renderDefaultPreview();
-      clearDish();
-      setStatus('Pronto. Use o seletor ou digite um termo e clique Buscar prato.');
-    })();
+    // ========== Init ==========
 
-    // ---------- Funções finais ----------
-    function readMap(){ try{ const r = localStorage.getItem(KEY_MAP); return r ? JSON.parse(r) : {...DEFAULT_MAPPINGS}; } catch(e){ return {...DEFAULT_MAPPINGS}; } }
+    populateWineSelect();
+    populateMapWine();
+    renderDefaultPreview();
+    clearDish();
+    setStatus('Pronto. Use o seletor ou digite um termo e clique Buscar prato.');
   </script>
 </body>
 </html>
