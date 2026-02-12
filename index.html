@@ -245,23 +245,17 @@
       width: 40px;
       height: 62px;
       border-radius: 6px;
-      background: radial-gradient(circle at top, #f3f4f6, #9ca3af);
+      background: radial-gradient(circle at top, #1f2937, #020617);
       display: flex;
       align-items: center;
       justify-content: center;
-      overflow: hidden;
-      font-size: 10px;
-      color: #111827;
+      font-size: 11px;
+      color: #e5e7eb;
       text-align: center;
       padding: 3px;
-      white-space: pre-line;
     }
 
-    .vinho-thumb img {
-      max-width: 100%;
-      max-height: 100%;
-      object-fit: cover;
-    }
+    .vinho-thumb img { display: none; }
 
     .vinho-info {
       font-size: 12px;
@@ -305,20 +299,11 @@
       background: radial-gradient(circle at top, rgba(248,250,252,0.05) 0, rgba(15,23,42,0.98) 35%, #020617 100%);
       border: 1px solid rgba(55,65,81,0.9);
       text-align: center;
-      min-height: 210px;
+      min-height: 120px;
       display: flex;
       flex-direction: column;
       justify-content: center;
       gap: 6px;
-    }
-
-    .prato-box img {
-      width: 100%;
-      max-height: 130px;
-      border-radius: 10px;
-      box-shadow: 0 16px 32px rgba(0,0,0,0.9);
-      object-fit: contain;
-      background-color: #020012;
     }
 
     .nome-prato {
@@ -467,7 +452,7 @@
           </select>
 
           <button id="btnBuscarReceitas" class="primary">
-            Buscar receita e foto
+            Buscar receita e resumo
           </button>
 
           <div class="status" id="statusReceitas">
@@ -568,7 +553,6 @@
         regiao: "PORTUGAL - LISBOA",
         uvas: ["Aragonez", "Castelão", "Touriga Nacional"],
         preco: 58.70,
-        imagem: "img/porta6_tinto.jpg",
         estilo: "tinto_medio"
       },
       {
@@ -577,7 +561,6 @@
         regiao: "PORTUGAL - LISBOA",
         uvas: ["Fernão Pires", "Arinto", "Sauvignon Blanc"],
         preco: 58.70,
-        imagem: "img/porta6_branco.jpg",
         estilo: "branco_fresco"
       },
       {
@@ -586,7 +569,6 @@
         regiao: "PORTUGAL - LISBOA",
         uvas: ["Aragonez", "Castelão", "Tinta Miuda"],
         preco: 52.68,
-        imagem: "img/reserva_amigos_tinto.jpg",
         estilo: "tinto_medio"
       },
       {
@@ -595,7 +577,6 @@
         regiao: "PORTUGAL - LISBOA",
         uvas: ["Aragonez", "Castelão", "Tinta Miuda"],
         preco: 84.67,
-        imagem: "img/reserva_amigos_magnum.jpg",
         estilo: "tinto_estruturado"
       },
       {
@@ -604,7 +585,6 @@
         regiao: "PORTUGAL - VERDE",
         uvas: ["Loureiro", "Trajadura", "Arinto"],
         preco: 58.70,
-        imagem: "img/porta6_verde.jpg",
         estilo: "branco_fresco"
       },
       {
@@ -613,7 +593,6 @@
         regiao: "PORTUGAL - VERDE",
         uvas: ["Azal", "Trajadura", "Loureiro", "Arinto"],
         preco: 37.82,
-        imagem: "img/pescada_original.jpg",
         estilo: "branco_fresco"
       },
       {
@@ -622,7 +601,6 @@
         regiao: "PORTUGAL - VERDE",
         uvas: ["Arinto", "Trajadura"],
         preco: 75.64,
-        imagem: "img/pescada_arinto_trajadura.jpg",
         estilo: "branco_fresco"
       },
       {
@@ -631,7 +609,6 @@
         regiao: "PORTUGAL - VERDE",
         uvas: ["Alvarinho"],
         preco: 135.84,
-        imagem: "img/pescada_alvarinho.jpg",
         estilo: "branco_estruturado"
       }
     ];
@@ -699,15 +676,7 @@
 
       const thumb = document.createElement('div');
       thumb.className = 'vinho-thumb';
-
-      if (v.imagem) {
-        const img = document.createElement('img');
-        img.src = v.imagem;
-        img.alt = v.nome;
-        thumb.appendChild(img);
-      } else {
-        thumb.textContent = 'sem\nimg';
-      }
+      thumb.textContent = 'Rótulo';
 
       const info = document.createElement('div');
       info.className = 'vinho-info';
@@ -815,10 +784,6 @@
         return;
       }
 
-      const img = document.createElement('img');
-      img.src = meal.strMealThumb;
-      img.alt = meal.strMeal;
-
       const nome = document.createElement('div');
       nome.className = 'nome-prato';
       nome.textContent = meal.strMeal;
@@ -827,7 +792,6 @@
       leg.className = 'prato-meta';
       leg.textContent = (meal.strArea || '') + (meal.strCategory ? ' · ' + meal.strCategory : '');
 
-      boxPrato.appendChild(img);
       boxPrato.appendChild(nome);
       boxPrato.appendChild(leg);
     }
@@ -891,7 +855,7 @@
         return;
       }
 
-      const combinam = sugerirVinhosWineBringing(base).slice(0, 2); // base + 2 = 3 vinhos
+      const combinam = sugerirVinhosWineBringing(base).slice(0, 2); // base + 2 = 3
       const combo = [base, ...combinam];
 
       if (!combo.length) {
