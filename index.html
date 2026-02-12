@@ -238,7 +238,7 @@
     }
 
     .vinho-item:hover::after {
-      border-color: rgba(168,85,247,0.7);
+      border-color: #a855f7;
     }
 
     .vinho-thumb {
@@ -391,18 +391,6 @@
       margin-bottom: 4px;
     }
 
-    .assinatura-lista-vinhos {
-      list-style: none;
-      padding-left: 0;
-      margin: 0;
-      font-size: 12px;
-    }
-
-    .assinatura-lista-vinhos li {
-      margin-bottom: 2px;
-      color: #e5e7eb;
-    }
-
     .assinatura-codigos {
       font-size: 11px;
       color: #9ca3af;
@@ -546,7 +534,7 @@
               <div class="assinatura-total-label">Total por mês</div>
               <div class="assinatura-total-valor" id="assinaturaTotalValor"></div>
             </div>
-            <div class="assinatura-lista-titulo">Vinhos incluídos (mini-cards):</div>
+            <div class="assinatura-lista-titulo">Vinhos incluídos:</div>
             <div class="lista" id="assinaturaMiniLista" style="max-height:110px;"></div>
             <div class="assinatura-codigos" id="assinaturaCodigos"></div>
           </div>
@@ -556,7 +544,6 @@
   </div>
 
   <script>
-    // ---------- Catálogo (exemplo) ----------
     const vinhosCatalogo = [
       {
         cod: "300078",
@@ -632,7 +619,6 @@
       }
     ];
 
-    // ---------- Elementos ----------
     const selectVinho = document.getElementById('selectVinho');
     const selectRegiao = document.getElementById('selectRegiao');
     const selectUva = document.getElementById('selectUva');
@@ -647,11 +633,9 @@
     const listaAssinatura = document.getElementById('listaAssinatura');
     const assinaturaCard = document.getElementById('assinaturaCard');
     const assinaturaTotalValor = document.getElementById('assinaturaTotalValor');
-    const assinaturaListaVinhos = document.getElementById('assinaturaListaVinhos');
     const assinaturaMiniLista = document.getElementById('assinaturaMiniLista');
     const assinaturaCodigos = document.getElementById('assinaturaCodigos');
 
-    // ---------- Combos ----------
     function initCombos() {
       selectVinho.innerHTML = '<option value="">Selecione um vinho...</option>';
       selectAssinaturaBase.innerHTML = '<option value="">Selecione um vinho...</option>';
@@ -692,7 +676,6 @@
 
     initCombos();
 
-    // ---------- Util: item de vinho ----------
     function criarItemVinho(v) {
       const item = document.createElement('div');
       item.className = 'vinho-item';
@@ -727,16 +710,13 @@
       return vinhosCatalogo
         .filter(v =>
           v.cod !== base.cod &&
-          (
-            v.regiao === base.regiao ||
-            (v.uvas || []).some(u => (base.uvas || []).includes(u)) ||
-            v.estilo === base.estilo
-          )
+          (v.regiao === base.regiao ||
+           (v.uvas || []).some(u => (base.uvas || []).includes(u)) ||
+           v.estilo === base.estilo)
         )
         .sort((a, b) => a.preco - b.preco);
     }
 
-    // ---------- 1) Wine Bringing ----------
     document.getElementById('btnVinhoSugestoes').addEventListener('click', () => {
       const cod = selectVinho.value;
       if (!cod) {
@@ -768,7 +748,6 @@
       sugeridos.forEach(v => listaWineBringing.appendChild(criarItemVinho(v)));
     });
 
-    // ---------- 2) Receita → vinho ----------
     document.getElementById('btnBuscarReceitas').addEventListener('click', () => {
       const tipoPrato = selectTipoPrato.value;
       if (!tipoPrato) {
@@ -837,13 +816,9 @@
 
     function sugerirVinhosParaTipoPrato(tipoPrato) {
       let estilosPreferidos = [];
-      if (tipoPrato === 'carne') {
-        estilosPreferidos = ['tinto_estruturado', 'tinto_medio'];
-      } else if (tipoPrato === 'peixe') {
-        estilosPreferidos = ['branco_fresco', 'branco_estruturado'];
-      } else if (tipoPrato === 'vegano') {
-        estilosPreferidos = ['branco_fresco', 'tinto_medio'];
-      }
+      if (tipoPrato === 'carne') estilosPreferidos = ['tinto_estruturado', 'tinto_medio'];
+      else if (tipoPrato === 'peixe') estilosPreferidos = ['branco_fresco', 'branco_estruturado'];
+      else if (tipoPrato === 'vegano') estilosPreferidos = ['branco_fresco', 'tinto_medio'];
 
       const candidatos = vinhosCatalogo
         .filter(v => estilosPreferidos.includes(v.estilo))
@@ -864,7 +839,6 @@
       candidatos.forEach(v => listaVinhosReceita.appendChild(criarItemVinho(v)));
     }
 
-    // ---------- 3) Filtro região / uva ----------
     document.getElementById('btnFiltrar').addEventListener('click', () => {
       const reg = selectRegiao.value;
       const uva = selectUva.value;
@@ -886,7 +860,6 @@
       lista.forEach(v => listaFiltro.appendChild(criarItemVinho(v)));
     });
 
-    // ---------- 4) Assinatura ----------
     document.getElementById('btnGerarAssinatura').addEventListener('click', () => {
       const codBase = selectAssinaturaBase.value;
       if (!codBase) {
@@ -919,11 +892,11 @@
       assinaturaTotalValor.textContent = 'R$ ' + total.toFixed(2) + ' / mês';
 
       assinaturaMiniLista.innerHTML = '';
-      combo.forEach(v => {
-        assinaturaMiniLista.appendChild(criarItemVinho(v));
-      });
+      combo.forEach(v => assinaturaMiniLista.appendChild(criarItemVinho(v)));
 
-      const codigos = combo.map(v => v.cod).join(', ');
+      const codigos = combo
+        .map(v => v.cod.toString().padStart(6, '0'))
+        .join(', ');
       assinaturaCodigos.textContent = 'Códigos dos rótulos: ' + codigos;
 
       assinaturaCard.style.display = 'block';
