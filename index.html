@@ -2,144 +2,193 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Uvva - Wine Bringing</title>
+  <title>Harmonizador Visual</title>
   <style>
+    * {
+      box-sizing: border-box;
+    }
     body {
       font-family: Arial, sans-serif;
-      margin: 20px;
-      background: #f7f7f7;
+      margin: 0;
+      padding: 20px;
+      background: #f5f5f5;
+      color: #333;
     }
     h1 {
-      margin-bottom: 10px;
+      margin-top: 0;
+      margin-bottom: 5px;
     }
-    section {
-      border: 1px solid #ccc;
-      padding: 10px;
-      margin-bottom: 15px;
+    p.sub {
+      margin-top: 0;
+      color: #555;
+      font-size: 14px;
+    }
+    .container {
+      display: flex;
+      gap: 20px;
+      margin-top: 15px;
+    }
+    .col {
+      flex: 1;
       background: #fff;
+      border-radius: 6px;
+      padding: 15px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
-    .hidden {
-      display: none;
+    .col h2 {
+      margin-top: 0;
+      font-size: 18px;
+    }
+    label {
+      font-size: 14px;
+    }
+    select, input[type="text"] {
+      padding: 5px;
+      margin: 5px 0;
+      width: 100%;
+      max-width: 260px;
     }
     button {
-      margin: 5px 0;
-      padding: 5px 10px;
+      padding: 6px 12px;
+      margin: 5px 5px 5px 0;
       cursor: pointer;
+      border-radius: 4px;
+      border: 1px solid #bbb;
+      background: #fff;
     }
-    input[type="text"] {
-      padding: 5px;
-      margin: 3px 0;
-      width: 100%;
-      max-width: 400px;
+    button.principal {
+      background: #007bff;
+      color: #fff;
+      border-color: #007bff;
     }
-    #lista-vinhos div,
-    #vinhos-sugeridos div,
-    #resultado-filtros div,
-    #vinhos-combinam div,
-    #itens-carrinho div,
-    #vinhos-selecionados div,
-    #receitas-sugeridas div,
-    #receitas-encontradas div {
-      border-bottom: 1px solid #eee;
-      padding: 5px 0;
+    button:disabled {
+      opacity: 0.5;
+      cursor: default;
     }
-    img.vinho-img {
-      max-height: 80px;
-      display: block;
-      margin: 3px 0;
+    .imagem-prato {
+      text-align: center;
+      margin-top: 10px;
+      min-height: 220px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      border: 1px dashed #ccc;
+      border-radius: 6px;
+      padding: 10px;
+      background: #fafafa;
     }
-    img.receita-img {
-      max-height: 120px;
-      display: block;
-      margin: 3px 0;
+    .imagem-prato img {
+      max-width: 100%;
+      max-height: 200px;
+      border-radius: 6px;
+      margin-bottom: 8px;
+    }
+    .nome-prato {
+      font-weight: bold;
+      font-size: 16px;
+    }
+    .status {
+      font-size: 13px;
+      color: #777;
+    }
+    .lista-vinhos {
+      margin-top: 10px;
+      max-height: 280px;
+      overflow-y: auto;
+      border: 1px solid #eee;
+      border-radius: 6px;
+      padding: 8px;
+      background: #fafafa;
+    }
+    .vinho-item {
+      border-bottom: 1px solid #e0e0e0;
+      padding: 6px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .vinho-item:last-child {
+      border-bottom: none;
+    }
+    .vinho-thumb {
+      width: 40px;
+      height: 60px;
+      background: #ddd;
+      border-radius: 4px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      color: #666;
+    }
+    .vinho-info {
+      flex: 1;
+      font-size: 13px;
+    }
+    .vinho-nome {
+      font-weight: bold;
+    }
+    .vinho-preco {
+      color: #007bff;
+    }
+    .rodape {
+      margin-top: 15px;
+      font-size: 12px;
+      color: #777;
     }
   </style>
 </head>
 <body>
-  <h1>Uvva - Wine Bringing</h1>
+  <h1>Harmonizador Visual</h1>
+  <p class="sub">Busca prato coerente com o vinho selecionado; mantém preços e layout.</p>
 
-  <!-- Escolha principal: ENTRA VINHO -> RECEITA ou ENTRA RECEITA -> VINHO -->
-  <section id="modo-escolha">
-    <h2>Como você quer começar?</h2>
-    <button id="btn-entra-vinho">Entrar com Vinho → Receitas</button>
-    <button id="btn-entra-receita">Entrar com Receita → Vinhos</button>
-  </section>
+  <div class="container">
+    <!-- Lado ESQUERDO: busca de prato e imagem -->
+    <div class="col">
+      <h2>Prato (TheMealDB – chave pública)</h2>
 
-  <!-- ENTRA VINHO -> RECEITA -->
-  <section id="sec-entra-vinho" class="hidden">
-    <h2>Entrar com VINHO → sugerir RECEITAS</h2>
+      <label for="modoBusca">Modo de busca:</label><br>
+      <select id="modoBusca">
+        <option value="termo">Por termo (ex.: pasta, salmon)</option>
+        <option value="categoria">Por categoria (ex.: Beef, Seafood)</option>
+      </select><br>
 
-    <input type="text" id="busca-vinho" placeholder="Digite o nome do vinho ou código">
-    <button id="btn-buscar-vinho">Buscar vinho</button>
+      <label for="termo">Termo ou categoria:</label><br>
+      <input type="text" id="termo" placeholder="Ex.: pasta, salmon, beef, seafood">
 
-    <h3>Resultado da busca de vinhos</h3>
-    <div id="lista-vinhos"></div>
+      <button id="btnBuscar" class="principal">Buscar prato</button>
+      <button id="btnAleatorio">Aleatório</button>
 
-    <h3>Vinho(s) selecionado(s) para sugerir receitas</h3>
-    <div id="vinhos-selecionados"></div>
-
-    <h3>Receitas sugeridas (API externa)</h3>
-    <div id="receitas-sugeridas"></div>
-  </section>
-
-  <!-- ENTRA RECEITA -> VINHO -->
-  <section id="sec-entra-receita" class="hidden">
-    <h2>Entrar com RECEITA → sugerir VINHOS</h2>
-
-    <h3>Tipo do prato (3 variações: peixe, carne ou vegano)</h3>
-    <div id="tipo-prato">
-      <label><input type="radio" name="tipoPrato" value="carne"> Carne</label>
-      <label><input type="radio" name="tipoPrato" value="peixe"> Peixe</label>
-      <label><input type="radio" name="tipoPrato" value="vegano"> Vegano</label>
+      <div class="imagem-prato" id="boxImagem">
+        <div class="status" id="statusImagem">Nenhuma imagem carregada<br>Busque um prato para ver a foto aqui</div>
+      </div>
     </div>
 
-    <h3>Menu com Entrada / Principal / Sobremesa</h3>
-    <label>Entrada:
-      <input type="text" id="entrada" placeholder="Ex.: Salada, Bruschetta...">
-    </label>
-    <label>Prato principal:
-      <input type="text" id="principal" placeholder="Ex.: Massa ao sugo, Peixe grelhado...">
-    </label>
-    <label>Sobremesa:
-      <input type="text" id="sobremesa" placeholder="Ex.: Tiramisu, Sorbet...">
-    </label>
-    <button id="btn-buscar-receitas">Buscar receitas e fotos (API externa)</button>
+    <!-- Lado DIREITO: sugestões de vinhos -->
+    <div class="col">
+      <h2>Sugestões de vinhos</h2>
+      <p style="font-size:13px;margin-top:0;">
+        Aqui entram os vinhos do seu catálogo, ordenados do menor preço para o maior.
+      </p>
 
-    <h3>Receitas / pratos encontrados</h3>
-    <div id="receitas-encontradas"></div>
+      <div class="lista-vinhos" id="listaVinhos">
+        <div class="status">Pronto. Selecione um prato e os vinhos serão listados aqui.</div>
+      </div>
+    </div>
+  </div>
 
-    <h3>Vinhos sugeridos para esta receita (ordenados do menor preço para o maior)</h3>
-    <div id="vinhos-sugeridos"></div>
-  </section>
-
-  <!-- Filtros por região / país / uva -->
-  <section id="filtros-vinhos">
-    <h2>Buscar vinhos por Região / País / Uva</h2>
-    <input type="text" id="filtro-regiao" placeholder="Região ou País (ex.: Portugal, Itália)">
-    <input type="text" id="filtro-uva" placeholder="Uva (ex.: Syrah, Aragonez)">
-    <button id="btn-filtrar-vinhos">Filtrar vinhos</button>
-    <div id="resultado-filtros"></div>
-  </section>
-
-  <!-- Wine Bringing: vinho que combina com vinho -->
-  <section id="wine-bringing">
-    <h2>Wine Bringing (vinho que combina com vinho)</h2>
-    <input type="text" id="vinho-base" placeholder="Digite o vinho base">
-    <button id="btn-sugerir-por-vinho">Sugerir vinhos que combinam</button>
-    <div id="vinhos-combinam"></div>
-  </section>
-
-  <!-- Carrinho com as sugestões -->
-  <section id="carrinho">
-    <h2>Carrinho de compras (sugestões vão para cá)</h2>
-    <div id="itens-carrinho"></div>
-    <div id="total-carrinho"></div>
-  </section>
+  <div class="rodape">
+    Mapeamentos vinho → termo, lista padrão e carrinho podem ser adicionados abaixo depois.
+  </div>
 
   <script>
-    // ========= DADOS DE EXEMPLO =========
-    // Depois você pode substituir por vinhos reais vindo de vinhos.json
-    // (código, nome, região, uvas, preço, imagem)
+    // =============================
+    // CONFIGURAÇÃO DO CATALOGO
+    // =============================
+
+    // Por enquanto, alguns vinhos de exemplo.
+    // Depois você gera isto a partir da planilha (ordenando por preço).
     const vinhosCatalogo = [
       {
         cod: "300078",
@@ -167,218 +216,35 @@
       }
     ];
 
-    // Estado simples de carrinho
-    let carrinho = [];
+    const modoBusca = document.getElementById("modoBusca");
+    const termoInput = document.getElementById("termo");
+    const btnBuscar = document.getElementById("btnBuscar");
+    const btnAleatorio = document.getElementById("btnAleatorio");
+    const boxImagem = document.getElementById("boxImagem");
+    const statusImagem = document.getElementById("statusImagem");
+    const listaVinhosEl = document.getElementById("listaVinhos");
 
-    function $(id) {
-      return document.getElementById(id);
+    // =============================
+    // CHAMADAS THEMEALDB
+    // =============================
+
+    // Busca por termo no nome do prato
+    // https://www.themealdb.com/api/json/v1/1/search.php?s=pasta
+    function buscarPorTermo(termo) {
+      const url = "https://www.themealdb.com/api/json/v1/1/search.php?s=" + encodeURIComponent(termo);
+      return fetch(url).then(r => r.json());
     }
 
-    function mostrarSecao(idSecao) {
-      $("sec-entra-vinho").classList.add("hidden");
-      $("sec-entra-receita").classList.add("hidden");
-      if (idSecao) {
-        $(idSecao).classList.remove("hidden");
-      }
+    // Busca por categoria (retorna vários pratos; vamos pegar um aleatório da categoria)
+    // https://www.themealdb.com/api/json/v1/1/filter.php?c=Seafood
+    function buscarPorCategoria(cat) {
+      const url = "https://www.themealdb.com/api/json/v1/1/filter.php?c=" + encodeURIComponent(cat);
+      return fetch(url).then(r => r.json());
     }
 
-    // ENTRA VINHO -> RECEITA
-    $("btn-entra-vinho").addEventListener("click", () => {
-      mostrarSecao("sec-entra-vinho");
-    });
+    // Prato aleatório
+    // https://www.themealdb.com/api/json/v1/1/random.php
+    function buscarAleatorio() {
+      const url = "https://www.themealdb.com/api/json/v1/1/ra
 
-    // ENTRA RECEITA -> VINHO
-    $("btn-entra-receita").addEventListener("click", () => {
-      mostrarSecao("sec-entra-receita");
-    });
-
-    // Buscar vinho pelo nome/código
-    $("btn-buscar-vinho").addEventListener("click", () => {
-      const termo = $("busca-vinho").value.toLowerCase();
-      const resultados = vinhosCatalogo.filter(v =>
-        v.nome.toLowerCase().includes(termo) || v.cod.includes(termo)
-      );
-      renderListaVinhos(resultados, "lista-vinhos", true);
-    });
-
-    // Renderizar lista de vinhos
-    function renderListaVinhos(lista, containerId, permitirSelecionar) {
-      const container = $(containerId);
-      container.innerHTML = "";
-      if (lista.length === 0) {
-        container.innerHTML = "<p>Nenhum vinho encontrado.</p>";
-        return;
-      }
-
-      lista.forEach(vinho => {
-        const div = document.createElement("div");
-        div.innerHTML = `
-          <strong>${vinho.nome}</strong> (${vinho.cod})<br>
-          Região: ${vinho.regiao}<br>
-          Uvas: ${vinho.uvas.join(", ")}<br>
-          Preço: R$ ${vinho.preco.toFixed(2)}<br>
-          ${vinho.imagem ? `<img src="${vinho.imagem}" alt="${vinho.nome}" class="vinho-img">` : ""}
-          <button class="btn-add-carrinho" data-cod="${vinho.cod}">Adicionar ao carrinho</button>
-          ${permitirSelecionar ? `<button class="btn-selecionar-vinho" data-cod="${vinho.cod}">Selecionar para sugerir receitas</button>` : ""}
-        `;
-        container.appendChild(div);
-      });
-
-      container.querySelectorAll(".btn-add-carrinho").forEach(btn => {
-        btn.addEventListener("click", () => {
-          const cod = btn.getAttribute("data-cod");
-          adicionarAoCarrinho(cod);
-        });
-      });
-
-      if (permitirSelecionar) {
-        container.querySelectorAll(".btn-selecionar-vinho").forEach(btn => {
-          btn.addEventListener("click", () => {
-            const cod = btn.getAttribute("data-cod");
-            selecionarVinhoParaReceitas(cod);
-          });
-        });
-      }
-    }
-
-    function adicionarAoCarrinho(cod) {
-      const vinho = vinhosCatalogo.find(v => v.cod === cod);
-      if (!vinho) return;
-      carrinho.push(vinho);
-      renderCarrinho();
-    }
-
-    function renderCarrinho() {
-      const container = $("itens-carrinho");
-      const totalContainer = $("total-carrinho");
-      container.innerHTML = "";
-
-      if (carrinho.length === 0) {
-        container.innerHTML = "<p>Carrinho vazio.</p>";
-        totalContainer.innerHTML = "";
-        return;
-      }
-
-      let total = 0;
-      carrinho.forEach(vinho => {
-        total += vinho.preco;
-        const div = document.createElement("div");
-        div.textContent = `${vinho.nome} - R$ ${vinho.preco.toFixed(2)}`;
-        container.appendChild(div);
-      });
-
-      totalContainer.innerHTML = `<strong>Total: R$ ${total.toFixed(2)}</strong>`;
-    }
-
-    // Selecionar vinho para sugerir receitas (VINHO -> RECEITA)
-    function selecionarVinhoParaReceitas(cod) {
-      const vinho = vinhosCatalogo.find(v => v.cod === cod);
-      if (!vinho) return;
-
-      const container = $("vinhos-selecionados");
-      const div = document.createElement("div");
-      div.textContent = `${vinho.nome} (${vinho.cod})`;
-      container.appendChild(div);
-
-      // EXEMPLO: chamada à API TheMealDB (pode alterar depois)
-      // Aqui estou buscando receitas de "Beef" só para demonstrar.
-      fetch("https://www.themealdb.com/api/json/v1/1/filter.php?c=Beef")
-        .then(res => res.json())
-        .then(data => {
-          renderReceitasSugeridas(data.meals || []);
-        })
-        .catch(() => {
-          $("receitas-sugeridas").innerHTML = "<p>Erro ao buscar receitas na API.</p>";
-        });
-    }
-
-    // Renderizar receitas sugeridas (VINHO -> RECEITA)
-    function renderReceitasSugeridas(receitas) {
-      const container = $("receitas-sugeridas");
-      container.innerHTML = "";
-      if (!receitas || receitas.length === 0) {
-        container.innerHTML = "<p>Nenhuma receita encontrada.</p>";
-        return;
-      }
-
-      receitas.slice(0, 6).forEach(r => {
-        const div = document.createElement("div");
-        div.innerHTML = `
-          <strong>${r.strMeal}</strong><br>
-          ${r.strMealThumb ? `<img src="${r.strMealThumb}" alt="${r.strMeal}" class="receita-img">` : ""}
-        `;
-        container.appendChild(div);
-      });
-    }
-
-    // RECEITA -> VINHO
-    $("btn-buscar-receitas").addEventListener("click", () => {
-      const tipoPrato = document.querySelector("input[name='tipoPrato']:checked");
-      if (!tipoPrato) {
-        alert("Escolha carne, peixe ou vegano.");
-        return;
-      }
-
-      const entrada = $("entrada").value;
-      const principal = $("principal").value;
-      const sobremesa = $("sobremesa").value;
-
-      const container = $("receitas-encontradas");
-      container.innerHTML = `
-        <p>Entrada: ${entrada || "(não informado)"}</p>
-        <p>Prato principal: ${principal || "(não informado)"}</p>
-        <p>Sobremesa: ${sobremesa || "(não informado)"}</p>
-        <p>(Aqui entrarão as receitas reais vindas da API externa com fotos, por tipo de prato.)</p>
-      `;
-
-      const vinhosOrdenados = sugerirVinhosPorTipo(tipoPrato.value);
-      renderListaVinhos(vinhosOrdenados, "vinhos-sugeridos", true);
-    });
-
-    // Sugerir vinhos por tipo de prato (carne, peixe, vegano) e ordenar do menor preço para o maior
-    function sugerirVinhosPorTipo(tipoPrato) {
-      const copia = [...vinhosCatalogo];
-      // Aqui você pode colocar lógica diferente por tipoPrato
-      // Ex.: se peixe -> filtra brancos/rosés; se carne -> tintos etc.
-      copia.sort((a, b) => a.preco - b.preco);
-      return copia;
-    }
-
-    // Filtro por região / país / uva
-    $("btn-filtrar-vinhos").addEventListener("click", () => {
-      const regiao = $("filtro-regiao").value.toLowerCase();
-      const uva = $("filtro-uva").value.toLowerCase();
-
-      const resultados = vinhosCatalogo.filter(v => {
-        const matchRegiao = regiao ? v.regiao.toLowerCase().includes(regiao) : true;
-        const matchUva = uva ? v.uvas.some(u => u.toLowerCase().includes(uva)) : true;
-        return matchRegiao && matchUva;
-      });
-
-      resultados.sort((a, b) => a.preco - b.preco);
-      renderListaVinhos(resultados, "resultado-filtros", true);
-    });
-
-    // Wine Bringing: vinho que combina com vinho
-    $("btn-sugerir-por-vinho").addEventListener("click", () => {
-      const termo = $("vinho-base").value.toLowerCase();
-      const vinhoBase = vinhosCatalogo.find(v =>
-        v.nome.toLowerCase().includes(termo) || v.cod.includes(termo)
-      );
-      if (!vinhoBase) {
-        $("vinhos-combinam").innerHTML = "<p>Vinho base não encontrado.</p>";
-        return;
-      }
-
-      const sugeridos = vinhosCatalogo.filter(v =>
-        v.cod !== vinhoBase.cod &&
-        (v.regiao === vinhoBase.regiao || v.uvas.some(u => vinhoBase.uvas.includes(u)))
-      );
-
-      sugeridos.sort((a, b) => a.preco - b.preco);
-
-      renderListaVinhos(sugeridos, "vinhos-combinam", true);
-    });
-  </script>
-</body>
-</html>
+      
