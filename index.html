@@ -2,36 +2,42 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Uvva – Harmonizador Visual</title>
+  <title>Uvva – Wine Bringing Premium</title>
   <style>
     * { box-sizing: border-box; }
     body {
       margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-      background: radial-gradient(circle at top, #f8f5ff 0, #f4f5f7 45%, #eceff4 100%);
-      color: #1f2933;
+      font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, Arial, sans-serif;
+      background: radial-gradient(circle at top, #2b2233 0, #130f1a 32%, #050509 100%);
+      color: #f9fafb;
     }
     .shell {
-      max-width: 1200px;
+      max-width: 1280px;
       margin: 0 auto;
-      padding: 24px 20px 40px;
+      padding: 26px 20px 40px;
     }
     header {
       display: flex;
       flex-direction: column;
-      gap: 6px;
-      margin-bottom: 18px;
+      gap: 4px;
+      margin-bottom: 20px;
+    }
+    .top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
     }
     .brand {
       font-size: 26px;
       font-weight: 700;
-      letter-spacing: 0.06em;
+      letter-spacing: 0.16em;
       text-transform: uppercase;
-      color: #2f3e5c;
+      color: #f4f4f5;
     }
-    .tagline {
-      font-size: 14px;
-      color: #697386;
+    .brand span {
+      color: #fbbf24;
     }
     .pill {
       display: inline-flex;
@@ -40,9 +46,14 @@
       padding: 4px 10px;
       border-radius: 999px;
       font-size: 11px;
-      background: rgba(255,255,255,0.7);
-      color: #4b5563;
-      border: 1px solid rgba(148,163,184,0.4);
+      background: rgba(24,24,27,0.75);
+      color: #e5e7eb;
+      border: 1px solid rgba(250,204,21,0.35);
+    }
+    .tagline {
+      font-size: 13px;
+      color: #a5b4fc;
+      margin-top: 6px;
     }
     .grid-main {
       display: grid;
@@ -52,22 +63,37 @@
     }
     .grid-bottom {
       display: grid;
-      grid-template-columns: minmax(0, 1fr);
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
       gap: 18px;
     }
-    @media (max-width: 900px) {
-      .grid-main {
+    @media (max-width: 960px) {
+      .grid-main, .grid-bottom {
         grid-template-columns: minmax(0, 1fr);
       }
     }
     .card {
-      background: rgba(255,255,255,0.9);
-      border-radius: 14px;
+      background: radial-gradient(circle at top, #1f1727 0, #111827 40%, #020617 100%);
+      border-radius: 18px;
       padding: 14px 16px 16px;
       box-shadow:
-        0 18px 40px rgba(15, 23, 42, 0.08),
-        0 0 0 1px rgba(148,163,184,0.35);
-      backdrop-filter: blur(8px);
+        0 22px 45px rgba(0,0,0,0.8),
+        0 0 0 1px rgba(148,163,184,0.28);
+      position: relative;
+      overflow: hidden;
+    }
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: -40%;
+      background:
+        radial-gradient(circle at top left, rgba(250,204,21,0.08) 0, transparent 55%),
+        radial-gradient(circle at bottom right, rgba(96,165,250,0.07) 0, transparent 60%);
+      opacity: 0.9;
+      pointer-events: none;
+    }
+    .card-inner {
+      position: relative;
+      z-index: 1;
     }
     .card-header {
       display: flex;
@@ -79,7 +105,7 @@
     .card-title {
       font-size: 16px;
       font-weight: 600;
-      color: #111827;
+      color: #f9fafb;
     }
     .card-sub {
       font-size: 12px;
@@ -87,24 +113,24 @@
     }
     label {
       font-size: 13px;
-      color: #4b5563;
+      color: #e5e7eb;
     }
     select {
       padding: 7px 9px;
       margin: 4px 0 8px;
       width: 100%;
       border-radius: 9px;
-      border: 1px solid #cbd5e1;
-      background: #f9fafb;
+      border: 1px solid rgba(148,163,184,0.7);
+      background: rgba(15,23,42,0.9);
       font-size: 13px;
-      color: #111827;
+      color: #f9fafb;
       outline: none;
       transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
     }
     select:focus {
-      border-color: #6366f1;
-      box-shadow: 0 0 0 1px rgba(99,102,241,0.15);
-      background: #fff;
+      border-color: #fbbf24;
+      box-shadow: 0 0 0 1px rgba(250,204,21,0.5);
+      background: rgba(15,23,42,1);
     }
     button {
       padding: 7px 14px;
@@ -116,25 +142,27 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      transition: background 0.15s, transform 0.05s, box-shadow 0.15s;
+      transition: background 0.15s, transform 0.05s, box-shadow 0.15s, border-color 0.15s;
     }
     button.primary {
-      background: linear-gradient(135deg, #6366f1, #4f46e5);
-      color: #fff;
-      box-shadow: 0 12px 24px rgba(79,70,229,0.22);
+      background: linear-gradient(135deg, #fbbf24, #facc15);
+      color: #111827;
+      box-shadow: 0 16px 35px rgba(250,204,21,0.35);
+      font-weight: 600;
     }
     button.primary:hover {
-      background: linear-gradient(135deg, #4f46e5, #4338ca);
+      background: linear-gradient(135deg, #facc15, #fbbf24);
       transform: translateY(-1px);
-      box-shadow: 0 16px 30px rgba(79,70,229,0.3);
+      box-shadow: 0 20px 40px rgba(250,204,21,0.5);
     }
     button.outline {
-      background: rgba(255,255,255,0.8);
-      color: #374151;
-      border-color: #cbd5e1;
+      background: rgba(15,23,42,0.8);
+      color: #e5e7eb;
+      border-color: rgba(148,163,184,0.7);
     }
     button.outline:hover {
-      background: #f9fafb;
+      border-color: #fbbf24;
+      color: #fbbf24;
     }
     .status {
       font-size: 12px;
@@ -144,10 +172,10 @@
       margin-top: 10px;
       max-height: 260px;
       overflow-y: auto;
-      border-radius: 10px;
+      border-radius: 12px;
       padding: 6px 4px;
-      background: linear-gradient(180deg, #f9fafb 0, #f3f4f6 100%);
-      border: 1px solid #e5e7eb;
+      background: radial-gradient(circle at top, rgba(15,23,42,0.9) 0, rgba(15,23,42,0.95) 40%, rgba(15,23,42,1) 100%);
+      border: 1px solid rgba(55,65,81,0.8);
     }
     .vinho-item {
       display: grid;
@@ -158,10 +186,10 @@
       position: relative;
     }
     .vinho-item:nth-child(odd) {
-      background: rgba(255,255,255,0.9);
+      background: rgba(15,23,42,0.9);
     }
     .vinho-item:nth-child(even) {
-      background: rgba(248,250,252,0.9);
+      background: rgba(17,24,39,0.9);
     }
     .vinho-item::after {
       content: "";
@@ -172,19 +200,19 @@
       pointer-events: none;
     }
     .vinho-item:hover::after {
-      border-color: rgba(129,140,248,0.5);
+      border-color: rgba(250,204,21,0.55);
     }
     .vinho-thumb {
       width: 44px;
       height: 68px;
       border-radius: 7px;
-      background: radial-gradient(circle at top, #e5e7eb, #cbd5e1);
+      background: radial-gradient(circle at top, #f3f4f6, #9ca3af);
       display: flex;
       align-items: center;
       justify-content: center;
       overflow: hidden;
       font-size: 10px;
-      color: #6b7280;
+      color: #111827;
       text-align: center;
       padding: 3px;
     }
@@ -198,18 +226,17 @@
       display: flex;
       flex-direction: column;
       gap: 2px;
-      color: #4b5563;
+      color: #e5e7eb;
     }
     .vinho-nome {
       font-weight: 600;
-      color: #111827;
       font-size: 13px;
     }
     .vinho-meta {
-      color: #6b7280;
+      color: #d1d5db;
     }
     .vinho-preco {
-      color: #16a34a;
+      color: #fbbf24;
       font-weight: 600;
       font-size: 13px;
     }
@@ -218,18 +245,18 @@
       align-items: center;
       padding: 1px 8px;
       border-radius: 999px;
-      background: rgba(79,70,229,0.06);
-      color: #4338ca;
+      background: rgba(250,204,21,0.08);
+      color: #fbbf24;
       font-size: 10px;
-      border: 1px solid rgba(129,140,248,0.35);
+      border: 1px solid rgba(250,204,21,0.5);
       margin-top: 2px;
     }
     .prato-box {
       margin-top: 6px;
-      border-radius: 12px;
+      border-radius: 14px;
       padding: 10px;
-      background: radial-gradient(circle at top, #eef2ff 0, #f9fafb 40%, #f3f4f6 100%);
-      border: 1px solid #e5e7eb;
+      background: radial-gradient(circle at top, rgba(248,250,252,0.05) 0, rgba(15,23,42,0.95) 35%, #020617 100%);
+      border: 1px solid rgba(55,65,81,0.9);
       text-align: center;
       min-height: 210px;
       display: flex;
@@ -240,121 +267,177 @@
     .prato-box img {
       max-width: 100%;
       max-height: 170px;
-      border-radius: 10px;
-      box-shadow: 0 14px 30px rgba(15,23,42,0.35);
+      border-radius: 12px;
+      box-shadow: 0 18px 40px rgba(0,0,0,0.9);
       object-fit: cover;
     }
     .nome-prato {
       font-weight: 600;
       font-size: 14px;
-      color: #111827;
+      color: #f9fafb;
     }
     .prato-meta {
       font-size: 11px;
-      color: #6b7280;
+      color: #d1d5db;
+    }
+    .assinatura-resumo {
+      margin-top: 8px;
+      font-size: 13px;
+      color: #e5e7eb;
+    }
+    .assinatura-total {
+      font-size: 16px;
+      font-weight: 700;
+      color: #facc15;
+      margin-top: 4px;
+    }
+    .badge-mes {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(34,197,94,0.16);
+      border: 1px solid rgba(34,197,94,0.6);
+      color: #bbf7d0;
+      margin-left: 4px;
     }
   </style>
 </head>
 <body>
   <div class="shell">
     <header>
-      <div class="pill">Uvva • Harmonizador visual de vinhos e pratos [file:2]</div>
-      <div class="brand">Wine Bringing Studio</div>
+      <div class="top-row">
+        <div class="brand"><span>Uvva</span> Wine Bringing</div>
+        <div class="pill">Sommelier digital • catálogo próprio [file:2][file:3]</div>
+      </div>
       <div class="tagline">
-        Sugestões inteligentes a partir do seu catálogo próprio, com fotos de rótulos e pratos. [file:3][web:12]
+        Harmonização visual entre rótulos e pratos, com base no seu portfólio; pronto para carrinho e assinatura mensal. [file:2][file:3][web:12]
       </div>
     </header>
 
     <div class="grid-main">
       <!-- 1) ENTRAR COM VINHO → VINHOS -->
       <section class="card">
-        <div class="card-header">
-          <div class="card-title">1. Entrar com vinho → sugerir vinhos</div>
-          <div class="card-sub">Wine Bringing (sommelier + enólogo)</div>
-        </div>
+        <div class="card-inner">
+          <div class="card-header">
+            <div class="card-title">1. Entrar com vinho → sugerir vinhos</div>
+            <div class="card-sub">Wine Bringing (vinho que combina com vinho)</div>
+          </div>
 
-        <label for="selectVinho">Rótulo do catálogo:</label>
-        <select id="selectVinho"></select>
-        <button id="btnVinhoSugestoes" class="primary">
-          Ver sugestões Wine Bringing
-        </button>
+          <label for="selectVinho">Rótulo do catálogo:</label>
+          <select id="selectVinho"></select>
+          <button id="btnVinhoSugestoes" class="primary">
+            Ver sugestões Wine Bringing
+          </button>
 
-        <div class="lista" id="listaWineBringing">
-          <div class="status">Escolha um vinho para ver outros rótulos Uvva que combinam (região, uva, estilo e perfil). [file:2][file:3]</div>
+          <div class="lista" id="listaWineBringing">
+            <div class="status">
+              Escolha um vinho para encontrar outros rótulos Uvva com perfil sensorial semelhante (região, uvas, estilo). [file:2][file:3]
+            </div>
+          </div>
         </div>
       </section>
 
       <!-- 2) RECEITA → VINHO -->
       <section class="card">
-        <div class="card-header">
-          <div class="card-title">2. Entrar com receita → sugerir vinhos</div>
-          <div class="card-sub">TheMealDB + regras de harmonização</div>
-        </div>
+        <div class="card-inner">
+          <div class="card-header">
+            <div class="card-title">2. Entrar com receita → sugerir vinhos</div>
+            <div class="card-sub">TheMealDB + lógica de harmonização</div>
+          </div>
 
-        <label for="selectTipoPrato">Tipo de prato:</label>
-        <select id="selectTipoPrato">
-          <option value="">Selecione...</option>
-          <option value="carne">Carne</option>
-          <option value="peixe">Peixe</option>
-          <option value="vegano">Vegano</option>
-        </select>
+          <label for="selectTipoPrato">Tipo de prato:</label>
+          <select id="selectTipoPrato">
+            <option value="">Selecione...</option>
+            <option value="carne">Carne</option>
+            <option value="peixe">Peixe</option>
+            <option value="vegano">Vegano</option>
+          </select>
 
-        <button id="btnBuscarReceitas" class="primary">
-          Buscar receita e foto (API externa)
-        </button>
+          <button id="btnBuscarReceitas" class="primary">
+            Buscar receita e foto (API externa)
+          </button>
 
-        <div class="status" id="statusReceitas">
-          As receitas são buscadas na TheMealDB apenas para testes visuais; o vinho sempre é do seu catálogo. [web:12][file:3]
-        </div>
+          <div class="status" id="statusReceitas">
+            As receitas vêm da TheMealDB apenas para ilustração; os vinhos sugeridos são do seu catálogo, ordenados por preço. [web:12][file:3]
+          </div>
 
-        <div class="prato-box" id="boxPrato">
-          <div class="status">Nenhum prato carregado ainda.</div>
-        </div>
+          <div class="prato-box" id="boxPrato">
+            <div class="status">Nenhum prato carregado ainda.</div>
+          </div>
 
-        <div class="lista" id="listaVinhosReceita">
-          <div class="status">
-            Ao escolher um tipo de prato, sugerimos vinhos compatíveis com o estilo (corpo, estrutura, acidez), do menor preço para o maior. [file:2][file:3]
+          <div class="lista" id="listaVinhosReceita">
+            <div class="status">
+              Após escolher um tipo de prato, sugerimos vinhos compatíveis (corpo, tanino, acidez) do menor preço para o maior. [file:2][file:3]
+            </div>
           </div>
         </div>
       </section>
     </div>
 
-    <!-- 3) FILTROS REGION / UVA -->
     <div class="grid-bottom">
+      <!-- 3) FILTRO REGIÃO / UVA -->
       <section class="card">
-        <div class="card-header">
-          <div class="card-title">3. Navegar por região / uva</div>
-          <div class="card-sub">Explorar o portfólio Uvva por terroir e casta</div>
-        </div>
-
-        <div style="display:flex; gap:12px; flex-wrap:wrap;">
-          <div style="flex:1; min-width:200px;">
-            <label for="selectRegiao">Região (somente nossas regiões):</label>
-            <select id="selectRegiao">
-              <option value="">Todas as regiões</option>
-            </select>
+        <div class="card-inner">
+          <div class="card-header">
+            <div class="card-title">3. Navegar por região / uva</div>
+            <div class="card-sub">Explorador do portfólio Uvva</div>
           </div>
-          <div style="flex:1; min-width:200px;">
-            <label for="selectUva">Uva (somente nossas uvas):</label>
-            <select id="selectUva">
-              <option value="">Todas as uvas</option>
-            </select>
+
+          <div style="display:flex; gap:12px; flex-wrap:wrap;">
+            <div style="flex:1; min-width:200px;">
+              <label for="selectRegiao">Região (somente nossas regiões):</label>
+              <select id="selectRegiao">
+                <option value="">Todas as regiões</option>
+              </select>
+            </div>
+            <div style="flex:1; min-width:200px;">
+              <label for="selectUva">Uva (somente nossas uvas):</label>
+              <select id="selectUva">
+                <option value="">Todas as uvas</option>
+              </select>
+            </div>
+          </div>
+
+          <button id="btnFiltrar" class="outline">
+            Filtrar vinhos
+          </button>
+
+          <div class="lista" id="listaFiltro">
+            <div class="status">Use a combinação de região + uva para ver famílias de rótulos específicos. [file:3]</div>
           </div>
         </div>
+      </section>
 
-        <button id="btnFiltrar" class="outline">
-          Filtrar vinhos
-        </button>
+      <!-- 4) ASSINATURA MENSAL -->
+      <section class="card">
+        <div class="card-inner">
+          <div class="card-header">
+            <div class="card-title">4. Assinatura mensal sugerida</div>
+            <div class="card-sub">Seleção de vinhos recorrente</div>
+          </div>
 
-        <div class="lista" id="listaFiltro">
-          <div class="status">Use a combinação de região + uva para visualizar rótulos específicos do catálogo. [file:3]</div>
+          <label for="selectAssinaturaBase">Selecione um vinho-base:</label>
+          <select id="selectAssinaturaBase"></select>
+
+          <button id="btnGerarAssinatura" class="primary">
+            Gerar combo de assinatura
+          </button>
+
+          <div class="lista" id="listaAssinatura">
+            <div class="status">
+              Aqui surgirá uma sugestão de combo mensal (3 ou 4 rótulos), somando valores e formando uma assinatura “Wine Club” Uvva. [file:2][file:3]
+            </div>
+          </div>
+
+          <div class="assinatura-resumo" id="assinaturaResumo"></div>
+          <div class="assinatura-total" id="assinaturaTotal"></div>
         </div>
       </section>
     </div>
   </div>
 
   <script>
-    // ========== DADOS EMBUTIDOS (com imagens) ==========
+    // ========== DADOS EMBUTIDOS ==========
     const vinhosCatalogo = [
       {
         cod: "300078",
@@ -430,19 +513,26 @@
       }
     ];
 
-    // ========== INICIALIZAÇÃO ==========
     const selectVinho = document.getElementById('selectVinho');
     const selectRegiao = document.getElementById('selectRegiao');
     const selectUva = document.getElementById('selectUva');
+    const selectTipoPrato = document.getElementById('selectTipoPrato');
+    const selectAssinaturaBase = document.getElementById('selectAssinaturaBase');
 
     function initCombos() {
-      // vinhos
+      // vinhos principais
       selectVinho.innerHTML = '<option value=\"\">Selecione um vinho...</option>';
+      selectAssinaturaBase.innerHTML = '<option value=\"\">Selecione um vinho...</option>';
       vinhosCatalogo.forEach(v => {
-        const opt = document.createElement('option');
-        opt.value = v.cod;
-        opt.textContent = v.nome;
-        selectVinho.appendChild(opt);
+        const opt1 = document.createElement('option');
+        opt1.value = v.cod;
+        opt1.textContent = v.nome;
+        selectVinho.appendChild(opt1);
+
+        const opt2 = document.createElement('option');
+        opt2.value = v.cod;
+        opt2.textContent = v.nome;
+        selectAssinaturaBase.appendChild(opt2);
       });
 
       // regiões e uvas
@@ -452,24 +542,19 @@
         if (v.regiao) regSet.add(v.regiao);
         (v.uvas || []).forEach(u => uvaSet.add(u));
       });
-      const regioes = Array.from(regSet).sort();
-      const uvas = Array.from(uvaSet).sort();
-
-      regioes.forEach(r => {
+      Array.from(regSet).sort().forEach(r => {
         const opt = document.createElement('option');
         opt.value = r;
         opt.textContent = r;
         selectRegiao.appendChild(opt);
       });
-
-      uvas.forEach(u => {
+      Array.from(uvaSet).sort().forEach(u => {
         const opt = document.createElement('option');
         opt.value = u;
         opt.textContent = u;
         selectUva.appendChild(opt);
       });
     }
-
     initCombos();
 
     function criarItemVinho(v) {
@@ -502,7 +587,7 @@
       return item;
     }
 
-    // ========== 1) WINE BRINGING ==========
+    // ===== 1) Wine Bringing =====
     document.getElementById('btnVinhoSugestoes').addEventListener('click', () => {
       const cod = selectVinho.value;
       const container = document.getElementById('listaWineBringing');
@@ -544,9 +629,8 @@
       sugeridos.forEach(v => container.appendChild(criarItemVinho(v)));
     });
 
-    // ========== 2) RECEITA → VINHO ==========
+    // ===== 2) Receita → vinho =====
     const btnBuscarReceitas = document.getElementById('btnBuscarReceitas');
-    const selectTipoPrato = document.getElementById('selectTipoPrato');
     const boxPrato = document.getElementById('boxPrato');
     const listaVinhosReceita = document.getElementById('listaVinhosReceita');
 
@@ -638,7 +722,7 @@
       candidatos.forEach(v => listaVinhosReceita.appendChild(criarItemVinho(v)));
     }
 
-    // ========== 3) FILTRO REGIÃO / UVA ==========
+    // ===== 3) Filtro região / uva =====
     document.getElementById('btnFiltrar').addEventListener('click', () => {
       const reg = selectRegiao.value;
       const uva = selectUva.value;
@@ -659,6 +743,48 @@
       }
 
       lista.forEach(v => container.appendChild(criarItemVinho(v)));
+    });
+
+    // ===== 4) Assinatura mensal =====
+    const btnGerarAssinatura = document.getElementById('btnGerarAssinatura');
+    const listaAssinatura = document.getElementById('listaAssinatura');
+    const assinaturaResumo = document.getElementById('assinaturaResumo');
+    const assinaturaTotal = document.getElementById('assinaturaTotal');
+
+    btnGerarAssinatura.addEventListener('click', () => {
+      const codBase = selectAssinaturaBase.value;
+      if (!codBase) {
+        alert('Escolha um vinho-base para montar a assinatura.');
+        return;
+      }
+      const base = vinhosCatalogo.find(v => v.cod === codBase);
+      if (!base) return;
+
+      // lógica simples: pega até 3 vinhos que combinam (Wine Bringing) + o base
+      const combinam = vinhosCatalogo
+        .filter(v =>
+          v.cod !== base.cod &&
+          (v.regiao === base.regiao ||
+           (v.uvas || []).some(u => (base.uvas || []).includes(u)) ||
+           v.estilo === base.estilo)
+        )
+        .sort((a, b) => a.preco - b.preco)
+        .slice(0, 3);
+
+      const combo = [base, ...combinam];
+      let total = 0;
+      combo.forEach(v => total += v.preco);
+
+      listaAssinatura.innerHTML = '';
+      combo.forEach(v => listaAssinatura.appendChild(criarItemVinho(v)));
+
+      assinaturaResumo.innerHTML =
+        'Assinatura sugerida com ' + combo.length + ' rótulos (1 garrafa de cada). ' +
+        'Pode virar um “Wine Club” mensal com estes códigos: ' + combo.map(v => v.cod).join(', ') + '.';
+
+      assinaturaTotal.innerHTML =
+        'Total estimado por mês: R$ ' + total.toFixed(2) +
+        '<span class="badge-mes">mensal</span>';
     });
   </script>
 </body>
