@@ -158,7 +158,7 @@
       font-size: 13px;
       color: #f9fafb;
       outline: none;
-      transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+      transition: border-color 0.15s, box-shadow 0.15s, background 0.15s, color 0.15s;
     }
 
     select:focus {
@@ -374,7 +374,6 @@
       margin-top: 4px;
     }
 
-    /* Wine Bringing: lista só texto, 3 itens */
     #listaWineBringing {
       max-height: none;
     }
@@ -385,30 +384,28 @@
       font-size: 14px;
     }
 
-    /* Tema claro (modo dia) – bem alto contraste */
+    /* TEMA CLARO (MODO DIA) – TODO TEXTO ESCURO */
     body.light {
       --bg-main: #f9fafb;
       --card-bg: #ffffff;
       --text-main: #111827;
       --card-border: #d1d5db;
-      --status-text: #4b5563;
+      --status-text: #374151;
       --meta-text: #4b5563;
       --pill-bg: #e5e7eb;
-    }
-
-    body.light {
       background: var(--bg-main);
-      color: var(--text-main);
+      color: #111827;
     }
 
     body.light .card {
       background: var(--card-bg);
       box-shadow:
-        0 6px 18px rgba(15,23,42,0.15),
+        0 6px 18px rgba(15,23,42,0.12),
         0 0 0 1px var(--card-border);
     }
 
-    body.light .brand {
+    body.light .brand,
+    body.light .brand span {
       color: #111827;
     }
 
@@ -421,6 +418,10 @@
       color: #111827;
     }
 
+    body.light .status {
+      color: #374151;
+    }
+
     body.light .lista {
       background: #f3f4f6;
       border-color: #e5e7eb;
@@ -431,12 +432,14 @@
       border-color: #e5e7eb;
     }
 
-    body.light .vinho-info {
+    body.light .vinho-info,
+    body.light .vinho-nome,
+    body.light .vinho-meta,
+    body.light .assinatura-titulo,
+    body.light .assinatura-codigos,
+    body.light .prato-meta,
+    body.light .nome-prato {
       color: #111827;
-    }
-
-    body.light .vinho-meta {
-      color: #4b5563;
     }
 
     body.light .vinho-preco {
@@ -461,7 +464,7 @@
     body.light select {
       background: #ffffff;
       color: #111827;
-      border-color: #cbd5f5;
+      border-color: #9ca3af;
     }
 
     body.light button.outline {
@@ -492,7 +495,6 @@
     </header>
 
     <div class="grid-main">
-      <!-- 1) VINHO → VINHOS -->
       <section class="card">
         <div class="card-inner">
           <div class="card-header">
@@ -514,7 +516,6 @@
         </div>
       </section>
 
-      <!-- 2) RECEITA → VINHO -->
       <section class="card">
         <div class="card-inner">
           <div class="card-header">
@@ -552,7 +553,6 @@
     </div>
 
     <div class="grid-bottom">
-      <!-- 3) REGIÃO / UVA -->
       <section class="card">
         <div class="card-inner">
           <div class="card-header">
@@ -585,7 +585,6 @@
         </div>
       </section>
 
-      <!-- 4) ASSINATURA -->
       <section class="card">
         <div class="card-inner">
           <div class="card-header">
@@ -626,70 +625,14 @@
 
   <script>
     const vinhosCatalogo = [
-      {
-        cod: "300078",
-        nome: "PORTA 6 TTO - ARAGONES, CASTELÃO, TOURIGA NACIONAL",
-        regiao: "PORTUGAL - LISBOA",
-        uvas: ["Aragonez", "Castelão", "Touriga Nacional"],
-        preco: 58.70,
-        estilo: "tinto_medio"
-      },
-      {
-        cod: "300093",
-        nome: "PORTA 6 BCO - FERNÃO PIRES, ARINTO, SAUVIGNON BLANC",
-        regiao: "PORTUGAL - LISBOA",
-        uvas: ["Fernão Pires", "Arinto", "Sauvignon Blanc"],
-        preco: 58.70,
-        estilo: "branco_fresco"
-      },
-      {
-        cod: "39",
-        nome: "RESERVA DOS AMIGOS REGIONAL TTO - ARAGONES, CASTELÃO, TINTA MIUDA",
-        regiao: "PORTUGAL - LISBOA",
-        uvas: ["Aragonez", "Castelão", "Tinta Miuda"],
-        preco: 52.68,
-        estilo: "tinto_medio"
-      },
-      {
-        cod: "83",
-        nome: "RESERVA DOS AMIGOS MAGNUM TTO - ARAGONES, CASTELÃO, TINTA MIUDA",
-        regiao: "PORTUGAL - LISBOA",
-        uvas: ["Aragonez", "Castelão", "Tinta Miuda"],
-        preco: 84.67,
-        estilo: "tinto_estruturado"
-      },
-      {
-        cod: "3000160",
-        nome: "VINHO VERDE PORTA 6 DOC - LOUREIRO, TRAJADURA, ARINTO",
-        regiao: "PORTUGAL - VERDE",
-        uvas: ["Loureiro", "Trajadura", "Arinto"],
-        preco: 58.70,
-        estilo: "branco_fresco"
-      },
-      {
-        cod: "3000444",
-        nome: "PESCADA BRANCO, DOC VERDE - AZAL, TRAJADURA, LOUREIRO, ARINTO",
-        regiao: "PORTUGAL - VERDE",
-        uvas: ["Azal", "Trajadura", "Loureiro", "Arinto"],
-        preco: 37.82,
-        estilo: "branco_fresco"
-      },
-      {
-        cod: "445",
-        nome: "PESCADA - ARINTO E TRAJADURA",
-        regiao: "PORTUGAL - VERDE",
-        uvas: ["Arinto", "Trajadura"],
-        preco: 75.64,
-        estilo: "branco_fresco"
-      },
-      {
-        cod: "446",
-        nome: "PESCADA - 100% ALVARINHO",
-        regiao: "PORTUGAL - VERDE",
-        uvas: ["Alvarinho"],
-        preco: 135.84,
-        estilo: "branco_estruturado"
-      }
+      { cod: "300078", nome: "PORTA 6 TTO - ARAGONES, CASTELÃO, TOURIGA NACIONAL", regiao: "PORTUGAL - LISBOA", uvas: ["Aragonez","Castelão","Touriga Nacional"], preco: 58.70, estilo: "tinto_medio" },
+      { cod: "300093", nome: "PORTA 6 BCO - FERNÃO PIRES, ARINTO, SAUVIGNON BLANC", regiao: "PORTUGAL - LISBOA", uvas: ["Fernão Pires","Arinto","Sauvignon Blanc"], preco: 58.70, estilo: "branco_fresco" },
+      { cod: "39", nome: "RESERVA DOS AMIGOS REGIONAL TTO - ARAGONES, CASTELÃO, TINTA MIUDA", regiao: "PORTUGAL - LISBOA", uvas: ["Aragonez","Castelão","Tinta Miuda"], preco: 52.68, estilo: "tinto_medio" },
+      { cod: "83", nome: "RESERVA DOS AMIGOS MAGNUM TTO - ARAGONES, CASTELÃO, TINTA MIUDA", regiao: "PORTUGAL - LISBOA", uvas: ["Aragonez","Castelão","Tinta Miuda"], preco: 84.67, estilo: "tinto_estruturado" },
+      { cod: "3000160", nome: "VINHO VERDE PORTA 6 DOC - LOUREIRO, TRAJADURA, ARINTO", regiao: "PORTUGAL - VERDE", uvas: ["Loureiro","Trajadura","Arinto"], preco: 58.70, estilo: "branco_fresco" },
+      { cod: "3000444", nome: "PESCADA BRANCO, DOC VERDE - AZAL, TRAJADURA, LOUREIRO, ARINTO", regiao: "PORTUGAL - VERDE", uvas: ["Azal","Trajadura","Loureiro","Arinto"], preco: 37.82, estilo: "branco_fresco" },
+      { cod: "445", nome: "PESCADA - ARINTO E TRAJADURA", regiao: "PORTUGAL - VERDE", uvas: ["Arinto","Trajadura"], preco: 75.64, estilo: "branco_fresco" },
+      { cod: "446", nome: "PESCADA - 100% ALVARINHO", regiao: "PORTUGAL - VERDE", uvas: ["Alvarinho"], preco: 135.84, estilo: "branco_estruturado" }
     ];
 
     const selectVinho = document.getElementById('selectVinho');
@@ -753,7 +696,6 @@
     function criarItemVinho(v) {
       const item = document.createElement('div');
       item.className = 'vinho-item';
-
       const info = document.createElement('div');
       info.className = 'vinho-info';
       info.innerHTML = `
@@ -762,7 +704,6 @@
         <div class="vinho-meta">Uvas: ${(v.uvas || []).join(', ')}</div>
         <div class="vinho-preco">R$ ${v.preco.toFixed(2)}</div>
       `;
-
       item.appendChild(info);
       return item;
     }
@@ -791,8 +732,7 @@
         return;
       }
 
-      let sugeridos = sugerirVinhosWineBringing(base);
-      sugeridos = sugeridos.slice(0, 3);
+      let sugeridos = sugerirVinhosWineBringing(base).slice(0, 3);
 
       listaWineBringing.innerHTML = '';
       const topo = document.createElement('div');
@@ -858,15 +798,12 @@
         boxPrato.innerHTML = '<div class="status">Nenhum prato encontrado.</div>';
         return;
       }
-
       const nome = document.createElement('div');
       nome.className = 'nome-prato';
       nome.textContent = meal.strMeal;
-
       const leg = document.createElement('div');
       leg.className = 'prato-meta';
       leg.textContent = (meal.strArea || '') + (meal.strCategory ? ' · ' + meal.strCategory : '');
-
       boxPrato.appendChild(nome);
       boxPrato.appendChild(leg);
     }
